@@ -29,9 +29,9 @@ type resolver struct{}
 
 func (resolver) Resolve(_ context.Context, q normalize.Query) (normalize.Resolution, error) {
 	if q.EventType == "tcp_state" {
-		return normalize.Resolution{Scope: normalize.Include, MetadataStatus: "test-socket"}, nil
+		return normalize.Resolution{Scope: normalize.Include, MetadataStatus: normalize.MetadataTupleScoped}, nil
 	}
-	return normalize.Resolution{Scope: normalize.Include, MetadataStatus: "test-resolved", ContainerID: q0Cid, PodUID: q0PodUID}, nil
+	return normalize.Resolution{Scope: normalize.Include, MetadataStatus: normalize.MetadataResolved, ContainerID: q0Cid, PodUID: q0PodUID}, nil
 }
 
 // q0Events turns the real Q0 Tetragon export into KernelEvent NDJSON with the
