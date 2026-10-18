@@ -12,4 +12,3 @@ BeaverDam Community 4Q Project
 
 ![Agentarium Overall Architecture Diagram](docs/architecture.svg)
 
-Documents are maintained in Markdown source. This is the target design as of 2026-10-11; new GCP features are planned for implementation and functional testing has not been run.
