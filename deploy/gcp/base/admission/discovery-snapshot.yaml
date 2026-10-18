@@ -1,0 +1,283 @@
+# Discovery snapshot Job and Pod shape (TASK-02 3.4, TASK-06 3.1/3.3).
+# SPEC-DELTA (discovery-snapshot-shape): TASK-01 3.2 does not list these
+# policies; they close the ServiceAccount choice that Job create allows.
+# The discovery KSA may create Jobs in agent-observe (deploy/gcp/base/rbac/
+# discovery.yaml). agent-role-contract only binds label == serviceAccountName
+# and an image from the whole agent-observe list, so without this policy a
+# discovery-created Job could run as any agent-observe ServiceAccount, with any
+# listed image, command or volume. These policies pin every Job created by
+# discovery, and every Pod that runs as discovery-snapshot, to the snapshot
+# scanner shape: the discovery-snapshot KSA without an API token, the pinned
+# snapshot image with its default entrypoint, the fixed TASK-02 argument
+# layout for the environment's discovery bucket, and only the emptyDir work
+# volume. PSS restricted and agent-role-contract still apply to the Pods. The
+# Job API adds job-name/controller-uid template labels before validation, so
+# only the app.kubernetes.io/name label is pinned.
+#
+# RENDER NOTE:
+#   ${DISCOVERY_SNAPSHOT_IMAGE}  digest reference of tools/discovery-snapshot;
+#                                must also be in AGENT_OBSERVE_IMAGES
+#   ${DISCOVERY_BUCKET}          lock storage.discovery_bucket
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: discovery-snapshot-constraints
+  namespace: agent-control
+data:
+  image: "${DISCOVERY_SNAPSHOT_IMAGE}"
+  bucket: "${DISCOVERY_BUCKET}"
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: discovery-snapshot-job
+spec:
+  failurePolicy: Fail
+  paramKind:
+    apiVersion: v1
+    kind: ConfigMap
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [batch]
+        apiVersions: ["v1"]
+        operations: [CREATE, UPDATE]
+        resources: [jobs]
+  matchConditions:
+    - name: discovery-or-snapshot-identity
+      expression: >-
+        request.userInfo.username == 'system:serviceaccount:agent-observe:discovery' ||
+        object.spec.template.spec.serviceAccountName == 'discovery-snapshot'
+  variables:
+    - name: s
+      expression: object.spec.template.spec
+  validations:
+    - expression: >-
+        has(object.spec.template.metadata.labels) &&
+        'app.kubernetes.io/name' in object.spec.template.metadata.labels &&
+        object.spec.template.metadata.labels['app.kubernetes.io/name'] == 'discovery-snapshot'
+      message: SNAPSHOT_LABEL_INVALID
+    # A manual selector could adopt unrelated Pods in agent-observe.
+    - expression: >-
+        !has(object.spec.manualSelector) || !object.spec.manualSelector
+      message: SNAPSHOT_SELECTOR_INVALID
+    - expression: >-
+        variables.s.serviceAccountName == 'discovery-snapshot' &&
+        has(variables.s.automountServiceAccountToken) && variables.s.automountServiceAccountToken == false
+      message: SNAPSHOT_IDENTITY_INVALID
+    - expression: >-
+        (!has(variables.s.initContainers) || variables.s.initContainers.size() == 0) &&
+        (!has(variables.s.ephemeralContainers) || variables.s.ephemeralContainers.size() == 0) &&
+        variables.s.containers.size() == 1 && variables.s.containers[0].name == 'scanner' &&
+        variables.s.containers[0].image == params.data.image && params.data.image.contains('@sha256:')
+      message: SNAPSHOT_IMAGE_INVALID
+    - expression: >-
+        !has(variables.s.containers[0].command) &&
+        (!has(variables.s.containers[0].env) || variables.s.containers[0].env.size() == 0) &&
+        (!has(variables.s.containers[0].envFrom) || variables.s.containers[0].envFrom.size() == 0) &&
+        has(variables.s.containers[0].args) && variables.s.containers[0].args.size() == 14 &&
+        variables.s.containers[0].args[0] == '--language' &&
+        variables.s.containers[0].args[1] in ['go', 'python'] &&
+        variables.s.containers[0].args[2] == '--source-uri' &&
+        variables.s.containers[0].args[3].matches('^gs://[a-z0-9._-]+/sources/[0-9a-f]{64}[.](tar[.]gz|tgz|tar|zip|whl)$') &&
+        variables.s.containers[0].args[3].startsWith('gs://' + params.data.bucket + '/sources/' + variables.s.containers[0].args[5] + '.') &&
+        variables.s.containers[0].args[4] == '--source-digest' &&
+        variables.s.containers[0].args[5].matches('^[0-9a-f]{64}$') &&
+        variables.s.containers[0].args[6] == '--library' &&
+        variables.s.containers[0].args[7].matches('^[A-Za-z0-9][A-Za-z0-9._/@+-]{0,199}$') &&
+        variables.s.containers[0].args[8] == '--library-version' &&
+        variables.s.containers[0].args[9].matches('^[A-Za-z0-9][A-Za-z0-9._+-]{0,99}$') &&
+        variables.s.containers[0].args[10] == '--out-root' &&
+        variables.s.containers[0].args[11] == 'gs://' + params.data.bucket &&
+        variables.s.containers[0].args[12] == '--work-dir' &&
+        variables.s.containers[0].args[13] == '/work'
+      message: SNAPSHOT_ARGS_INVALID
+    # Container fields are an allowlist: CEL cannot list a typed object's keys,
+    # so every other core/v1 Container field is required to be absent. Probes
+    # and lifecycle hooks are exec paths; stdin/tty, workingDir, ports,
+    # resizePolicy and a container restartPolicy are not needed by the scanner.
+    # Allowed: name, image, args, resources, volumeMounts, securityContext and
+    # the API-defaulted imagePullPolicy and termination message fields.
+    - expression: >-
+        variables.s.containers.all(c,
+          !has(c.lifecycle) && !has(c.livenessProbe) && !has(c.readinessProbe) && !has(c.startupProbe) &&
+          !has(c.workingDir) && !has(c.ports) && !has(c.resizePolicy) && !has(c.restartPolicy) &&
+          (!has(c.stdin) || !c.stdin) && (!has(c.stdinOnce) || !c.stdinOnce) && (!has(c.tty) || !c.tty) &&
+          (!has(c.terminationMessagePath) || c.terminationMessagePath == '/dev/termination-log') &&
+          (!has(c.terminationMessagePolicy) || c.terminationMessagePolicy == 'File'))
+      message: SNAPSHOT_CONTAINER_FIELDS_INVALID
+    # Container securityContext is pinned to the restricted profile the service
+    # sets; no other field (privileged, runAsUser, seccomp/AppArmor/SELinux,
+    # procMount, added capabilities) may override the Pod settings.
+    - expression: >-
+        variables.s.containers.all(c,
+          has(c.securityContext) &&
+          has(c.securityContext.readOnlyRootFilesystem) && c.securityContext.readOnlyRootFilesystem &&
+          has(c.securityContext.allowPrivilegeEscalation) && !c.securityContext.allowPrivilegeEscalation &&
+          has(c.securityContext.capabilities) && !has(c.securityContext.capabilities.add) &&
+          has(c.securityContext.capabilities.drop) && c.securityContext.capabilities.drop == ['ALL'] &&
+          !has(c.securityContext.privileged) && !has(c.securityContext.runAsUser) &&
+          !has(c.securityContext.runAsGroup) && !has(c.securityContext.runAsNonRoot) &&
+          !has(c.securityContext.seccompProfile) && !has(c.securityContext.appArmorProfile) &&
+          !has(c.securityContext.seLinuxOptions) && !has(c.securityContext.windowsOptions) &&
+          !has(c.securityContext.procMount))
+      message: SNAPSHOT_SECURITY_CONTEXT_INVALID
+    - expression: >-
+        (!has(variables.s.serviceAccount) || variables.s.serviceAccount == 'discovery-snapshot') &&
+        (!has(variables.s.shareProcessNamespace) || !variables.s.shareProcessNamespace)
+      message: SNAPSHOT_POD_INVALID
+    - expression: >-
+        has(variables.s.volumes) && variables.s.volumes.size() == 1 &&
+        variables.s.volumes[0].name == 'work' && has(variables.s.volumes[0].emptyDir) &&
+        has(variables.s.containers[0].volumeMounts) && variables.s.containers[0].volumeMounts.size() == 1 &&
+        variables.s.containers[0].volumeMounts[0].name == 'work' &&
+        variables.s.containers[0].volumeMounts[0].mountPath == '/work' &&
+        !has(variables.s.containers[0].volumeMounts[0].subPath) &&
+        !has(variables.s.containers[0].volumeMounts[0].subPathExpr) &&
+        (!has(variables.s.containers[0].volumeDevices) || variables.s.containers[0].volumeDevices.size() == 0)
+      message: SNAPSHOT_VOLUMES_INVALID
+    - expression: >-
+        (!has(variables.s.hostNetwork) || !variables.s.hostNetwork) &&
+        (!has(variables.s.hostPID) || !variables.s.hostPID) &&
+        (!has(variables.s.hostIPC) || !variables.s.hostIPC) &&
+        variables.s.restartPolicy == 'Never'
+      message: SNAPSHOT_POD_INVALID
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: discovery-snapshot-job
+spec:
+  policyName: discovery-snapshot-job
+  validationActions: [Deny]
+  paramRef:
+    name: discovery-snapshot-constraints
+    namespace: agent-control
+    parameterNotFoundAction: Deny
+  matchResources:
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values: [agent-observe]
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: discovery-snapshot-pod
+spec:
+  failurePolicy: Fail
+  paramKind:
+    apiVersion: v1
+    kind: ConfigMap
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: [CREATE]
+        resources: [pods]
+  matchConditions:
+    - name: snapshot-identity
+      expression: object.spec.serviceAccountName == 'discovery-snapshot'
+  variables:
+    - name: s
+      expression: object.spec
+  validations:
+    - expression: >-
+        variables.s.serviceAccountName == 'discovery-snapshot' &&
+        has(variables.s.automountServiceAccountToken) && variables.s.automountServiceAccountToken == false
+      message: SNAPSHOT_IDENTITY_INVALID
+    - expression: >-
+        (!has(variables.s.initContainers) || variables.s.initContainers.size() == 0) &&
+        (!has(variables.s.ephemeralContainers) || variables.s.ephemeralContainers.size() == 0) &&
+        variables.s.containers.size() == 1 && variables.s.containers[0].name == 'scanner' &&
+        variables.s.containers[0].image == params.data.image && params.data.image.contains('@sha256:')
+      message: SNAPSHOT_IMAGE_INVALID
+    - expression: >-
+        !has(variables.s.containers[0].command) &&
+        (!has(variables.s.containers[0].env) || variables.s.containers[0].env.size() == 0) &&
+        (!has(variables.s.containers[0].envFrom) || variables.s.containers[0].envFrom.size() == 0) &&
+        has(variables.s.containers[0].args) && variables.s.containers[0].args.size() == 14 &&
+        variables.s.containers[0].args[0] == '--language' &&
+        variables.s.containers[0].args[1] in ['go', 'python'] &&
+        variables.s.containers[0].args[2] == '--source-uri' &&
+        variables.s.containers[0].args[3].matches('^gs://[a-z0-9._-]+/sources/[0-9a-f]{64}[.](tar[.]gz|tgz|tar|zip|whl)$') &&
+        variables.s.containers[0].args[3].startsWith('gs://' + params.data.bucket + '/sources/' + variables.s.containers[0].args[5] + '.') &&
+        variables.s.containers[0].args[4] == '--source-digest' &&
+        variables.s.containers[0].args[5].matches('^[0-9a-f]{64}$') &&
+        variables.s.containers[0].args[6] == '--library' &&
+        variables.s.containers[0].args[7].matches('^[A-Za-z0-9][A-Za-z0-9._/@+-]{0,199}$') &&
+        variables.s.containers[0].args[8] == '--library-version' &&
+        variables.s.containers[0].args[9].matches('^[A-Za-z0-9][A-Za-z0-9._+-]{0,99}$') &&
+        variables.s.containers[0].args[10] == '--out-root' &&
+        variables.s.containers[0].args[11] == 'gs://' + params.data.bucket &&
+        variables.s.containers[0].args[12] == '--work-dir' &&
+        variables.s.containers[0].args[13] == '/work'
+      message: SNAPSHOT_ARGS_INVALID
+    # Container fields are an allowlist: CEL cannot list a typed object's keys,
+    # so every other core/v1 Container field is required to be absent. Probes
+    # and lifecycle hooks are exec paths; stdin/tty, workingDir, ports,
+    # resizePolicy and a container restartPolicy are not needed by the scanner.
+    # Allowed: name, image, args, resources, volumeMounts, securityContext and
+    # the API-defaulted imagePullPolicy and termination message fields.
+    - expression: >-
+        variables.s.containers.all(c,
+          !has(c.lifecycle) && !has(c.livenessProbe) && !has(c.readinessProbe) && !has(c.startupProbe) &&
+          !has(c.workingDir) && !has(c.ports) && !has(c.resizePolicy) && !has(c.restartPolicy) &&
+          (!has(c.stdin) || !c.stdin) && (!has(c.stdinOnce) || !c.stdinOnce) && (!has(c.tty) || !c.tty) &&
+          (!has(c.terminationMessagePath) || c.terminationMessagePath == '/dev/termination-log') &&
+          (!has(c.terminationMessagePolicy) || c.terminationMessagePolicy == 'File'))
+      message: SNAPSHOT_CONTAINER_FIELDS_INVALID
+    # Container securityContext is pinned to the restricted profile the service
+    # sets; no other field (privileged, runAsUser, seccomp/AppArmor/SELinux,
+    # procMount, added capabilities) may override the Pod settings.
+    - expression: >-
+        variables.s.containers.all(c,
+          has(c.securityContext) &&
+          has(c.securityContext.readOnlyRootFilesystem) && c.securityContext.readOnlyRootFilesystem &&
+          has(c.securityContext.allowPrivilegeEscalation) && !c.securityContext.allowPrivilegeEscalation &&
+          has(c.securityContext.capabilities) && !has(c.securityContext.capabilities.add) &&
+          has(c.securityContext.capabilities.drop) && c.securityContext.capabilities.drop == ['ALL'] &&
+          !has(c.securityContext.privileged) && !has(c.securityContext.runAsUser) &&
+          !has(c.securityContext.runAsGroup) && !has(c.securityContext.runAsNonRoot) &&
+          !has(c.securityContext.seccompProfile) && !has(c.securityContext.appArmorProfile) &&
+          !has(c.securityContext.seLinuxOptions) && !has(c.securityContext.windowsOptions) &&
+          !has(c.securityContext.procMount))
+      message: SNAPSHOT_SECURITY_CONTEXT_INVALID
+    - expression: >-
+        (!has(variables.s.serviceAccount) || variables.s.serviceAccount == 'discovery-snapshot') &&
+        (!has(variables.s.shareProcessNamespace) || !variables.s.shareProcessNamespace)
+      message: SNAPSHOT_POD_INVALID
+    - expression: >-
+        has(variables.s.volumes) && variables.s.volumes.size() == 1 &&
+        variables.s.volumes[0].name == 'work' && has(variables.s.volumes[0].emptyDir) &&
+        has(variables.s.containers[0].volumeMounts) && variables.s.containers[0].volumeMounts.size() == 1 &&
+        variables.s.containers[0].volumeMounts[0].name == 'work' &&
+        variables.s.containers[0].volumeMounts[0].mountPath == '/work' &&
+        !has(variables.s.containers[0].volumeMounts[0].subPath) &&
+        !has(variables.s.containers[0].volumeMounts[0].subPathExpr) &&
+        (!has(variables.s.containers[0].volumeDevices) || variables.s.containers[0].volumeDevices.size() == 0)
+      message: SNAPSHOT_VOLUMES_INVALID
+    - expression: >-
+        (!has(variables.s.hostNetwork) || !variables.s.hostNetwork) &&
+        (!has(variables.s.hostPID) || !variables.s.hostPID) &&
+        (!has(variables.s.hostIPC) || !variables.s.hostIPC) &&
+        variables.s.restartPolicy == 'Never'
+      message: SNAPSHOT_POD_INVALID
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: discovery-snapshot-pod
+spec:
+  policyName: discovery-snapshot-pod
+  validationActions: [Deny]
+  paramRef:
+    name: discovery-snapshot-constraints
+    namespace: agent-control
+    parameterNotFoundAction: Deny
+  matchResources:
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values: [agent-observe]

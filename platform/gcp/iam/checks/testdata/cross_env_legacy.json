@@ -1,0 +1,12 @@
+{
+  "bindings": [
+    {
+      "members": [
+        "serviceAccount:example-regression.svc.id.goog[agent-release/regression-runner]"
+      ],
+      "role": "roles/iam.workloadIdentityUser"
+    }
+  ],
+  "etag": "BwYAAAAAAAA=",
+  "version": 1
+}

@@ -1,0 +1,21 @@
+-- TASK-04: make gateway_app a member of gateway_reader.
+--
+-- COMMON "read access to other Task tables" gives the gateway's cross-Task SELECT to
+-- gateway_reader (TASK-04). The owning Tasks' migrations grant it
+-- health.holds and health.control_health_leases (20261016132231
+-- health_control_health) and release.active_policy and desired_bundle
+-- (20261018092000), while 20261017075445_identity_gateway_reads and
+-- 20261017075446_release_gateway_reads grant the TASK-03, TASK-05 and
+-- desired_bundle reads to gateway_app directly. The gateway login is a member
+-- of gateway_app (TASK-16), so without this membership it cannot read holds
+-- or leases, and every decision fails closed with 503
+-- CONTROL_HEALTH_UNAVAILABLE.
+--
+-- INHERIT (the default) so that gateway_app uses the reader's privileges
+-- directly, as coordinator_app does with coordinator_reader
+-- (20261016212952). Only SELECT is reachable through it; no write grant is
+-- added. Missing roles fail the migration: both exist after
+-- 20261016132231 and 20261016181826. The installer needs ADMIN OPTION on
+-- gateway_reader (the role's creator has it; CREATEROLE alone does not on
+-- PostgreSQL 16+ for a role created by someone else).
+GRANT gateway_reader TO gateway_app;

@@ -1,0 +1,13 @@
+{"row": "runtime.process", "run": "run2", "observed": "process_exec 31 (30 children + container start), process_exit 31", "outcome": "supported"}
+{"row": "runtime.tcp_connect", "run": "run2", "observed": "matched 30/30 (run1 30/30); connect daddr {'10.30.0.10:53': 30} (the ClusterIP, before DNAT); 18 distinct sock cookies for 30 connects (pointer reuse)", "outcome": "supported"}
+{"row": "runtime.tcp_state", "run": "run1", "observed": "default deny list: ESTABLISHED 10/30, CLOSE 6/30 (sock_ptr+tuple+time join); attribution {'agent-sensors': 13, 'gmp-system': 1, 'agent-exec': 2}", "outcome": "unsupported_with_default_config"}
+{"row": "runtime.tcp_state", "run": "run2", "observed": "deny list without \"\": ESTABLISHED 29/30, CLOSE 25/30 (sock_ptr+tuple+time join); attribution {'(empty)': 48, 'agent-sensors': 6}; the missing ones were attributed to kube-system (confirmed in 20261015-task01-q0-min-2)", "outcome": "partial"}
+{"row": "runtime.file_open_allowed", "run": "run2", "observed": "security_file_open 31 (30 opens + 1 create), path /work/protected-fixture, return 0", "outcome": "supported"}
+{"row": "runtime.file_open_attempt", "run": "run2", "observed": "__x64_sys_openat 61 = 31 fd returns + 30 returns -13; Tetragon warns 'syscall return type is not long int' for returnArg int but loads the policy", "outcome": "supported"}
+{"row": "runtime.file_open_attempt.openat2", "run": "run2", "observed": "not exercised: the Go stimulus uses openat; no sys_openat2 events", "outcome": "not_run"}
+{"row": "runtime.process_ns", "run": "run2", "observed": "process.ns has uts, ipc, mnt, pid, pid_for_children, net, time, time_for_children, cgroup, user", "outcome": "supported"}
+{"row": "netpol.node_file", "run": "netpol", "observed": "3 allow records (policies[] present), 2 deny records (count aggregation: [6, 3]) for 3 denied attempts; file -rwxr-xr-x root; src/dest have namespace, pod_name, pod_namespace but not the documented workload_name/workload_kind", "outcome": "partial"}
+{"row": "netpol.rotation", "run": "netpol", "observed": "policy_action.log rotation limit not measured", "outcome": "not_run"}
+{"row": "netpol.delivery_delay", "run": "netpol", "observed": "delay from connection to node file / Cloud Logging not measured", "outcome": "not_run"}
+{"row": "netpol.aggregate_timestamp", "run": "netpol", "observed": "which timestamp an aggregated deny record carries (first or last packet) not measured", "outcome": "not_run"}
+{"row": "netpol.drop_counter", "run": "netpol", "observed": "anetd policy_logging drop counters not read", "outcome": "not_run"}

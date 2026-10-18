@@ -1,0 +1,12 @@
+{
+  "bindings": [
+    {
+      "members": [
+        "group:agentarium-operators@example.com"
+      ],
+      "role": "roles/storage.objectViewer",
+      "extra": true
+    }
+  ],
+  "version": 1
+}

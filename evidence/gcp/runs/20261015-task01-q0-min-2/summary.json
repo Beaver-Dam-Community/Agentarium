@@ -1,0 +1,34 @@
+{
+  "task_id": "TASK-01",
+  "status": "incomplete",
+  "implementation_commit": "6d01fe8511df41d9dfd2ed3154e50006ce3d1c07",
+  "image_digest": null,
+  "environment_manifest": "manifest.json",
+  "policy_bundle_id": null,
+  "policy_epoch": null,
+  "run_id": "20261015-task01-q0-min-2",
+  "run_kind": "q0_min_observation",
+  "fixture_set_digest": "272dc2123f41e41ebaa5b86b2e2044359a2e24acd6fdb76af5d31049890c1d8c",
+  "baseline_bundle_digest": null,
+  "candidate_digest": null,
+  "expected_cases": 5,
+  "observed_cases": 5,
+  "passed": 4,
+  "failed": 0,
+  "unknown": 1,
+  "metrics": null,
+  "invariants": null,
+  "release_eligible": null,
+  "startup_capture": null,
+  "evidence_refs": [
+    "expected.json",
+    "observed.jsonl",
+    "report.md",
+    "raw/"
+  ],
+  "limitations": [
+    "one exec node, one repetition; no event-loss or load measurement",
+    "health_check-only deny list also exports host and kube-system events; volume not measured",
+    "returnArg warning cause not identified"
+  ]
+}

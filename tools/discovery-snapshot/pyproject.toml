@@ -1,0 +1,12 @@
+[project]
+name = "agentarium-discovery-snapshot"
+version = "0.1.0"
+description = "Python ast call-site scanner used by the discovery snapshot Job (TASK-02)"
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[dependency-groups]
+dev = ["pytest>=8.3"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

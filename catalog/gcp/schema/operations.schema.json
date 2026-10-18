@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "operations.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["catalog_version", "operations"],
+  "properties": {
+    "catalog_version": {"type": "string"},
+    "operations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation_id", "endpoint_id", "service_id", "adapter_id", "transport", "method", "route_id",
+          "route_template", "effect_type", "disclosure", "credential_binding", "limits", "retry_policy",
+          "idempotency_support", "evidence_strategy", "evidence_level_max", "evidence_deadline_seconds",
+          "intent_check_on_standing_rule", "response_data_class", "redact_fields",
+          "response_limit_bytes", "description", "schema_version", "owner"
+        ],
+        "properties": {
+          "operation_id": {"type": "string", "pattern": "^[a-z0-9]+(\\.[a-z0-9_]+)+$"},
+          "endpoint_id": {"type": "string"},
+          "service_id": {"type": "string"},
+          "adapter_id": {"enum": ["kubernetes-reader", "receiver-sender", "model", "evidence-reader"]},
+          "transport": {"enum": ["https_rest"]},
+          "method": {"enum": ["GET", "POST"]},
+          "route_id": {"type": "string"},
+          "route_template": {"type": "string", "pattern": "^/"},
+          "effect_type": {"enum": ["read", "external_send", "model_disclosure"]},
+          "disclosure": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind"],
+            "properties": {"kind": {"enum": ["none", "payload_fields", "message_sources"]}}
+          },
+          "credential_binding": {"type": ["string", "null"]},
+          "limits": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["max"],
+              "properties": {
+                "min": {"type": "integer"},
+                "max": {"type": "integer"},
+                "fixed": {"type": "integer"}
+              }
+            }
+          },
+          "retry_policy": {"enum": ["none"]},
+          "idempotency_support": {"enum": ["none", "idempotency_key"]},
+          "evidence_strategy": {"enum": ["response_only", "receiver_receipt", "provider_response"]},
+          "evidence_level_max": {"enum": ["accepted", "effect_verified"]},
+          "evidence_deadline_seconds": {"type": "integer", "minimum": 0, "maximum": 300},
+          "intent_check_on_standing_rule": {"type": "boolean"},
+          "model_profiles": {
+            "type": "array",
+            "items": {"enum": ["agent", "policy_proposal", "intent_check", "discovery"]}
+          },
+          "response_data_class": {"enum": ["none", "synthetic", "internal", "confidential", "inherit"]},
+          "redact_fields": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^(/([^/~]|~[01])*)*$"}
+          },
+          "response_limit_bytes": {"type": "integer", "minimum": 1, "maximum": 1048576},
+          "content_checks": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "fields": {"type": "array", "items": {"type": "string"}},
+              "email_pattern": {"type": "boolean"},
+              "synthetic_identifiers": {"type": "array", "items": {"type": "string"}}
+            }
+          },
+          "description": {"type": "string", "maxLength": 512},
+          "schema_version": {"type": "string"},
+          "owner": {"type": "string"}
+        }
+      }
+    }
+  }
+}

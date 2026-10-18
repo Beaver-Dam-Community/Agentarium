@@ -1,0 +1,14 @@
+{
+  "bindings": [
+    {
+      "members": [
+        "principal://iam.googleapis.com/projects/111111111111/locations/global/workloadIdentityPools/example-prod.svc.id.goog/subject/ns/agent-exec/sa/agent-runtime"
+      ],
+      "members": [
+        "group:agentarium-operators@example.com"
+      ],
+      "role": "roles/storage.objectViewer"
+    }
+  ],
+  "version": 1
+}

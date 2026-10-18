@@ -1,0 +1,24 @@
+{
+  "adapter_constraints": {
+    "model": {"max_request_bytes": 65536, "max_response_bytes": 65536, "allowed_route_ids": []}
+  },
+  "receiver": {"allowed_disclosure_fields": ["summary"]},
+  "sensor_rules": {},
+  "service_profiles": {
+    "activation_probe": {"operation_ids": ["receiver.submit"], "model_profiles": [], "target_ids": ["receiver-probe"]}
+  },
+  "standing_rules": {
+    "standing.k8s_read.v1": {
+      "standing_rule_id": "standing.k8s_read.v1", "session_kind": "user", "profile": null,
+      "operation_ids": ["k8s.pods.list", "k8s.events.list", "k8s.pods.logs"],
+      "target_pattern": "k8s-agent-targets", "limits": {"limit": 100, "tailLines": 200, "limitBytes": 65536},
+      "data_profile": "synthetic", "session_budget": 100
+    },
+    "probe.activation.v1": {
+      "standing_rule_id": "probe.activation.v1", "session_kind": "service", "profile": "activation_probe",
+      "operation_ids": ["receiver.submit"], "target_pattern": "receiver-probe",
+      "disclosure_fields": ["summary"], "limits": {"request_bytes": 4096},
+      "data_profile": "synthetic", "session_budget": 4
+    }
+  }
+}

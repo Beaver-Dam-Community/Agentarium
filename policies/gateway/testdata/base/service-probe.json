@@ -1,0 +1,24 @@
+{
+  "envelope": {"schema_version": "v1", "action_id": "8c1e0000-0000-4000-8000-000000000003", "session_kind": "service", "session_id": "5e5e0000-0000-4000-8000-000000000001",
+    "authenticated_actor": "service:agent-release/releaser", "workload_id": null, "endpoint_id": "test-receiver-v1",
+    "operation_id": "receiver.submit", "canonical_target": {"target_id": "receiver-probe", "route_id": "submissions-v1"},
+    "environment": "test", "tenant": "hackathon", "disclosure_fields": ["summary"], "data_class": "synthetic",
+    "data_sources": [], "content_digest": "7777777777777777777777777777777777777777777777777777777777777777", "content_ref": "7777777777777777777777777777777777777777777777777777777777777777", "bytes": 40,
+    "limits": {"request_bytes": 40}, "catalog_digest": "@CATALOG_DIGEST@", "catalog_version": "test-2026-10-11",
+    "canonicalization_version": "v1", "raw_body_digest": "8888888888888888888888888888888888888888888888888888888888888888", "action_digest": "9999999999999999999999999999999999999999999999999999999999999999"},
+  "verified_session": {"kind": "service", "session_id": "5e5e0000-0000-4000-8000-000000000001", "authenticated_actor": "service:agent-release/releaser",
+    "tenant": "hackathon", "state": "active", "expires_at": "2026-10-11T12:05:00Z", "allowed_operation_ids": [],
+    "service_scope": {"profile": "activation_probe", "issue_id": null, "candidate_id": null, "change_id": "c0000000-0000-4000-8000-000000000001", "snapshot_id": null, "action_id": null}},
+  "approval_snapshot": null,
+  "workload_data_state": {"data_class_high_water": "none", "data_sources": []},
+  "control_health": {"evaluated_at": "2026-10-11T12:00:00Z", "active_artifact_digest": "@ARTIFACT_DIGEST@",
+    "active_holds": [{"hold_id": "h0000000-0000-4000-8000-000000000001", "scope": "global", "scope_id": "*", "reason": "policy_activation"}],
+    "required_leases": [
+      {"component": "coordinator", "observed_state": "healthy", "lease_until": "2026-10-11T12:00:12Z", "active_version": null},
+      {"component": "audit-db", "observed_state": "healthy", "lease_until": "2026-10-11T12:00:12Z", "active_version": null},
+      {"component": "adapter", "observed_state": "healthy", "lease_until": "2026-10-11T12:00:11Z", "active_version": "@ARTIFACT_DIGEST@"},
+      {"component": "destination-evidence", "observed_state": "healthy", "lease_until": "2026-10-11T12:00:10Z", "active_version": null}],
+    "activation_probe": {"activation_probe_id": "p0000000-0000-4000-8000-000000000001", "change_id": "c0000000-0000-4000-8000-000000000001",
+      "service_session_id": "5e5e0000-0000-4000-8000-000000000001", "action_id": "8c1e0000-0000-4000-8000-000000000003",
+      "target_epoch": 8, "expires_at": "2026-10-11T12:02:00Z"}}
+}

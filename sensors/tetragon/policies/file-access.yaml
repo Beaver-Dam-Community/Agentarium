@@ -1,0 +1,52 @@
+# Copied verbatim from docs/tech-specs/TASK-09-node-sensor.md 3.2.
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicyNamespaced
+metadata:
+  name: agentarium-protected-file
+  namespace: agent-exec
+spec:
+  kprobes:
+    - call: security_file_open     # only opens that passed the permission check are visible
+      syscall: false
+      return: true
+      args:
+        - index: 0
+          type: file
+      returnArg:
+        index: 0
+        type: int
+      selectors:
+        - matchArgs:
+            - index: 0
+              operator: Equal
+              values: ["/work/protected-fixture"]
+    - call: sys_openat             # includes denied attempts; uses the path string the user passed
+      syscall: true
+      return: true
+      args:
+        - index: 1
+          type: string
+        - index: 2
+          type: int
+      returnArg:
+        index: 0
+        type: int
+      selectors:
+        - matchArgs:
+            - index: 1
+              operator: Equal
+              values: ["/work/protected-fixture"]
+    - call: sys_openat2
+      syscall: true
+      return: true
+      args:
+        - index: 1
+          type: string
+      returnArg:
+        index: 0
+        type: int
+      selectors:
+        - matchArgs:
+            - index: 1
+              operator: Equal
+              values: ["/work/protected-fixture"]

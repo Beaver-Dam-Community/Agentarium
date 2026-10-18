@@ -1,0 +1,45 @@
+-- name: Events :many
+-- Risk candidates of one node: connects, protected-path opens and execs, with
+-- the unique historical Pod of the event's container (NULL when ambiguous).
+SELECT k.source_event_id,k.event_type,k.boot_id,coalesce(k.container_id,'')::text AS container_id,
+ coalesce(k.process_exec_id,'')::text AS process_exec_id,coalesce(k.parent_exec_id,'')::text AS parent_exec_id,k.source_time,
+ coalesce(host(k.daddr),'')::text AS daddr,k.dport,coalesce(k.safe_attributes->>'path','')::text AS path,(CASE WHEN jsonb_typeof(k.safe_attributes->'flags')='number' AND (k.safe_attributes->>'flags') ~ '^[0-9]{1,18}$'
+  THEN (k.safe_attributes->>'flags')::bigint ELSE -1 END)::bigint AS flags,
+ coalesce((SELECT CASE WHEN count(DISTINCT li.pod_uid)=1 THEN min(li.pod_uid::text) END FROM correlation.lifecycle_intervals li
+   WHERE li.node_uid=k.node_uid AND li.boot_id=k.boot_id AND li.container_id=k.container_id AND li.started_at<=k.source_time
+   AND (li.ended_at>k.source_time OR (li.ended_at IS NULL AND li.end_quality='open'))),'')::text AS pod_uid,
+ EXISTS (SELECT 1 FROM audit.kernel_events s WHERE k.event_type='tcp_connect' AND s.event_type='tcp_state' AND s.tcp_new_state=1
+   AND s.node_uid=k.node_uid AND s.boot_id=k.boot_id AND s.sock_ptr=k.sock_ptr AND s.saddr=k.saddr AND s.sport=k.sport
+   AND s.daddr=k.daddr AND s.dport=k.dport AND s.source_time>=k.source_time) AS established,
+ EXISTS (SELECT 1 FROM correlation.correlations c WHERE c.kernel_event_id=k.source_event_id AND c.confidence='confirmed'
+   AND c.revision=(SELECT max(c2.revision) FROM correlation.correlations c2 WHERE c2.kernel_event_id=k.source_event_id)) AS confirmed
+FROM audit.kernel_events k
+WHERE k.node_uid=sqlc.arg(node_uid)::uuid AND k.event_type IN ('tcp_connect','file_open','openat','process_exec')
+AND k.source_time>=sqlc.arg(from_time)::timestamptz AND k.source_time<sqlc.arg(to_time)::timestamptz
+ORDER BY k.source_time,k.source_event_id;
+
+-- name: Execs :many
+-- Execs of the node from the earliest start of a container live in the range
+-- (parents of in-range execs) up to the range end.
+SELECT boot_id,coalesce(container_id,'')::text AS container_id,process_exec_id::text AS process_exec_id,
+ coalesce(parent_exec_id,'')::text AS parent_exec_id,source_time
+FROM audit.kernel_events
+WHERE node_uid=sqlc.arg(node_uid)::uuid AND event_type='process_exec' AND process_exec_id IS NOT NULL
+AND source_time>=sqlc.arg(from_time)::timestamptz AND source_time<sqlc.arg(to_time)::timestamptz
+ORDER BY source_time,source_event_id;
+
+-- name: Starts :many
+-- Containers of the node live in the range, with their lifecycle start and
+-- the earliest observed exec of the container. The start process is that
+-- exec only when it lies at the lifecycle start (checked by the caller).
+SELECT DISTINCT ON (li.boot_id,li.container_id) li.boot_id,li.container_id,li.started_at,
+ coalesce((SELECT k.process_exec_id FROM audit.kernel_events k WHERE k.node_uid=li.node_uid AND k.boot_id=li.boot_id
+   AND k.container_id=li.container_id AND k.event_type='process_exec' AND k.process_exec_id IS NOT NULL
+   ORDER BY k.source_time,k.source_event_id LIMIT 1),'')::text AS first_exec,
+ (SELECT k.source_time FROM audit.kernel_events k WHERE k.node_uid=li.node_uid AND k.boot_id=li.boot_id
+   AND k.container_id=li.container_id AND k.event_type='process_exec' AND k.process_exec_id IS NOT NULL
+   ORDER BY k.source_time,k.source_event_id LIMIT 1)::timestamptz AS first_exec_at
+FROM correlation.lifecycle_intervals li
+WHERE li.node_uid=sqlc.arg(node_uid)::uuid AND li.started_at IS NOT NULL AND li.started_at<sqlc.arg(to_time)::timestamptz
+AND (li.ended_at IS NULL OR li.ended_at>sqlc.arg(from_time)::timestamptz)
+ORDER BY li.boot_id,li.container_id,li.mapping_version DESC;

@@ -1,0 +1,12 @@
+{
+  "bindings": [
+    {
+      "members": [
+        "principalSet://iam.googleapis.com/projects/111111111111/locations/global/workloadIdentityPools/example-prod.svc.id.goog/kubernetes.cluster/https://container.googleapis.com/v1/projects/example-prod/locations/us-central1/clusters/agentarium-prod"
+      ],
+      "role": "roles/storage.objectViewer"
+    }
+  ],
+  "etag": "BwYAAAAAAAA=",
+  "version": 1
+}

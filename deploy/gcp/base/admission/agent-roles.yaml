@@ -1,0 +1,116 @@
+# Control-side role Namespaces admission policy.
+# Source: docs/tech-specs/TASK-01-gke-platform.md 3.2 (agent-role-contract).
+# Policy and binding copied verbatim from the spec.
+# Params: ConfigMap agent-control/agent-role-constraints (constraints.yaml).
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: agent-role-contract
+spec:
+  failurePolicy: Fail
+  paramKind:
+    apiVersion: v1
+    kind: ConfigMap
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: [CREATE, UPDATE]
+        resources: [pods, pods/ephemeralcontainers]
+  variables:
+    - name: allowedImages
+      expression: params.data[request.namespace + '.images'].split(',')
+  validations:
+    - expression: >-
+        has(object.spec.nodeSelector) &&
+        'node-restriction.kubernetes.io/agentarium-role' in object.spec.nodeSelector &&
+        object.spec.nodeSelector['node-restriction.kubernetes.io/agentarium-role'] == 'control' &&
+        (!has(object.spec.nodeName) || object.spec.nodeName == '') &&
+        object.spec.schedulerName == 'default-scheduler'
+      message: ROLE_PLACEMENT_INVALID
+    - expression: >-
+        object.spec.containers.all(c, c.image.contains('@sha256:') && c.image in variables.allowedImages) &&
+        (!has(object.spec.initContainers) ||
+          object.spec.initContainers.all(c, c.image.contains('@sha256:') && c.image in variables.allowedImages))
+      message: ROLE_IMAGE_NOT_ALLOWED
+    - expression: >-
+        !has(object.spec.ephemeralContainers) || object.spec.ephemeralContainers.size() == 0
+      message: ROLE_EPHEMERAL_FORBIDDEN
+    - expression: >-
+        has(object.metadata.labels) &&
+        'app.kubernetes.io/name' in object.metadata.labels &&
+        object.metadata.labels['app.kubernetes.io/name'] == object.spec.serviceAccountName &&
+        (!has(object.spec.priorityClassName) || object.spec.priorityClassName != 'agentarium-runtime')
+      message: ROLE_LABEL_OR_PRIORITY_INVALID
+    - expression: >-
+        request.namespace != 'agent-adapters' ||
+        object.spec.serviceAccountName == 'probe-runner' ||
+        !has(object.spec.tolerations) ||
+        object.spec.tolerations.all(t, !has(t.key) || t.key != 'agentarium.io/observe-not-ready')
+      message: ROLE_ADAPTER_BOOTSTRAP_TOLERATION_FORBIDDEN
+    - expression: >-
+        !has(object.spec.runtimeClassName) &&
+        (!has(object.metadata.annotations) ||
+          params.data.forbiddenAnnotationKeys.split(',').all(k, !(k in object.metadata.annotations)))
+      message: ROLE_RUNTIME_INVALID
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: agent-role-contract
+spec:
+  policyName: agent-role-contract
+  validationActions: [Deny]
+  paramRef:
+    name: agent-role-constraints
+    namespace: agent-control
+    parameterNotFoundAction: Deny
+  matchResources:
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values: [agent-control, agent-adapters, agent-observe, agent-release, agent-targets]
+---
+# SPEC-DELTA (agent-role-status-metadata): agent-role-contract and
+# agent-sensors-contract match only pods and pods/ephemeralcontainers. A
+# pods/status UPDATE keeps metadata changes, so a principal with pods/status
+# could relabel a Pod to another app.kubernetes.io/name (another KSA identity
+# and NetworkPolicy podSelector, TASK-06) or add an annotation without any
+# policy evaluating it. This policy gives the role and sensors Namespaces the
+# same rule agent-exec-profile applies in agent-exec: on pods/status, labels
+# and annotations must equal oldObject's. It reads no params, so kubelet status
+# updates of Pods admitted under an earlier image list are not affected.
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: agent-role-status-metadata
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: [UPDATE]
+        resources: [pods/status]
+  validations:
+    - expression: >-
+        (has(object.metadata.labels) ? object.metadata.labels : {}) ==
+          (has(oldObject.metadata.labels) ? oldObject.metadata.labels : {}) &&
+        (has(object.metadata.annotations) ? object.metadata.annotations : {}) ==
+          (has(oldObject.metadata.annotations) ? oldObject.metadata.annotations : {})
+      message: ROLE_STATUS_METADATA_IMMUTABLE
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: agent-role-status-metadata
+spec:
+  policyName: agent-role-status-metadata
+  validationActions: [Deny]
+  matchResources:
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values: [agent-control, agent-adapters, agent-observe, agent-release, agent-targets, agent-sensors]

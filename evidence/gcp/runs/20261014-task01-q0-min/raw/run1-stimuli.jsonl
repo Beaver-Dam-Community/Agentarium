@@ -1,0 +1,122 @@
+{"kind":"start","seq":0,"time":"2026-10-14T13:16:14.322855223Z","pid":1,"ok":true}
+{"kind":"process","seq":0,"time":"2026-10-14T13:16:14.327030605Z","pid":11,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":1,"time":"2026-10-14T13:16:14.330449745Z","pid":15,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":2,"time":"2026-10-14T13:16:14.333511136Z","pid":19,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":3,"time":"2026-10-14T13:16:14.3364063Z","pid":23,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":4,"time":"2026-10-14T13:16:14.338893323Z","pid":27,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":5,"time":"2026-10-14T13:16:14.425383824Z","pid":31,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":6,"time":"2026-10-14T13:16:14.428513792Z","pid":35,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":7,"time":"2026-10-14T13:16:14.431095694Z","pid":39,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":8,"time":"2026-10-14T13:16:14.43392301Z","pid":43,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":9,"time":"2026-10-14T13:16:14.436559743Z","pid":47,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":10,"time":"2026-10-14T13:16:14.439010717Z","pid":51,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":11,"time":"2026-10-14T13:16:14.524007966Z","pid":55,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":12,"time":"2026-10-14T13:16:14.527002468Z","pid":59,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":13,"time":"2026-10-14T13:16:14.530068007Z","pid":63,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":14,"time":"2026-10-14T13:16:14.5326551Z","pid":67,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":15,"time":"2026-10-14T13:16:14.535353573Z","pid":71,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":16,"time":"2026-10-14T13:16:14.537974747Z","pid":75,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":17,"time":"2026-10-14T13:16:14.625414886Z","pid":79,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":18,"time":"2026-10-14T13:16:14.628002256Z","pid":83,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":19,"time":"2026-10-14T13:16:14.631065506Z","pid":87,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":20,"time":"2026-10-14T13:16:14.633951022Z","pid":91,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":21,"time":"2026-10-14T13:16:14.636750486Z","pid":95,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":22,"time":"2026-10-14T13:16:14.639458714Z","pid":99,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":23,"time":"2026-10-14T13:16:14.724945765Z","pid":103,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":24,"time":"2026-10-14T13:16:14.727708239Z","pid":107,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":25,"time":"2026-10-14T13:16:14.730386322Z","pid":111,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":26,"time":"2026-10-14T13:16:14.732918542Z","pid":115,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":27,"time":"2026-10-14T13:16:14.735778056Z","pid":119,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":28,"time":"2026-10-14T13:16:14.738367105Z","pid":123,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":29,"time":"2026-10-14T13:16:14.8244329Z","pid":127,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"tcp","seq":0,"time":"2026-10-14T13:16:14.826695958Z","local":"10.20.1.4:60266","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":1,"time":"2026-10-14T13:16:14.879709345Z","local":"10.20.1.4:60272","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":2,"time":"2026-10-14T13:16:14.931097423Z","local":"10.20.1.4:60284","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":3,"time":"2026-10-14T13:16:14.982457086Z","local":"10.20.1.4:60292","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":4,"time":"2026-10-14T13:16:15.033958987Z","local":"10.20.1.4:60294","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":5,"time":"2026-10-14T13:16:15.08529426Z","local":"10.20.1.4:60298","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":6,"time":"2026-10-14T13:16:15.136587602Z","local":"10.20.1.4:60306","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":7,"time":"2026-10-14T13:16:15.187881434Z","local":"10.20.1.4:60310","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":8,"time":"2026-10-14T13:16:15.239297241Z","local":"10.20.1.4:60322","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":9,"time":"2026-10-14T13:16:15.29078653Z","local":"10.20.1.4:60330","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":10,"time":"2026-10-14T13:16:15.34239457Z","local":"10.20.1.4:60336","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":11,"time":"2026-10-14T13:16:15.393715345Z","local":"10.20.1.4:60338","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":12,"time":"2026-10-14T13:16:15.444850967Z","local":"10.20.1.4:60344","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":13,"time":"2026-10-14T13:16:15.496316843Z","local":"10.20.1.4:60360","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":14,"time":"2026-10-14T13:16:15.547561129Z","local":"10.20.1.4:60366","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":15,"time":"2026-10-14T13:16:15.598808962Z","local":"10.20.1.4:60380","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":16,"time":"2026-10-14T13:16:15.650430508Z","local":"10.20.1.4:60388","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":17,"time":"2026-10-14T13:16:15.701712623Z","local":"10.20.1.4:60396","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":18,"time":"2026-10-14T13:16:15.753052496Z","local":"10.20.1.4:60398","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":19,"time":"2026-10-14T13:16:15.804321829Z","local":"10.20.1.4:60408","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":20,"time":"2026-10-14T13:16:15.855450711Z","local":"10.20.1.4:60424","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":21,"time":"2026-10-14T13:16:15.907010139Z","local":"10.20.1.4:60434","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":22,"time":"2026-10-14T13:16:15.958332391Z","local":"10.20.1.4:60450","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":23,"time":"2026-10-14T13:16:16.009768076Z","local":"10.20.1.4:60454","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":24,"time":"2026-10-14T13:16:16.061435878Z","local":"10.20.1.4:60466","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":25,"time":"2026-10-14T13:16:16.11284458Z","local":"10.20.1.4:60468","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":26,"time":"2026-10-14T13:16:16.164246746Z","local":"10.20.1.4:60476","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":27,"time":"2026-10-14T13:16:16.21574899Z","local":"10.20.1.4:60488","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":28,"time":"2026-10-14T13:16:16.266912984Z","local":"10.20.1.4:60492","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":29,"time":"2026-10-14T13:16:16.318312836Z","local":"10.20.1.4:60502","remote":"10.30.0.10:53","ok":true}
+{"kind":"file_open_allowed","seq":0,"time":"2026-10-14T13:16:16.36897152Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":1,"time":"2026-10-14T13:16:16.369065056Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":2,"time":"2026-10-14T13:16:16.369102573Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":3,"time":"2026-10-14T13:16:16.369160872Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":4,"time":"2026-10-14T13:16:16.369200053Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":5,"time":"2026-10-14T13:16:16.369260861Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":6,"time":"2026-10-14T13:16:16.369292472Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":7,"time":"2026-10-14T13:16:16.369336189Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":8,"time":"2026-10-14T13:16:16.369368148Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":9,"time":"2026-10-14T13:16:16.369398956Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":10,"time":"2026-10-14T13:16:16.369432411Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":11,"time":"2026-10-14T13:16:16.369462581Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":12,"time":"2026-10-14T13:16:16.369494141Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":13,"time":"2026-10-14T13:16:16.36952434Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":14,"time":"2026-10-14T13:16:16.369551769Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":15,"time":"2026-10-14T13:16:16.369582005Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":16,"time":"2026-10-14T13:16:16.36961288Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":17,"time":"2026-10-14T13:16:16.369640978Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":18,"time":"2026-10-14T13:16:16.369699175Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":19,"time":"2026-10-14T13:16:16.369743985Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":20,"time":"2026-10-14T13:16:16.369882081Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":21,"time":"2026-10-14T13:16:16.369998423Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":22,"time":"2026-10-14T13:16:16.370092543Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":23,"time":"2026-10-14T13:16:16.370168438Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":24,"time":"2026-10-14T13:16:16.370253946Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":25,"time":"2026-10-14T13:16:16.370508394Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":26,"time":"2026-10-14T13:16:16.370612968Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":27,"time":"2026-10-14T13:16:16.37072545Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":28,"time":"2026-10-14T13:16:16.370815379Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":29,"time":"2026-10-14T13:16:16.370878204Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_denied","seq":0,"time":"2026-10-14T13:16:16.370973706Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":1,"time":"2026-10-14T13:16:16.371062439Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":2,"time":"2026-10-14T13:16:16.371083068Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":3,"time":"2026-10-14T13:16:16.371098341Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":4,"time":"2026-10-14T13:16:16.371112648Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":5,"time":"2026-10-14T13:16:16.371126413Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":6,"time":"2026-10-14T13:16:16.371139785Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":7,"time":"2026-10-14T13:16:16.371153105Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":8,"time":"2026-10-14T13:16:16.371166183Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":9,"time":"2026-10-14T13:16:16.371180039Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":10,"time":"2026-10-14T13:16:16.371230519Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":11,"time":"2026-10-14T13:16:16.371248555Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":12,"time":"2026-10-14T13:16:16.371262756Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":13,"time":"2026-10-14T13:16:16.371276569Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":14,"time":"2026-10-14T13:16:16.371290631Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":15,"time":"2026-10-14T13:16:16.371304495Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":16,"time":"2026-10-14T13:16:16.371328929Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":17,"time":"2026-10-14T13:16:16.371342879Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":18,"time":"2026-10-14T13:16:16.371356996Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":19,"time":"2026-10-14T13:16:16.371370308Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":20,"time":"2026-10-14T13:16:16.371384754Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":21,"time":"2026-10-14T13:16:16.371398968Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":22,"time":"2026-10-14T13:16:16.371413389Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":23,"time":"2026-10-14T13:16:16.371429433Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":24,"time":"2026-10-14T13:16:16.371444191Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":25,"time":"2026-10-14T13:16:16.371457374Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":26,"time":"2026-10-14T13:16:16.371511656Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":27,"time":"2026-10-14T13:16:16.371527072Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":28,"time":"2026-10-14T13:16:16.371541088Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":29,"time":"2026-10-14T13:16:16.371555798Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"done","seq":0,"time":"2026-10-14T13:16:16.371560888Z","ok":true}

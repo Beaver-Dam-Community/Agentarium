@@ -1,0 +1,104 @@
+# drift-probe read-only access for baseline digests.
+# Source: docs/tech-specs/TASK-01-gke-platform.md 4 ("drift probe permissions" and the
+# baseline_kind table). KSA drift-probe (agent-observe) is owned by TASK-06.
+# get/list only; no secrets, no write verbs. GKE node pool settings are read
+# through the GCP API (container.clusters.get custom role, TASK-06 IAM table).
+# SPEC-QUESTION: the spec does not name these RBAC objects; they are named
+# after the KSA.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: drift-probe
+rules:
+  - apiGroups: [admissionregistration.k8s.io]
+    resources: [validatingadmissionpolicies, validatingadmissionpolicybindings]
+    verbs: [get, list]
+  - apiGroups: [rbac.authorization.k8s.io]
+    resources: [roles, rolebindings, clusterroles, clusterrolebindings]
+    verbs: [get, list]
+  - apiGroups: [networking.k8s.io]
+    resources: [networkpolicies]
+    verbs: [get, list]
+  - apiGroups: [networking.gke.io]
+    resources: [networkloggings]
+    verbs: [get, list]
+  - apiGroups: [cilium.io]
+    resources: [tracingpolicies, tracingpoliciesnamespaced]
+    verbs: [get, list]
+  - apiGroups: [""]
+    resources: [nodes, namespaces]
+    verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: drift-probe
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: drift-probe
+subjects:
+  - kind: ServiceAccount
+    name: drift-probe
+    namespace: agent-observe
+---
+# ConfigMap reads are limited by resourceNames to the two constraints
+# ConfigMaps in agent-control. A namespaced Role is used so the resourceNames
+# grant does not extend to same-named ConfigMaps in other Namespaces.
+# SPEC-QUESTION: "ConfigMap read" names no verbs; only get is granted, since
+# list cannot be narrowed by resourceNames without a field selector.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: drift-probe
+  namespace: agent-control
+rules:
+  - apiGroups: [""]
+    resources: [configmaps]
+    resourceNames: [agent-exec-constraints, agent-role-constraints]
+    verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: drift-probe
+  namespace: agent-control
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: drift-probe
+subjects:
+  - kind: ServiceAccount
+    name: drift-probe
+    namespace: agent-observe
+---
+# sensor_policy baseline reads: only the named sensor ConfigMap and DaemonSet,
+# in agent-sensors. These named GET grants do not permit collection LIST/WATCH.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: drift-probe
+  namespace: agent-sensors
+rules:
+  - apiGroups: [""]
+    resources: [configmaps]
+    resourceNames: [tetragon-config]
+    verbs: [get]
+  - apiGroups: [apps]
+    resources: [daemonsets]
+    resourceNames: [tetragon]
+    verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: drift-probe
+  namespace: agent-sensors
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: drift-probe
+subjects:
+  - kind: ServiceAccount
+    name: drift-probe
+    namespace: agent-observe

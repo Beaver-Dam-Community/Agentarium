@@ -1,0 +1,25 @@
+{
+  "envelope": {"schema_version": "v1", "action_id": "8c1e0000-0000-4000-8000-000000000001", "session_kind": "user", "session_id": "51ab0000-0000-4000-8000-000000000001",
+    "authenticated_actor": "user:alice@example.com", "workload_id": "agent-runtime-0", "endpoint_id": "test-receiver-v1",
+    "operation_id": "receiver.submit", "canonical_target": {"target_id": "receiver-primary", "route_id": "submissions-v1"},
+    "environment": "test", "tenant": "hackathon", "disclosure_fields": ["summary"], "data_class": "synthetic",
+    "data_sources": ["fixture:receiver-safe-v1"], "content_digest": "1111111111111111111111111111111111111111111111111111111111111111", "content_ref": "1111111111111111111111111111111111111111111111111111111111111111", "bytes": 23,
+    "limits": {}, "catalog_digest": "@CATALOG_DIGEST@", "catalog_version": "test-2026-10-11",
+    "canonicalization_version": "v1", "raw_body_digest": "2222222222222222222222222222222222222222222222222222222222222222", "action_digest": "3333333333333333333333333333333333333333333333333333333333333333"},
+  "verified_session": {"kind": "user", "session_id": "51ab0000-0000-4000-8000-000000000001", "authenticated_actor": "user:alice@example.com",
+    "tenant": "hackathon", "workload_id": "agent-runtime-0", "state": "claimed", "expires_at": "2026-10-11T12:30:00Z",
+    "allowed_operation_ids": ["k8s.pods.list", "k8s.pods.logs", "receiver.submit", "model.generate"], "service_scope": null},
+  "approval_snapshot": {"approval_id": "a9000000-0000-4000-8000-000000000001", "action_id": "8c1e0000-0000-4000-8000-000000000001", "revision": 1, "approval_kind": "action", "session_id": "51ab0000-0000-4000-8000-000000000001",
+    "authenticated_actor": "user:alice@example.com", "allowed_operation": "receiver.submit",
+    "canonical_target": {"target_id": "receiver-primary", "route_id": "submissions-v1"}, "disclosure_fields": ["summary"],
+    "content_digest": "1111111111111111111111111111111111111111111111111111111111111111", "max_actions": 1, "used_actions": 0, "policy_epoch": 7,
+    "expires_at": "2026-10-11T12:10:00Z", "revoked_at": null},
+  "workload_data_state": {"data_class_high_water": "synthetic", "data_sources": ["fixture:receiver-safe-v1"]},
+  "control_health": {"evaluated_at": "2026-10-11T12:00:00Z", "active_artifact_digest": "@ARTIFACT_DIGEST@",
+    "active_holds": [],
+    "required_leases": [
+      {"component": "coordinator", "observed_state": "healthy", "lease_until": "2026-10-11T12:00:12Z", "active_version": null},
+      {"component": "audit-db", "observed_state": "healthy", "lease_until": "2026-10-11T12:00:12Z", "active_version": null},
+      {"component": "adapter", "observed_state": "healthy", "lease_until": "2026-10-11T12:00:11Z", "active_version": "@ARTIFACT_DIGEST@"},
+      {"component": "destination-evidence", "observed_state": "healthy", "lease_until": "2026-10-11T12:00:10Z", "active_version": null}]}
+}

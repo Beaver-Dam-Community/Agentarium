@@ -1,0 +1,33 @@
+{
+  "bindings": [
+    {
+      "members": [
+        "principal://iam.googleapis.com/projects/111111111111/locations/global/workloadIdentityPools/example-prod.svc.id.goog/subject/ns/agent-control/sa/policy-gateway",
+        "principal://iam.googleapis.com/projects/111111111111/locations/global/workloadIdentityPools/example-prod.svc.id.goog/subject/ns/agent-adapters/sa/kubernetes-reader"
+      ],
+      "role": "roles/storage.objectViewer"
+    },
+    {
+      "members": [
+        "serviceAccount:example-prod.svc.id.goog[agent-control/coordinator]"
+      ],
+      "role": "roles/iam.workloadIdentityUser"
+    },
+    {
+      "members": [
+        "principalSet://iam.googleapis.com/projects/111111111111/locations/global/workloadIdentityPools/example-prod.svc.id.goog/namespace/agent-observe",
+        "serviceAccount:agentarium-gke-nodes@example-prod.iam.gserviceaccount.com",
+        "serviceAccount:regression-runner@example-regression.iam.gserviceaccount.com",
+        "group:agentarium-operators@example.com",
+        "principal://iam.googleapis.com/locations/global/workforcePools/corp/subject/alice"
+      ],
+      "role": "roles/artifactregistry.reader",
+      "condition": {
+        "title": "prod cluster only",
+        "expression": "request.time < timestamp('2027-01-01T00:00:00Z')"
+      }
+    }
+  ],
+  "etag": "BwYAAAAAAAA=",
+  "version": 3
+}

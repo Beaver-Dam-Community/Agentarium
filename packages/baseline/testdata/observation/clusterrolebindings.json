@@ -1,0 +1,90 @@
+{
+  "apiVersion": "rbac.authorization.k8s.io/v1",
+  "kind": "ClusterRoleBindingList",
+  "metadata": {
+    "resourceVersion": "999"
+  },
+  "items": [
+    {
+      "metadata": {
+        "name": "system:basic-user",
+        "resourceVersion": "123",
+        "uid": "0f6c7b8e-0000-4000-8000-000000000001",
+        "creationTimestamp": "2026-10-01T00:00:00Z",
+        "generation": 3,
+        "managedFields": [
+          {
+            "manager": "kubectl",
+            "operation": "Apply"
+          }
+        ]
+      },
+      "roleRef": {
+        "apiGroup": "rbac.authorization.k8s.io/v1",
+        "kind": "ClusterRole",
+        "name": "system:basic-user"
+      },
+      "subjects": [
+        {
+          "apiGroup": "rbac.authorization.k8s.io/v1",
+          "kind": "Group",
+          "name": "system:authenticated"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "name": "tetragon",
+        "resourceVersion": "123",
+        "uid": "0f6c7b8e-0000-4000-8000-000000000001",
+        "creationTimestamp": "2026-10-01T00:00:00Z",
+        "generation": 3,
+        "managedFields": [
+          {
+            "manager": "kubectl",
+            "operation": "Apply"
+          }
+        ]
+      },
+      "roleRef": {
+        "apiGroup": "rbac.authorization.k8s.io/v1",
+        "kind": "ClusterRole",
+        "name": "tetragon"
+      },
+      "subjects": [
+        {
+          "kind": "ServiceAccount",
+          "name": "tetragon",
+          "namespace": "agent-sensors"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "name": "cluster-admin",
+        "resourceVersion": "123",
+        "uid": "0f6c7b8e-0000-4000-8000-000000000001",
+        "creationTimestamp": "2026-10-01T00:00:00Z",
+        "generation": 3,
+        "managedFields": [
+          {
+            "manager": "kubectl",
+            "operation": "Apply"
+          }
+        ]
+      },
+      "roleRef": {
+        "apiGroup": "rbac.authorization.k8s.io/v1",
+        "kind": "ClusterRole",
+        "name": "cluster-admin"
+      },
+      "subjects": [
+        {
+          "apiGroup": "rbac.authorization.k8s.io/v1",
+          "kind": "Group",
+          "name": "system:masters"
+        }
+      ]
+    }
+  ]
+}

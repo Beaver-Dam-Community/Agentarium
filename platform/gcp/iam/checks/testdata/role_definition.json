@@ -1,0 +1,10 @@
+{
+  "name": "projects/example-prod/roles/agentariumManifestPublicKey",
+  "title": "Agentarium manifest public key",
+  "description": "",
+  "includedPermissions": [
+    "cloudkms.cryptoKeyVersions.viewPublicKey"
+  ],
+  "stage": "GA",
+  "etag": "BwYAAAAAAAA="
+}

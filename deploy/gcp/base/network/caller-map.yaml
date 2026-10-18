@@ -1,0 +1,1452 @@
+{
+  "version": 1,
+  "deferred_callers": {
+    "TASK-15 measurement": "Not rendered until its execution KSA is registered in COMMON, per TASK-06 3.1."
+  },
+  "apis": [
+    {
+      "api": "`POST /v1/sessions`",
+      "caller": "Authenticated user (console)",
+      "routes": [
+        {
+          "from": "gfe",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`GET /v1/runtime/assignments`",
+      "caller": "runtime (workload mTLS)",
+      "routes": [
+        {
+          "from": "agent-exec/agent-runtime",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/policy-gateway",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /v1/sessions/{session_id}:claim`",
+      "caller": "runtime (mTLS + claim_code)",
+      "routes": [
+        {
+          "from": "agent-exec/agent-runtime",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/policy-gateway",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /v1/sessions/{session_id}:revoke`",
+      "caller": "Console owner, operator",
+      "routes": [
+        {
+          "from": "gfe",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /v1/sessions/{session_id}:refresh`",
+      "caller": "runtime (mTLS + current token)",
+      "routes": [
+        {
+          "from": "agent-exec/agent-runtime",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/policy-gateway",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/service-sessions`",
+      "caller": "Registered service principals: TASK-12 proposal service, TASK-04 intent checker, TASK-02 discovery analyzer, TASK-14 releaser",
+      "routes": [
+        {
+          "from": "agent-observe/policy-proposer",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/intent-checker",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/discovery",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-release/releaser",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/sessions:revoke-scope`",
+      "caller": "TASK-10 control-health",
+      "routes": [
+        {
+          "from": "agent-observe/control-health",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/workload-certificates`",
+      "caller": "All KSAs registered in `registered_workloads` (runtime, probe runner, start fixture, node runtime bridge, and hostNetwork agent-sensors service workloads (`tetragon` exporter, `netpol-collector`) go through the gateway; other services call directly)",
+      "routes": [
+        {
+          "from": "agent-control/policy-gateway",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/coordinator",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/credential-broker",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/node-readiness",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/intent-checker",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/kubernetes-reader",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/receiver-sender",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/model-adapter",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/evidence-reader",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/probe-runner",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/audit-writer",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/audit-exporter",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/audit-verifier",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/evidence-collector",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/pod-watcher",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/control-health",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/correlation",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/start-coordinator",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/drift-probe",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/timeline",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/policy-proposer",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/discovery",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/discovery-snapshot",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-release/releaser",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-release/regression-dispatcher",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-targets/receiver",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-targets/probe-sink",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-targets/start-marker",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-exec/agent-runtime",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-exec/probe-runner",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-exec/start-fixture",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "node_cidr",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-sensors/lifecycle-recorder",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /v1/actions`",
+      "caller": "runtime session token, service session",
+      "routes": [
+        {
+          "from": "agent-observe/policy-proposer",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/intent-checker",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/discovery",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-release/releaser",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-exec/agent-runtime",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`GET /v1/actions/{action_id}`",
+      "caller": "Owner, the corresponding service session",
+      "routes": [
+        {
+          "from": "agent-observe/policy-proposer",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/intent-checker",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/discovery",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-release/releaser",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-exec/agent-runtime",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/workload-identity",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "gfe",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`GET /v1/actions/{action_id}/result`",
+      "caller": "Owner, the corresponding service session",
+      "routes": [
+        {
+          "from": "agent-observe/policy-proposer",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/intent-checker",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/discovery",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-release/releaser",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-exec/agent-runtime",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/workload-identity",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "gfe",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /v1/actions/{action_id}:reevaluate`",
+      "caller": "runtime, console (via the identity BFF)",
+      "routes": [
+        {
+          "from": "agent-control/workload-identity",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "gfe",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-exec/agent-runtime",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`GET /v1/approvals/pending?session_id=`",
+      "caller": "Console owner",
+      "routes": [
+        {
+          "from": "gfe",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`GET /v1/actions/{action_id}/approval-contract`",
+      "caller": "Console owner",
+      "routes": [
+        {
+          "from": "gfe",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/intent-checks`",
+      "caller": "TASK-03 contract renderer, gateway (standing rule path)",
+      "routes": [
+        {
+          "from": "agent-control/workload-identity",
+          "to": "agent-control/intent-checker",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/policy-gateway",
+          "to": "agent-control/intent-checker",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /v1/approvals`",
+      "caller": "Console owner",
+      "routes": [
+        {
+          "from": "gfe",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /v1/approvals/{approval_id}/revoke`",
+      "caller": "Owner, operations cancel role",
+      "routes": [
+        {
+          "from": "gfe",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/adapter/{adapter_id}/execute`",
+      "caller": "gateway",
+      "routes": [
+        {
+          "from": "agent-control/policy-gateway",
+          "to": "agent-adapters/kubernetes-reader",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/policy-gateway",
+          "to": "agent-adapters/receiver-sender",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/policy-gateway",
+          "to": "agent-adapters/model-adapter",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/policy-gateway",
+          "to": "agent-adapters/evidence-reader",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/dispatch/reservations`",
+      "caller": "adapter",
+      "routes": [
+        {
+          "from": "agent-adapters/kubernetes-reader",
+          "to": "agent-control/coordinator",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/receiver-sender",
+          "to": "agent-control/coordinator",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/model-adapter",
+          "to": "agent-control/coordinator",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/evidence-reader",
+          "to": "agent-control/coordinator",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/dispatch/permits/{permit_id}/check`",
+      "caller": "The same adapter",
+      "routes": [
+        {
+          "from": "agent-adapters/kubernetes-reader",
+          "to": "agent-control/coordinator",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/receiver-sender",
+          "to": "agent-control/coordinator",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/model-adapter",
+          "to": "agent-control/coordinator",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/evidence-reader",
+          "to": "agent-control/coordinator",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/dispatch/attempts/{attempt_id}/outcome`",
+      "caller": "The same adapter",
+      "routes": [
+        {
+          "from": "agent-adapters/kubernetes-reader",
+          "to": "agent-control/coordinator",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/receiver-sender",
+          "to": "agent-control/coordinator",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/model-adapter",
+          "to": "agent-control/coordinator",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/evidence-reader",
+          "to": "agent-control/coordinator",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/dispatch/activation-probes`",
+      "caller": "TASK-14 releaser",
+      "routes": [
+        {
+          "from": "agent-release/releaser",
+          "to": "agent-control/coordinator",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/credentials:resolve`",
+      "caller": "adapter (after reservation, before permit claim)",
+      "routes": [
+        {
+          "from": "agent-adapters/receiver-sender",
+          "to": "agent-control/credential-broker",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/audit/events`",
+      "caller": "Registered producer",
+      "routes": [
+        {
+          "from": "agent-control/policy-gateway",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/workload-identity",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/coordinator",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/kubernetes-reader",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/receiver-sender",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/model-adapter",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/evidence-reader",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/evidence-collector",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/timeline",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-release/releaser",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/intent-checker",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/discovery",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/policy-proposer",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/control-health",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/correlation",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/start-coordinator",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/audit-verifier",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/kernel/events:batch`",
+      "caller": "TASK-09 exporter",
+      "routes": [
+        {
+          "from": "node_cidr",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/lifecycle/events:batch`",
+      "caller": "TASK-09 lifecycle recorder, Pod watcher",
+      "routes": [
+        {
+          "from": "agent-sensors/lifecycle-recorder",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/pod-watcher",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`GET /internal/lifecycle/checkpoints?scope=`",
+      "caller": "TASK-09 Pod watcher",
+      "routes": [
+        {
+          "from": "agent-observe/pod-watcher",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/control-health/leases`",
+      "caller": "TASK-03/04/05/07/08/09/14, node-readiness, network policy log node collector (`component = netpol-collector`)",
+      "routes": [
+        {
+          "from": "agent-control/policy-gateway",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/coordinator",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/kubernetes-reader",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/receiver-sender",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/model-adapter",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/evidence-reader",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/audit-writer",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/audit-exporter",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/audit-verifier",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/evidence-collector",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-targets/receiver",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-release/releaser",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/node-readiness",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/probe-runner",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "node_cidr",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-sensors/lifecycle-recorder",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/network-policy/records:batch`",
+      "caller": "Network policy log node collector (TASK-06 3.4)",
+      "routes": [
+        {
+          "from": "node_cidr",
+          "to": "agent-observe/correlation",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/control-health/observation-gaps`",
+      "caller": "TASK-09 pod-watcher (exact SAN `spiffe://agentarium.internal/ns/agent-observe/sa/pod-watcher`) and runtime lifecycle recorder (`.../agent-sensors/sa/lifecycle-recorder`, node certificate)",
+      "routes": [
+        {
+          "from": "agent-observe/pod-watcher",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-sensors/lifecycle-recorder",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/control-health/probe-results`",
+      "caller": "TASK-07 audit-exporter, TASK-08 evidence-collector, TASK-09 sensor exporter, TASK-10 probe runner (via the gateway relay)",
+      "routes": [
+        {
+          "from": "agent-observe/audit-exporter",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/evidence-collector",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-adapters/probe-runner",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "node_cidr",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/policy-gateway",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /v1/runtime/session-workers`, `GET /v1/runtime/session-workers/{id}`, `POST /v1/runtime/session-workers/{id}:close`",
+      "caller": "Workload mTLS of the trusted supervisor + claimed session token",
+      "routes": [
+        {
+          "from": "agent-exec/agent-runtime",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/policy-gateway",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/control-health/session-workers`, `GET /internal/control-health/session-workers/{id}`, `POST /internal/control-health/session-workers/{id}:close`",
+      "caller": "gateway relay only",
+      "routes": [
+        {
+          "from": "agent-control/policy-gateway",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/control-health/worker-observation-results`",
+      "caller": "TASK-09 registered node-sensors, own node/boot only",
+      "routes": [
+        {
+          "from": "node_cidr",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /v1/runtime/work-readiness/checks`, `GET /v1/runtime/work-readiness/checks/{id}`",
+      "caller": "Workload mTLS of the runtime + claimed session token",
+      "routes": [
+        {
+          "from": "agent-exec/agent-runtime",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/policy-gateway",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/control-health/work-readiness/checks`, `GET /internal/control-health/work-readiness/checks/{id}`",
+      "caller": "gateway relay only",
+      "routes": [
+        {
+          "from": "agent-control/policy-gateway",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/control-health/pod-observation-results`",
+      "caller": "TASK-09 node-sensors, own node/boot only",
+      "routes": [
+        {
+          "from": "node_cidr",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /v1/runtime/work-events`",
+      "caller": "Workload mTLS of the runtime + claimed session token",
+      "routes": [
+        {
+          "from": "agent-exec/agent-runtime",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/policy-gateway",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/audit/work-events`",
+      "caller": "gateway relay only (the exact gateway SAN fixed at installation)",
+      "routes": [
+        {
+          "from": "agent-control/policy-gateway",
+          "to": "agent-observe/audit-writer",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /v1/runtime/probe-reports`",
+      "caller": "Probe runner in `agent-exec` (workload mTLS)",
+      "routes": [
+        {
+          "from": "agent-control/policy-gateway",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-exec/probe-runner",
+          "to": "agent-control/policy-gateway",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/holds`",
+      "caller": "Registered components (TASK-07/09/11/14, etc.). `reason = operator_stop` only from the console BFF (operators with the operator role). The probe runner does not call it. For TASK-10 probe results, the requester and owner is `control-health`, which verified the result, and the TASK-08 destination probe is requested and owned by `destination-evidence`",
+      "routes": [
+        {
+          "from": "agent-control/workload-identity",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/audit-writer",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/correlation",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/audit-exporter",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/audit-verifier",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/evidence-collector",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/timeline",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-release/releaser",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "node_cidr",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`GET /internal/holds?owner_component=`",
+      "caller": "Owning components with automatic release permission (TASK-07 `audit-export`, etc.). Own component only",
+      "routes": [
+        {
+          "from": "agent-observe/audit-exporter",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/holds/{hold_id}/release`",
+      "caller": "The owning component of the reason; operator approval for security reasons",
+      "routes": [
+        {
+          "from": "agent-observe/start-coordinator",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/audit-writer",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/audit-exporter",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/audit-verifier",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/evidence-collector",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/timeline",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-release/releaser",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "node_cidr",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/workload-identity",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`GET /internal/control-health?scope=&scope_id=`",
+      "caller": "coordinator, gateway, releaser, verification services, node-readiness, node-sensors and node runtime bridge (own node/boot only)",
+      "routes": [
+        {
+          "from": "agent-control/coordinator",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/policy-gateway",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-release/releaser",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/timeline",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/node-readiness",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "node_cidr",
+          "to": "agent-observe/control-health",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/runtime/start-permits`",
+      "caller": "node runtime bridge",
+      "routes": [
+        {
+          "from": "node_cidr",
+          "to": "agent-observe/start-coordinator",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/runtime/start-permits/{id}/consume`",
+      "caller": "The same bridge",
+      "routes": [
+        {
+          "from": "node_cidr",
+          "to": "agent-observe/start-coordinator",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`GET /internal/runtime/start-attempts/{id}`",
+      "caller": "Bridge on the same node/boot, operations investigation role",
+      "routes": [
+        {
+          "from": "node_cidr",
+          "to": "agent-observe/start-coordinator",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "gfe",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/workload-identity",
+          "to": "agent-observe/start-coordinator",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/runtime/start-attempts/{id}/transitions`",
+      "caller": "Bridge on the same node/boot",
+      "routes": [
+        {
+          "from": "node_cidr",
+          "to": "agent-observe/start-coordinator",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /test/v1/submissions`",
+      "caller": "receiver-sender adapter",
+      "routes": [
+        {
+          "from": "agent-adapters/receiver-sender",
+          "to": "agent-targets/receiver",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`GET /test/v1/receipts/{action_id}`",
+      "caller": "TASK-08 evidence collector only",
+      "routes": [
+        {
+          "from": "agent-observe/evidence-collector",
+          "to": "agent-targets/receiver",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`GET /internal/evidence/actions/{action_id}`, `/bundles/{bundle_id}`, `/regressions/{run_id}`",
+      "caller": "evidence-reader adapter",
+      "routes": [
+        {
+          "from": "agent-adapters/evidence-reader",
+          "to": "agent-observe/timeline",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`GET /v1/actions/{action_id}/timeline`",
+      "caller": "Owner, operations query role",
+      "routes": [
+        {
+          "from": "gfe",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/workload-identity",
+          "to": "agent-observe/timeline",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /v1/actions/{action_id}/resolutions`",
+      "caller": "Operator (evidence reference required)",
+      "routes": [
+        {
+          "from": "gfe",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/workload-identity",
+          "to": "agent-observe/timeline",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/issues`",
+      "caller": "TASK-11 verifier, TASK-04 intent checker (`source = intent_divergence`), TASK-10 correlation (`source = network_finding`)",
+      "routes": [
+        {
+          "from": "agent-observe/timeline",
+          "to": "agent-observe/policy-proposer",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/intent-checker",
+          "to": "agent-observe/policy-proposer",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/correlation",
+          "to": "agent-observe/policy-proposer",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/proposals`, `GET /internal/proposals/{proposal_id}`",
+      "caller": "Operator console",
+      "routes": [
+        {
+          "from": "gfe",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/workload-identity",
+          "to": "agent-observe/policy-proposer",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/proposals/{proposal_id}:revise`",
+      "caller": "Operator console",
+      "routes": [
+        {
+          "from": "gfe",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/workload-identity",
+          "to": "agent-observe/policy-proposer",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/proposals/{proposal_id}:finalize`",
+      "caller": "Operator console",
+      "routes": [
+        {
+          "from": "gfe",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/workload-identity",
+          "to": "agent-observe/policy-proposer",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/policy-diff:check`",
+      "caller": "TASK-12 proposal service, console",
+      "routes": [
+        {
+          "from": "gfe",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/policy-proposer",
+          "to": "agent-release/releaser",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/workload-identity",
+          "to": "agent-release/releaser",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/regression-runs`, `GET /internal/regression-runs/{run_id}`",
+      "caller": "TASK-12 proposal service, TASK-14 releaser, TASK-02 discovery, measurement runs (TASK-15)",
+      "routes": [
+        {
+          "from": "agent-observe/policy-proposer",
+          "to": "agent-release/regression-dispatcher",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-observe/discovery",
+          "to": "agent-release/regression-dispatcher",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-release/releaser",
+          "to": "agent-release/regression-dispatcher",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /v1/policy-changes`, `GET /v1/policy-changes/{change_id}`",
+      "caller": "Operator console",
+      "routes": [
+        {
+          "from": "gfe",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/workload-identity",
+          "to": "agent-release/releaser",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /v1/policy-changes/{change_id}/approve`",
+      "caller": "An approver different from the proposer",
+      "routes": [
+        {
+          "from": "gfe",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/workload-identity",
+          "to": "agent-release/releaser",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /v1/policy-changes/{change_id}/activate`, `/rollback`",
+      "caller": "Role `release_operator`",
+      "routes": [
+        {
+          "from": "gfe",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/workload-identity",
+          "to": "agent-release/releaser",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`POST /internal/discovery/snapshots`, `POST /internal/discovery/runs`, `GET /internal/discovery/candidates`, `POST /internal/discovery/candidates/{candidate_id}/promote`, `POST /internal/discovery/candidates/{candidate_id}/reject`",
+      "caller": "Operator, analysis service",
+      "routes": [
+        {
+          "from": "gfe",
+          "to": "agent-control/workload-identity",
+          "port": "TCP/8443"
+        },
+        {
+          "from": "agent-control/workload-identity",
+          "to": "agent-observe/discovery",
+          "port": "TCP/8443"
+        }
+      ]
+    },
+    {
+      "api": "`GET /internal/discovery/snapshots/{snapshot_id}/files`, `GET /internal/discovery/snapshots/{snapshot_id}/callgraph`",
+      "caller": "evidence-reader adapter (`discovery.source.read`, `discovery.callgraph.read`)",
+      "routes": [
+        {
+          "from": "agent-adapters/evidence-reader",
+          "to": "agent-observe/discovery",
+          "port": "TCP/8443"
+        }
+      ]
+    }
+  ]
+}

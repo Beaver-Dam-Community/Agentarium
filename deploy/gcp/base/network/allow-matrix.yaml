@@ -1,0 +1,943 @@
+{
+  "version": 1,
+  "namespaces": [
+    "agent-exec",
+    "agent-control",
+    "agent-adapters",
+    "agent-observe",
+    "agent-release",
+    "agent-targets",
+    "agent-sensors"
+  ],
+  "workloads": [
+    "agent-exec/agent-runtime",
+    "agent-exec/probe-runner",
+    "agent-exec/start-fixture",
+    "agent-control/policy-gateway",
+    "agent-control/workload-identity",
+    "agent-control/coordinator",
+    "agent-control/credential-broker",
+    "agent-control/node-readiness",
+    "agent-control/intent-checker",
+    "agent-control/db-installer",
+    "agent-adapters/kubernetes-reader",
+    "agent-adapters/receiver-sender",
+    "agent-adapters/model-adapter",
+    "agent-adapters/evidence-reader",
+    "agent-adapters/probe-runner",
+    "agent-observe/audit-writer",
+    "agent-observe/audit-exporter",
+    "agent-observe/audit-verifier",
+    "agent-observe/audit-retention",
+    "agent-observe/evidence-collector",
+    "agent-observe/pod-watcher",
+    "agent-observe/control-health",
+    "agent-observe/correlation",
+    "agent-observe/start-coordinator",
+    "agent-observe/drift-probe",
+    "agent-observe/timeline",
+    "agent-observe/policy-proposer",
+    "agent-observe/discovery",
+    "agent-observe/discovery-snapshot",
+    "agent-release/releaser",
+    "agent-release/regression-dispatcher",
+    "agent-targets/receiver",
+    "agent-targets/probe-sink",
+    "agent-targets/start-marker",
+    "agent-sensors/lifecycle-recorder"
+  ],
+  "infra": {
+    "metadata": {
+      "ipBlock": "169.254.169.254/32",
+      "ports": [
+        "TCP/80",
+        "TCP/8080"
+      ]
+    },
+    "pga": {
+      "ipBlock": "199.36.153.8/30",
+      "ports": [
+        "TCP/443"
+      ]
+    },
+    "kube_apiserver": {
+      "ipBlock": "${control_plane_endpoint}/32",
+      "ports": [
+        "TCP/443"
+      ]
+    },
+    "cloudsql": {
+      "ipBlock": "${cloudsql_private_ip}/32",
+      "ports": [
+        "TCP/3307"
+      ]
+    },
+    "kube_dns": {
+      "namespace": "kube-system",
+      "podLabels": {
+        "k8s-app": "kube-dns"
+      },
+      "ports": [
+        "UDP/53",
+        "TCP/53"
+      ]
+    },
+    "node_cidr": {
+      "ipBlock": "${node_cidr}"
+    },
+    "gfe": {
+      "ipBlocks": [
+        "130.211.0.0/22",
+        "35.191.0.0/16"
+      ]
+    }
+  },
+  "edges": [
+    {
+      "from": "agent-adapters/evidence-reader",
+      "to": "agent-control/coordinator",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-adapters/evidence-reader",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-adapters/evidence-reader",
+      "to": "agent-observe/audit-writer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-adapters/evidence-reader",
+      "to": "agent-observe/control-health",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-adapters/evidence-reader",
+      "to": "agent-observe/discovery",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-adapters/evidence-reader",
+      "to": "agent-observe/timeline",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-adapters/kubernetes-reader",
+      "to": "agent-control/coordinator",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-adapters/kubernetes-reader",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-adapters/kubernetes-reader",
+      "to": "agent-observe/audit-writer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-adapters/kubernetes-reader",
+      "to": "agent-observe/control-health",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-adapters/model-adapter",
+      "to": "agent-control/coordinator",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-adapters/model-adapter",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-adapters/model-adapter",
+      "to": "agent-observe/audit-writer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-adapters/model-adapter",
+      "to": "agent-observe/control-health",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-adapters/probe-runner",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-adapters/probe-runner",
+      "to": "agent-observe/control-health",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-adapters/probe-runner",
+      "to": "agent-targets/probe-sink",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-adapters/receiver-sender",
+      "to": "agent-control/coordinator",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-adapters/receiver-sender",
+      "to": "agent-control/credential-broker",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-adapters/receiver-sender",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-adapters/receiver-sender",
+      "to": "agent-observe/audit-writer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-adapters/receiver-sender",
+      "to": "agent-observe/control-health",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-adapters/receiver-sender",
+      "to": "agent-targets/receiver",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/coordinator",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/coordinator",
+      "to": "agent-observe/audit-writer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/coordinator",
+      "to": "agent-observe/control-health",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/credential-broker",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/intent-checker",
+      "to": "agent-control/policy-gateway",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/intent-checker",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/intent-checker",
+      "to": "agent-observe/audit-writer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/intent-checker",
+      "to": "agent-observe/policy-proposer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/node-readiness",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/node-readiness",
+      "to": "agent-observe/control-health",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/policy-gateway",
+      "to": "agent-adapters/evidence-reader",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/policy-gateway",
+      "to": "agent-adapters/kubernetes-reader",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/policy-gateway",
+      "to": "agent-adapters/model-adapter",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/policy-gateway",
+      "to": "agent-adapters/receiver-sender",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/policy-gateway",
+      "to": "agent-control/intent-checker",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/policy-gateway",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/policy-gateway",
+      "to": "agent-observe/audit-writer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/policy-gateway",
+      "to": "agent-observe/control-health",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/workload-identity",
+      "to": "agent-control/intent-checker",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/workload-identity",
+      "to": "agent-control/policy-gateway",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/workload-identity",
+      "to": "agent-observe/audit-writer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/workload-identity",
+      "to": "agent-observe/control-health",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/workload-identity",
+      "to": "agent-observe/discovery",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/workload-identity",
+      "to": "agent-observe/policy-proposer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/workload-identity",
+      "to": "agent-observe/start-coordinator",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/workload-identity",
+      "to": "agent-observe/timeline",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-control/workload-identity",
+      "to": "agent-release/releaser",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-exec/agent-runtime",
+      "to": "agent-control/policy-gateway",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-exec/probe-runner",
+      "to": "agent-control/policy-gateway",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-exec/probe-runner",
+      "to": "agent-targets/probe-sink",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-exec/start-fixture",
+      "to": "agent-control/policy-gateway",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-exec/start-fixture",
+      "to": "agent-targets/start-marker",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/audit-exporter",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/audit-exporter",
+      "to": "agent-observe/control-health",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/audit-verifier",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/audit-verifier",
+      "to": "agent-observe/control-health",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/audit-verifier",
+      "to": "agent-observe/audit-writer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/audit-writer",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/audit-writer",
+      "to": "agent-observe/control-health",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/control-health",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/control-health",
+      "to": "agent-observe/audit-writer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/correlation",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/correlation",
+      "to": "agent-observe/audit-writer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/correlation",
+      "to": "agent-observe/control-health",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/correlation",
+      "to": "agent-observe/policy-proposer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/discovery",
+      "to": "agent-control/policy-gateway",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/discovery",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/discovery",
+      "to": "agent-observe/audit-writer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/discovery",
+      "to": "agent-release/regression-dispatcher",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/discovery-snapshot",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/drift-probe",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/evidence-collector",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/evidence-collector",
+      "to": "agent-observe/audit-writer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/evidence-collector",
+      "to": "agent-observe/control-health",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/evidence-collector",
+      "to": "agent-targets/receiver",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/pod-watcher",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/pod-watcher",
+      "to": "agent-observe/audit-writer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/pod-watcher",
+      "to": "agent-observe/control-health",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/policy-proposer",
+      "to": "agent-control/policy-gateway",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/policy-proposer",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/policy-proposer",
+      "to": "agent-observe/audit-writer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/policy-proposer",
+      "to": "agent-release/regression-dispatcher",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/policy-proposer",
+      "to": "agent-release/releaser",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/start-coordinator",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/start-coordinator",
+      "to": "agent-observe/audit-writer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/start-coordinator",
+      "to": "agent-observe/control-health",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/timeline",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/timeline",
+      "to": "agent-observe/audit-writer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/timeline",
+      "to": "agent-observe/control-health",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-observe/timeline",
+      "to": "agent-observe/policy-proposer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-release/regression-dispatcher",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-release/releaser",
+      "to": "agent-control/coordinator",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-release/releaser",
+      "to": "agent-control/policy-gateway",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-release/releaser",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-release/releaser",
+      "to": "agent-observe/audit-writer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-release/releaser",
+      "to": "agent-observe/control-health",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-release/releaser",
+      "to": "agent-release/regression-dispatcher",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-sensors/lifecycle-recorder",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-sensors/lifecycle-recorder",
+      "to": "agent-observe/audit-writer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-sensors/lifecycle-recorder",
+      "to": "agent-observe/control-health",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-targets/probe-sink",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-targets/receiver",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-targets/receiver",
+      "to": "agent-observe/control-health",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "agent-targets/start-marker",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "gfe",
+      "to": "agent-control/workload-identity",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "node_cidr",
+      "to": "agent-control/policy-gateway",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "node_cidr",
+      "to": "agent-observe/audit-writer",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "node_cidr",
+      "to": "agent-observe/control-health",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "node_cidr",
+      "to": "agent-observe/correlation",
+      "port": "TCP/8443"
+    },
+    {
+      "from": "node_cidr",
+      "to": "agent-observe/start-coordinator",
+      "port": "TCP/8443"
+    }
+  ],
+  "infra_edges": [
+    {
+      "from": "agent-control/policy-gateway",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata"
+      ]
+    },
+    {
+      "from": "agent-control/workload-identity",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata",
+        "kube_apiserver"
+      ]
+    },
+    {
+      "from": "agent-control/coordinator",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata"
+      ]
+    },
+    {
+      "from": "agent-control/credential-broker",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata"
+      ]
+    },
+    {
+      "from": "agent-control/node-readiness",
+      "to": [
+        "kube_dns",
+        "kube_apiserver"
+      ]
+    },
+    {
+      "from": "agent-control/db-installer",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata"
+      ]
+    },
+    {
+      "from": "agent-control/intent-checker",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata"
+      ]
+    },
+    {
+      "from": "agent-adapters/kubernetes-reader",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata",
+        "kube_apiserver"
+      ]
+    },
+    {
+      "from": "agent-adapters/receiver-sender",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata"
+      ]
+    },
+    {
+      "from": "agent-adapters/model-adapter",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata"
+      ]
+    },
+    {
+      "from": "agent-adapters/evidence-reader",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata"
+      ]
+    },
+    {
+      "from": "agent-adapters/probe-runner",
+      "to": [
+        "kube_dns"
+      ]
+    },
+    {
+      "from": "agent-observe/audit-writer",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata"
+      ]
+    },
+    {
+      "from": "agent-observe/audit-exporter",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata"
+      ]
+    },
+    {
+      "from": "agent-observe/audit-verifier",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata"
+      ]
+    },
+    {
+      "from": "agent-observe/audit-retention",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata"
+      ]
+    },
+    {
+      "from": "agent-observe/evidence-collector",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata"
+      ]
+    },
+    {
+      "from": "agent-observe/pod-watcher",
+      "to": [
+        "kube_dns",
+        "kube_apiserver"
+      ]
+    },
+    {
+      "from": "agent-observe/control-health",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata",
+        "kube_apiserver"
+      ]
+    },
+    {
+      "from": "agent-observe/correlation",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata",
+        "kube_apiserver"
+      ]
+    },
+    {
+      "from": "agent-observe/start-coordinator",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata"
+      ]
+    },
+    {
+      "from": "agent-observe/drift-probe",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata",
+        "kube_apiserver"
+      ]
+    },
+    {
+      "from": "agent-observe/timeline",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata"
+      ]
+    },
+    {
+      "from": "agent-observe/policy-proposer",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata"
+      ]
+    },
+    {
+      "from": "agent-observe/discovery",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata",
+        "kube_apiserver"
+      ]
+    },
+    {
+      "from": "agent-observe/discovery-snapshot",
+      "to": [
+        "kube_dns",
+        "pga",
+        "metadata"
+      ]
+    },
+    {
+      "from": "agent-release/releaser",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata",
+        "kube_apiserver"
+      ]
+    },
+    {
+      "from": "agent-release/regression-dispatcher",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata"
+      ]
+    },
+    {
+      "from": "agent-targets/receiver",
+      "to": [
+        "kube_dns",
+        "cloudsql",
+        "pga",
+        "metadata"
+      ]
+    },
+    {
+      "from": "agent-targets/probe-sink",
+      "to": [
+        "kube_dns"
+      ]
+    },
+    {
+      "from": "agent-targets/start-marker",
+      "to": [
+        "kube_dns"
+      ]
+    },
+    {
+      "from": "agent-sensors/lifecycle-recorder",
+      "to": [
+        "kube_dns",
+        "kube_apiserver"
+      ]
+    }
+  ]
+}

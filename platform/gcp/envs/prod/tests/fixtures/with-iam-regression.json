@@ -1,0 +1,19 @@
+{
+  "project": {
+    "id": "example-prod"
+  },
+  "iam": {
+    "oidc_client_secret": "projects/example-prod/secrets/oidc",
+    "credential_secret_resources": [
+      "projects/123456789012/secrets/receiver"
+    ],
+    "regression": {
+      "project_id": "example-regression",
+      "project_number": "222222222222"
+    }
+  },
+  "identity": {
+    "claim_key_secret": "projects/123456789012/secrets/identity-claim-key",
+    "claim_key_version": "1"
+  }
+}

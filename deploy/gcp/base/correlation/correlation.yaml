@@ -1,0 +1,322 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "correlation",
+        "namespace": "agent-observe"
+      },
+      "automountServiceAccountToken": false
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ConfigMap",
+      "metadata": {
+        "name": "correlation-network-values",
+        "namespace": "agent-observe"
+      },
+      "data": {
+        "network-values.json": "{\"control_plane_endpoint\":\"${control_plane_endpoint}\",\"cloudsql_private_ip\":\"${cloudsql_private_ip}\",\"node_cidr\":\"${node_cidr}\"}"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "correlation-epoch",
+        "namespace": "agent-observe"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "resources": {
+          "requests": {
+            "storage": "1Gi"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "correlation",
+        "namespace": "agent-observe"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/name": "correlation"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/name": "correlation"
+            }
+          },
+          "spec": {
+            "serviceAccountName": "correlation",
+            "automountServiceAccountToken": false,
+            "nodeSelector": {
+              "node-restriction.kubernetes.io/agentarium-role": "control"
+            },
+            "schedulerName": "default-scheduler",
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 65532,
+              "runAsGroup": 65532,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              },
+              "fsGroup": 65532
+            },
+            "terminationGracePeriodSeconds": 30,
+            "initContainers": [
+              {
+                "name": "cloud-sql-proxy",
+                "image": "${SQL_PROXY_IMAGE}",
+                "restartPolicy": "Always",
+                "args": [
+                  "--auto-iam-authn",
+                  "--private-ip",
+                  "--address=127.0.0.1",
+                  "--port=5432",
+                  "--health-check",
+                  "--http-address=0.0.0.0",
+                  "--http-port=9801",
+                  "--impersonate-service-account=${CORRELATION_DB_GSA}",
+                  "${CLOUDSQL_CONNECTION_NAME}"
+                ],
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "50m",
+                    "memory": "64Mi"
+                  },
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "256Mi"
+                  }
+                },
+                "startupProbe": {
+                  "httpGet": {
+                    "path": "/startup",
+                    "port": 9801
+                  },
+                  "periodSeconds": 2,
+                  "failureThreshold": 60
+                },
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/readiness",
+                    "port": 9801
+                  },
+                  "periodSeconds": 5
+                },
+                "livenessProbe": {
+                  "httpGet": {
+                    "path": "/liveness",
+                    "port": 9801
+                  },
+                  "periodSeconds": 10
+                }
+              }
+            ],
+            "containers": [
+              {
+                "name": "correlation",
+                "image": "${CORRELATION_IMAGE}",
+                "args": [
+                  "--identity-url=https://workload-identity.agent-control.svc:8443",
+                  "--bootstrap-token=/var/run/agentarium-bootstrap/token",
+                  "--tls-ca=/etc/agentarium-trust/ca.pem",
+                  "--listen=:8443",
+                  "--cluster-uid=${CLUSTER_UID}",
+                  "--environment-lock=/etc/agentarium-inputs/lock/environment.lock.json",
+                  "--network-values=/etc/agentarium-inputs/network/network-values.json",
+                  "--allow-matrix=/etc/agentarium-inputs/matrix/allow-matrix.yaml",
+                  "--control-health-url=https://control-health.agent-observe.svc:8443",
+                  "--audit-source-id=${CORRELATION_AUDIT_SOURCE_ID}",
+                  "--version=${CORRELATION_IMAGE}",
+                  "--epoch-dir=/var/lib/agentarium/correlation-epoch"
+                ],
+                "env": [
+                  {
+                    "name": "DB_USER",
+                    "value": "${CORRELATION_DB_USER}"
+                  },
+                  {
+                    "name": "DB_NAME",
+                    "value": "${DB_NAME}"
+                  },
+                  {
+                    "name": "DATABASE_URL",
+                    "value": "host=127.0.0.1 port=5432 user=$(DB_USER) dbname=$(DB_NAME) sslmode=disable"
+                  }
+                ],
+                "ports": [
+                  {
+                    "name": "https",
+                    "containerPort": 8443
+                  }
+                ],
+                "volumeMounts": [
+                  {
+                    "name": "trust",
+                    "mountPath": "/etc/agentarium-trust",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "bootstrap",
+                    "mountPath": "/var/run/agentarium-bootstrap",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "environment-lock",
+                    "mountPath": "/etc/agentarium-inputs/lock",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "network-values",
+                    "mountPath": "/etc/agentarium-inputs/network",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "allow-matrix",
+                    "mountPath": "/etc/agentarium-inputs/matrix",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "epoch",
+                    "mountPath": "/var/lib/agentarium/correlation-epoch"
+                  }
+                ],
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "128Mi"
+                  },
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "512Mi"
+                  }
+                },
+                "startupProbe": {
+                  "tcpSocket": {
+                    "port": "https"
+                  },
+                  "periodSeconds": 2,
+                  "failureThreshold": 60
+                },
+                "readinessProbe": {
+                  "tcpSocket": {
+                    "port": "https"
+                  },
+                  "periodSeconds": 5
+                },
+                "livenessProbe": {
+                  "tcpSocket": {
+                    "port": "https"
+                  },
+                  "periodSeconds": 10
+                }
+              }
+            ],
+            "volumes": [
+              {
+                "name": "trust",
+                "configMap": {
+                  "name": "agentarium-trust"
+                }
+              },
+              {
+                "name": "bootstrap",
+                "projected": {
+                  "sources": [
+                    {
+                      "serviceAccountToken": {
+                        "path": "token",
+                        "expirationSeconds": 600,
+                        "audience": "agentarium-identity"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "environment-lock",
+                "configMap": {
+                  "name": "agentarium-environment-lock"
+                }
+              },
+              {
+                "name": "network-values",
+                "configMap": {
+                  "name": "correlation-network-values"
+                }
+              },
+              {
+                "name": "allow-matrix",
+                "configMap": {
+                  "name": "agentarium-allow-matrix"
+                }
+              },
+              {
+                "name": "epoch",
+                "persistentVolumeClaim": {
+                  "claimName": "correlation-epoch"
+                }
+              }
+            ]
+          }
+        },
+        "strategy": {
+          "type": "Recreate"
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "correlation",
+        "namespace": "agent-observe"
+      },
+      "spec": {
+        "selector": {
+          "app.kubernetes.io/name": "correlation"
+        },
+        "ports": [
+          {
+            "name": "https",
+            "port": 8443,
+            "targetPort": "https"
+          }
+        ]
+      }
+    }
+  ]
+}

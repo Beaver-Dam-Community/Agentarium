@@ -1,0 +1,2824 @@
+{
+  "description": "Shared packages/canonical test vectors (TASK-02 3.3). Templates are hand-written; jcs/sha256/digest fields are computed by testdata/crosscheck/crosscheck.mjs with the upstream JavaScript JCS reference, not by Go.",
+  "format_version": 1,
+  "canonicalization_version": "v1",
+  "catalog": {
+    "dir": "catalog",
+    "catalog_version": "test-2026-10-11",
+    "json_value": {
+      "operations": [
+        {
+          "operation_id": "discovery.callgraph.read",
+          "endpoint_id": "discovery-snapshots-v1",
+          "service_id": "discovery",
+          "adapter_id": "evidence-reader",
+          "transport": "https_rest",
+          "method": "GET",
+          "route_id": "discovery-callgraph-v1",
+          "route_template": "/internal/discovery/snapshots/{snapshot_id}/callgraph",
+          "effect_type": "read",
+          "disclosure": {
+            "kind": "none"
+          },
+          "credential_binding": null,
+          "limits": {
+            "depth": {
+              "min": 1,
+              "max": 3
+            }
+          },
+          "retry_policy": "none",
+          "idempotency_support": "none",
+          "evidence_strategy": "response_only",
+          "evidence_level_max": "accepted",
+          "evidence_deadline_seconds": 0,
+          "intent_check_on_standing_rule": false,
+          "response_data_class": "internal",
+          "redact_fields": [],
+          "response_limit_bytes": 65536,
+          "description": "discovery snapshot의 call graph를 읽는다",
+          "schema_version": "v1",
+          "owner": "platform-team"
+        },
+        {
+          "operation_id": "discovery.source.read",
+          "endpoint_id": "discovery-snapshots-v1",
+          "service_id": "discovery",
+          "adapter_id": "evidence-reader",
+          "transport": "https_rest",
+          "method": "GET",
+          "route_id": "discovery-files-v1",
+          "route_template": "/internal/discovery/snapshots/{snapshot_id}/files",
+          "effect_type": "read",
+          "disclosure": {
+            "kind": "none"
+          },
+          "credential_binding": null,
+          "limits": {},
+          "retry_policy": "none",
+          "idempotency_support": "none",
+          "evidence_strategy": "response_only",
+          "evidence_level_max": "accepted",
+          "evidence_deadline_seconds": 0,
+          "intent_check_on_standing_rule": false,
+          "response_data_class": "internal",
+          "redact_fields": [],
+          "response_limit_bytes": 65536,
+          "description": "discovery snapshot의 소스 줄 범위를 읽는다",
+          "schema_version": "v1",
+          "owner": "platform-team"
+        },
+        {
+          "operation_id": "evidence.action.read",
+          "endpoint_id": "evidence-api-v1",
+          "service_id": "evidence",
+          "adapter_id": "evidence-reader",
+          "transport": "https_rest",
+          "method": "GET",
+          "route_id": "evidence-action-v1",
+          "route_template": "/internal/evidence/actions/{resource_id}",
+          "effect_type": "read",
+          "disclosure": {
+            "kind": "none"
+          },
+          "credential_binding": null,
+          "limits": {},
+          "retry_policy": "none",
+          "idempotency_support": "none",
+          "evidence_strategy": "response_only",
+          "evidence_level_max": "accepted",
+          "evidence_deadline_seconds": 0,
+          "intent_check_on_standing_rule": false,
+          "response_data_class": "internal",
+          "redact_fields": [
+            "/attempts/*/peer",
+            "/a~1b"
+          ],
+          "response_limit_bytes": 65536,
+          "description": "정제된 action 증거를 읽는다",
+          "schema_version": "v1",
+          "owner": "platform-team"
+        },
+        {
+          "operation_id": "evidence.bundle.read",
+          "endpoint_id": "evidence-api-v1",
+          "service_id": "evidence",
+          "adapter_id": "evidence-reader",
+          "transport": "https_rest",
+          "method": "GET",
+          "route_id": "evidence-bundle-v1",
+          "route_template": "/internal/evidence/bundles/{resource_id}",
+          "effect_type": "read",
+          "disclosure": {
+            "kind": "none"
+          },
+          "credential_binding": null,
+          "limits": {},
+          "retry_policy": "none",
+          "idempotency_support": "none",
+          "evidence_strategy": "response_only",
+          "evidence_level_max": "accepted",
+          "evidence_deadline_seconds": 0,
+          "intent_check_on_standing_rule": false,
+          "response_data_class": "internal",
+          "redact_fields": [],
+          "response_limit_bytes": 65536,
+          "description": "정제된 bundle 증거를 읽는다",
+          "schema_version": "v1",
+          "owner": "platform-team"
+        },
+        {
+          "operation_id": "evidence.regression.read",
+          "endpoint_id": "evidence-api-v1",
+          "service_id": "evidence",
+          "adapter_id": "evidence-reader",
+          "transport": "https_rest",
+          "method": "GET",
+          "route_id": "evidence-regression-v1",
+          "route_template": "/internal/evidence/regressions/{resource_id}",
+          "effect_type": "read",
+          "disclosure": {
+            "kind": "none"
+          },
+          "credential_binding": null,
+          "limits": {},
+          "retry_policy": "none",
+          "idempotency_support": "none",
+          "evidence_strategy": "response_only",
+          "evidence_level_max": "accepted",
+          "evidence_deadline_seconds": 0,
+          "intent_check_on_standing_rule": false,
+          "response_data_class": "internal",
+          "redact_fields": [],
+          "response_limit_bytes": 65536,
+          "description": "정제된 회귀 시험 증거를 읽는다",
+          "schema_version": "v1",
+          "owner": "platform-team"
+        },
+        {
+          "operation_id": "k8s.events.list",
+          "endpoint_id": "k8s-api-v1",
+          "service_id": "kubernetes",
+          "adapter_id": "kubernetes-reader",
+          "transport": "https_rest",
+          "method": "GET",
+          "route_id": "event-list-v1",
+          "route_template": "/api/v1/namespaces/{namespace}/events",
+          "effect_type": "read",
+          "disclosure": {
+            "kind": "none"
+          },
+          "credential_binding": null,
+          "limits": {
+            "limit": {
+              "max": 100,
+              "fixed": 100
+            }
+          },
+          "retry_policy": "none",
+          "idempotency_support": "none",
+          "evidence_strategy": "response_only",
+          "evidence_level_max": "accepted",
+          "evidence_deadline_seconds": 0,
+          "intent_check_on_standing_rule": true,
+          "response_data_class": "synthetic",
+          "redact_fields": [],
+          "response_limit_bytes": 1048576,
+          "description": "agent-targets namespace의 이벤트 목록을 읽는다",
+          "schema_version": "v1",
+          "owner": "platform-team"
+        },
+        {
+          "operation_id": "k8s.pods.list",
+          "endpoint_id": "k8s-api-v1",
+          "service_id": "kubernetes",
+          "adapter_id": "kubernetes-reader",
+          "transport": "https_rest",
+          "method": "GET",
+          "route_id": "pod-list-v1",
+          "route_template": "/api/v1/namespaces/{namespace}/pods",
+          "effect_type": "read",
+          "disclosure": {
+            "kind": "none"
+          },
+          "credential_binding": null,
+          "limits": {
+            "limit": {
+              "max": 100,
+              "fixed": 100
+            }
+          },
+          "retry_policy": "none",
+          "idempotency_support": "none",
+          "evidence_strategy": "response_only",
+          "evidence_level_max": "accepted",
+          "evidence_deadline_seconds": 0,
+          "intent_check_on_standing_rule": true,
+          "response_data_class": "synthetic",
+          "redact_fields": [],
+          "response_limit_bytes": 1048576,
+          "description": "agent-targets namespace의 Pod 목록을 읽는다",
+          "schema_version": "v1",
+          "owner": "platform-team"
+        },
+        {
+          "operation_id": "k8s.pods.logs",
+          "endpoint_id": "k8s-api-v1",
+          "service_id": "kubernetes",
+          "adapter_id": "kubernetes-reader",
+          "transport": "https_rest",
+          "method": "GET",
+          "route_id": "pod-log-v1",
+          "route_template": "/api/v1/namespaces/{namespace}/pods/{pod_name}/log",
+          "effect_type": "read",
+          "disclosure": {
+            "kind": "none"
+          },
+          "credential_binding": null,
+          "limits": {
+            "tail_lines": {
+              "min": 1,
+              "max": 200
+            },
+            "limit_bytes": {
+              "min": 1,
+              "max": 1048576
+            }
+          },
+          "retry_policy": "none",
+          "idempotency_support": "none",
+          "evidence_strategy": "response_only",
+          "evidence_level_max": "accepted",
+          "evidence_deadline_seconds": 0,
+          "intent_check_on_standing_rule": true,
+          "response_data_class": "synthetic",
+          "redact_fields": [],
+          "response_limit_bytes": 1048576,
+          "description": "agent-targets namespace의 등록 Pod 로그 마지막 몇 줄을 읽는다",
+          "schema_version": "v1",
+          "owner": "platform-team"
+        },
+        {
+          "operation_id": "model.generate",
+          "endpoint_id": "agent-platform-v1",
+          "service_id": "agent-platform",
+          "adapter_id": "model",
+          "transport": "https_rest",
+          "method": "POST",
+          "route_id": "generate-content-v1",
+          "route_template": "/v1/projects/{project}/locations/{location}/publishers/google/models/{model_id}:generateContent",
+          "effect_type": "model_disclosure",
+          "disclosure": {
+            "kind": "message_sources"
+          },
+          "credential_binding": null,
+          "limits": {},
+          "retry_policy": "none",
+          "idempotency_support": "none",
+          "evidence_strategy": "provider_response",
+          "evidence_level_max": "accepted",
+          "evidence_deadline_seconds": 0,
+          "intent_check_on_standing_rule": true,
+          "model_profiles": [
+            "agent",
+            "policy_proposal",
+            "intent_check",
+            "discovery"
+          ],
+          "response_data_class": "inherit",
+          "redact_fields": [],
+          "response_limit_bytes": 1048576,
+          "description": "Agent Platform Gemini generateContent를 호출한다",
+          "schema_version": "v1",
+          "owner": "platform-team"
+        },
+        {
+          "operation_id": "receiver.submit",
+          "endpoint_id": "test-receiver-v1",
+          "service_id": "test-receiver",
+          "adapter_id": "receiver-sender",
+          "transport": "https_rest",
+          "method": "POST",
+          "route_id": "submissions-v1",
+          "route_template": "/test/v1/submissions",
+          "effect_type": "external_send",
+          "disclosure": {
+            "kind": "payload_fields"
+          },
+          "credential_binding": "receiver-api-key",
+          "limits": {},
+          "retry_policy": "none",
+          "idempotency_support": "idempotency_key",
+          "evidence_strategy": "receiver_receipt",
+          "evidence_level_max": "effect_verified",
+          "evidence_deadline_seconds": 30,
+          "intent_check_on_standing_rule": false,
+          "response_data_class": "none",
+          "redact_fields": [],
+          "response_limit_bytes": 65536,
+          "content_checks": {
+            "fields": [
+              "summary"
+            ],
+            "email_pattern": true,
+            "synthetic_identifiers": [
+              "SYN-USER-0001",
+              "SYN-USER-0002"
+            ]
+          },
+          "description": "자체 시험 receiver에 승인된 요약을 보낸다",
+          "schema_version": "v1",
+          "owner": "platform-team"
+        }
+      ],
+      "targets": [
+        {
+          "target_id": "agent-platform-gemini",
+          "endpoint_id": "agent-platform-v1",
+          "environment": "test",
+          "tenant": "hackathon",
+          "origin": "https://us-central1-aiplatform.googleapis.com:443",
+          "expected_tls_name": "us-central1-aiplatform.googleapis.com",
+          "ca_ref": "system",
+          "allowed_cidrs": [
+            "199.36.153.8/30"
+          ],
+          "max_data_class": "internal",
+          "operation_ids": [
+            "model.generate"
+          ],
+          "model": {
+            "project": "agentarium-test",
+            "location": "us-central1",
+            "model_id": "gemini-test-model"
+          },
+          "auth_audience": null,
+          "namespace": null
+        },
+        {
+          "target_id": "discovery-snapshots",
+          "endpoint_id": "discovery-snapshots-v1",
+          "environment": "test",
+          "tenant": "hackathon",
+          "origin": "https://discovery.agent-observe.svc:8443",
+          "expected_tls_name": "discovery.agent-observe.svc",
+          "ca_ref": "agentarium-trust",
+          "expected_uri_san": "spiffe://agentarium.internal/ns/agent-observe/sa/discovery",
+          "allowed_cidrs": [
+            "10.96.20.11/32"
+          ],
+          "max_data_class": "internal",
+          "operation_ids": [
+            "discovery.source.read",
+            "discovery.callgraph.read"
+          ],
+          "auth_audience": null,
+          "namespace": null,
+          "model": null
+        },
+        {
+          "target_id": "evidence-api",
+          "endpoint_id": "evidence-api-v1",
+          "environment": "test",
+          "tenant": "hackathon",
+          "origin": "https://timeline.agent-observe.svc:8443",
+          "expected_tls_name": "timeline.agent-observe.svc",
+          "ca_ref": "agentarium-trust",
+          "expected_uri_san": "spiffe://agentarium.internal/ns/agent-observe/sa/timeline",
+          "auth_audience": null,
+          "allowed_cidrs": [
+            "10.96.20.10/32"
+          ],
+          "max_data_class": "internal",
+          "operation_ids": [
+            "evidence.action.read",
+            "evidence.bundle.read",
+            "evidence.regression.read"
+          ],
+          "namespace": null,
+          "model": null
+        },
+        {
+          "target_id": "k8s-agent-targets",
+          "endpoint_id": "k8s-api-v1",
+          "environment": "test",
+          "tenant": "hackathon",
+          "origin": "https://kubernetes.default.svc:443",
+          "expected_tls_name": "kubernetes.default.svc",
+          "ca_ref": "cluster",
+          "auth_audience": null,
+          "allowed_cidrs": [
+            "10.96.0.1/32"
+          ],
+          "max_data_class": "synthetic",
+          "operation_ids": [
+            "k8s.pods.list",
+            "k8s.events.list",
+            "k8s.pods.logs"
+          ],
+          "namespace": "agent-targets",
+          "model": null
+        },
+        {
+          "target_id": "receiver-primary",
+          "endpoint_id": "test-receiver-v1",
+          "environment": "test",
+          "tenant": "hackathon",
+          "origin": "https://receiver.agent-targets.svc:8443",
+          "expected_tls_name": "receiver.agent-targets.svc",
+          "ca_ref": "agentarium-trust",
+          "expected_uri_san": "spiffe://agentarium.internal/ns/agent-targets/sa/receiver",
+          "allowed_cidrs": [
+            "10.96.10.20/32"
+          ],
+          "max_data_class": "synthetic",
+          "operation_ids": [
+            "receiver.submit"
+          ],
+          "auth_audience": null,
+          "namespace": null,
+          "model": null
+        },
+        {
+          "target_id": "receiver-probe",
+          "endpoint_id": "test-receiver-v1",
+          "environment": "test",
+          "tenant": "hackathon",
+          "origin": "https://receiver-probe.agent-targets.svc:8443",
+          "expected_tls_name": "receiver-probe.agent-targets.svc",
+          "ca_ref": "agentarium-trust",
+          "expected_uri_san": "spiffe://agentarium.internal/ns/agent-targets/sa/receiver-probe",
+          "allowed_cidrs": [
+            "10.96.10.21/32"
+          ],
+          "max_data_class": "synthetic",
+          "operation_ids": [
+            "receiver.submit"
+          ],
+          "auth_audience": null,
+          "namespace": null,
+          "model": null
+        }
+      ]
+    },
+    "jcs": "{\"operations\":[{\"adapter_id\":\"evidence-reader\",\"credential_binding\":null,\"description\":\"discovery snapshot의 call graph를 읽는다\",\"disclosure\":{\"kind\":\"none\"},\"effect_type\":\"read\",\"endpoint_id\":\"discovery-snapshots-v1\",\"evidence_deadline_seconds\":0,\"evidence_level_max\":\"accepted\",\"evidence_strategy\":\"response_only\",\"idempotency_support\":\"none\",\"intent_check_on_standing_rule\":false,\"limits\":{\"depth\":{\"max\":3,\"min\":1}},\"method\":\"GET\",\"operation_id\":\"discovery.callgraph.read\",\"owner\":\"platform-team\",\"redact_fields\":[],\"response_data_class\":\"internal\",\"response_limit_bytes\":65536,\"retry_policy\":\"none\",\"route_id\":\"discovery-callgraph-v1\",\"route_template\":\"/internal/discovery/snapshots/{snapshot_id}/callgraph\",\"schema_version\":\"v1\",\"service_id\":\"discovery\",\"transport\":\"https_rest\"},{\"adapter_id\":\"evidence-reader\",\"credential_binding\":null,\"description\":\"discovery snapshot의 소스 줄 범위를 읽는다\",\"disclosure\":{\"kind\":\"none\"},\"effect_type\":\"read\",\"endpoint_id\":\"discovery-snapshots-v1\",\"evidence_deadline_seconds\":0,\"evidence_level_max\":\"accepted\",\"evidence_strategy\":\"response_only\",\"idempotency_support\":\"none\",\"intent_check_on_standing_rule\":false,\"limits\":{},\"method\":\"GET\",\"operation_id\":\"discovery.source.read\",\"owner\":\"platform-team\",\"redact_fields\":[],\"response_data_class\":\"internal\",\"response_limit_bytes\":65536,\"retry_policy\":\"none\",\"route_id\":\"discovery-files-v1\",\"route_template\":\"/internal/discovery/snapshots/{snapshot_id}/files\",\"schema_version\":\"v1\",\"service_id\":\"discovery\",\"transport\":\"https_rest\"},{\"adapter_id\":\"evidence-reader\",\"credential_binding\":null,\"description\":\"정제된 action 증거를 읽는다\",\"disclosure\":{\"kind\":\"none\"},\"effect_type\":\"read\",\"endpoint_id\":\"evidence-api-v1\",\"evidence_deadline_seconds\":0,\"evidence_level_max\":\"accepted\",\"evidence_strategy\":\"response_only\",\"idempotency_support\":\"none\",\"intent_check_on_standing_rule\":false,\"limits\":{},\"method\":\"GET\",\"operation_id\":\"evidence.action.read\",\"owner\":\"platform-team\",\"redact_fields\":[\"/attempts/*/peer\",\"/a~1b\"],\"response_data_class\":\"internal\",\"response_limit_bytes\":65536,\"retry_policy\":\"none\",\"route_id\":\"evidence-action-v1\",\"route_template\":\"/internal/evidence/actions/{resource_id}\",\"schema_version\":\"v1\",\"service_id\":\"evidence\",\"transport\":\"https_rest\"},{\"adapter_id\":\"evidence-reader\",\"credential_binding\":null,\"description\":\"정제된 bundle 증거를 읽는다\",\"disclosure\":{\"kind\":\"none\"},\"effect_type\":\"read\",\"endpoint_id\":\"evidence-api-v1\",\"evidence_deadline_seconds\":0,\"evidence_level_max\":\"accepted\",\"evidence_strategy\":\"response_only\",\"idempotency_support\":\"none\",\"intent_check_on_standing_rule\":false,\"limits\":{},\"method\":\"GET\",\"operation_id\":\"evidence.bundle.read\",\"owner\":\"platform-team\",\"redact_fields\":[],\"response_data_class\":\"internal\",\"response_limit_bytes\":65536,\"retry_policy\":\"none\",\"route_id\":\"evidence-bundle-v1\",\"route_template\":\"/internal/evidence/bundles/{resource_id}\",\"schema_version\":\"v1\",\"service_id\":\"evidence\",\"transport\":\"https_rest\"},{\"adapter_id\":\"evidence-reader\",\"credential_binding\":null,\"description\":\"정제된 회귀 시험 증거를 읽는다\",\"disclosure\":{\"kind\":\"none\"},\"effect_type\":\"read\",\"endpoint_id\":\"evidence-api-v1\",\"evidence_deadline_seconds\":0,\"evidence_level_max\":\"accepted\",\"evidence_strategy\":\"response_only\",\"idempotency_support\":\"none\",\"intent_check_on_standing_rule\":false,\"limits\":{},\"method\":\"GET\",\"operation_id\":\"evidence.regression.read\",\"owner\":\"platform-team\",\"redact_fields\":[],\"response_data_class\":\"internal\",\"response_limit_bytes\":65536,\"retry_policy\":\"none\",\"route_id\":\"evidence-regression-v1\",\"route_template\":\"/internal/evidence/regressions/{resource_id}\",\"schema_version\":\"v1\",\"service_id\":\"evidence\",\"transport\":\"https_rest\"},{\"adapter_id\":\"kubernetes-reader\",\"credential_binding\":null,\"description\":\"agent-targets namespace의 이벤트 목록을 읽는다\",\"disclosure\":{\"kind\":\"none\"},\"effect_type\":\"read\",\"endpoint_id\":\"k8s-api-v1\",\"evidence_deadline_seconds\":0,\"evidence_level_max\":\"accepted\",\"evidence_strategy\":\"response_only\",\"idempotency_support\":\"none\",\"intent_check_on_standing_rule\":true,\"limits\":{\"limit\":{\"fixed\":100,\"max\":100}},\"method\":\"GET\",\"operation_id\":\"k8s.events.list\",\"owner\":\"platform-team\",\"redact_fields\":[],\"response_data_class\":\"synthetic\",\"response_limit_bytes\":1048576,\"retry_policy\":\"none\",\"route_id\":\"event-list-v1\",\"route_template\":\"/api/v1/namespaces/{namespace}/events\",\"schema_version\":\"v1\",\"service_id\":\"kubernetes\",\"transport\":\"https_rest\"},{\"adapter_id\":\"kubernetes-reader\",\"credential_binding\":null,\"description\":\"agent-targets namespace의 Pod 목록을 읽는다\",\"disclosure\":{\"kind\":\"none\"},\"effect_type\":\"read\",\"endpoint_id\":\"k8s-api-v1\",\"evidence_deadline_seconds\":0,\"evidence_level_max\":\"accepted\",\"evidence_strategy\":\"response_only\",\"idempotency_support\":\"none\",\"intent_check_on_standing_rule\":true,\"limits\":{\"limit\":{\"fixed\":100,\"max\":100}},\"method\":\"GET\",\"operation_id\":\"k8s.pods.list\",\"owner\":\"platform-team\",\"redact_fields\":[],\"response_data_class\":\"synthetic\",\"response_limit_bytes\":1048576,\"retry_policy\":\"none\",\"route_id\":\"pod-list-v1\",\"route_template\":\"/api/v1/namespaces/{namespace}/pods\",\"schema_version\":\"v1\",\"service_id\":\"kubernetes\",\"transport\":\"https_rest\"},{\"adapter_id\":\"kubernetes-reader\",\"credential_binding\":null,\"description\":\"agent-targets namespace의 등록 Pod 로그 마지막 몇 줄을 읽는다\",\"disclosure\":{\"kind\":\"none\"},\"effect_type\":\"read\",\"endpoint_id\":\"k8s-api-v1\",\"evidence_deadline_seconds\":0,\"evidence_level_max\":\"accepted\",\"evidence_strategy\":\"response_only\",\"idempotency_support\":\"none\",\"intent_check_on_standing_rule\":true,\"limits\":{\"limit_bytes\":{\"max\":1048576,\"min\":1},\"tail_lines\":{\"max\":200,\"min\":1}},\"method\":\"GET\",\"operation_id\":\"k8s.pods.logs\",\"owner\":\"platform-team\",\"redact_fields\":[],\"response_data_class\":\"synthetic\",\"response_limit_bytes\":1048576,\"retry_policy\":\"none\",\"route_id\":\"pod-log-v1\",\"route_template\":\"/api/v1/namespaces/{namespace}/pods/{pod_name}/log\",\"schema_version\":\"v1\",\"service_id\":\"kubernetes\",\"transport\":\"https_rest\"},{\"adapter_id\":\"model\",\"credential_binding\":null,\"description\":\"Agent Platform Gemini generateContent를 호출한다\",\"disclosure\":{\"kind\":\"message_sources\"},\"effect_type\":\"model_disclosure\",\"endpoint_id\":\"agent-platform-v1\",\"evidence_deadline_seconds\":0,\"evidence_level_max\":\"accepted\",\"evidence_strategy\":\"provider_response\",\"idempotency_support\":\"none\",\"intent_check_on_standing_rule\":true,\"limits\":{},\"method\":\"POST\",\"model_profiles\":[\"agent\",\"policy_proposal\",\"intent_check\",\"discovery\"],\"operation_id\":\"model.generate\",\"owner\":\"platform-team\",\"redact_fields\":[],\"response_data_class\":\"inherit\",\"response_limit_bytes\":1048576,\"retry_policy\":\"none\",\"route_id\":\"generate-content-v1\",\"route_template\":\"/v1/projects/{project}/locations/{location}/publishers/google/models/{model_id}:generateContent\",\"schema_version\":\"v1\",\"service_id\":\"agent-platform\",\"transport\":\"https_rest\"},{\"adapter_id\":\"receiver-sender\",\"content_checks\":{\"email_pattern\":true,\"fields\":[\"summary\"],\"synthetic_identifiers\":[\"SYN-USER-0001\",\"SYN-USER-0002\"]},\"credential_binding\":\"receiver-api-key\",\"description\":\"자체 시험 receiver에 승인된 요약을 보낸다\",\"disclosure\":{\"kind\":\"payload_fields\"},\"effect_type\":\"external_send\",\"endpoint_id\":\"test-receiver-v1\",\"evidence_deadline_seconds\":30,\"evidence_level_max\":\"effect_verified\",\"evidence_strategy\":\"receiver_receipt\",\"idempotency_support\":\"idempotency_key\",\"intent_check_on_standing_rule\":false,\"limits\":{},\"method\":\"POST\",\"operation_id\":\"receiver.submit\",\"owner\":\"platform-team\",\"redact_fields\":[],\"response_data_class\":\"none\",\"response_limit_bytes\":65536,\"retry_policy\":\"none\",\"route_id\":\"submissions-v1\",\"route_template\":\"/test/v1/submissions\",\"schema_version\":\"v1\",\"service_id\":\"test-receiver\",\"transport\":\"https_rest\"}],\"targets\":[{\"allowed_cidrs\":[\"199.36.153.8/30\"],\"auth_audience\":null,\"ca_ref\":\"system\",\"endpoint_id\":\"agent-platform-v1\",\"environment\":\"test\",\"expected_tls_name\":\"us-central1-aiplatform.googleapis.com\",\"max_data_class\":\"internal\",\"model\":{\"location\":\"us-central1\",\"model_id\":\"gemini-test-model\",\"project\":\"agentarium-test\"},\"namespace\":null,\"operation_ids\":[\"model.generate\"],\"origin\":\"https://us-central1-aiplatform.googleapis.com:443\",\"target_id\":\"agent-platform-gemini\",\"tenant\":\"hackathon\"},{\"allowed_cidrs\":[\"10.96.20.11/32\"],\"auth_audience\":null,\"ca_ref\":\"agentarium-trust\",\"endpoint_id\":\"discovery-snapshots-v1\",\"environment\":\"test\",\"expected_tls_name\":\"discovery.agent-observe.svc\",\"expected_uri_san\":\"spiffe://agentarium.internal/ns/agent-observe/sa/discovery\",\"max_data_class\":\"internal\",\"model\":null,\"namespace\":null,\"operation_ids\":[\"discovery.source.read\",\"discovery.callgraph.read\"],\"origin\":\"https://discovery.agent-observe.svc:8443\",\"target_id\":\"discovery-snapshots\",\"tenant\":\"hackathon\"},{\"allowed_cidrs\":[\"10.96.20.10/32\"],\"auth_audience\":null,\"ca_ref\":\"agentarium-trust\",\"endpoint_id\":\"evidence-api-v1\",\"environment\":\"test\",\"expected_tls_name\":\"timeline.agent-observe.svc\",\"expected_uri_san\":\"spiffe://agentarium.internal/ns/agent-observe/sa/timeline\",\"max_data_class\":\"internal\",\"model\":null,\"namespace\":null,\"operation_ids\":[\"evidence.action.read\",\"evidence.bundle.read\",\"evidence.regression.read\"],\"origin\":\"https://timeline.agent-observe.svc:8443\",\"target_id\":\"evidence-api\",\"tenant\":\"hackathon\"},{\"allowed_cidrs\":[\"10.96.0.1/32\"],\"auth_audience\":null,\"ca_ref\":\"cluster\",\"endpoint_id\":\"k8s-api-v1\",\"environment\":\"test\",\"expected_tls_name\":\"kubernetes.default.svc\",\"max_data_class\":\"synthetic\",\"model\":null,\"namespace\":\"agent-targets\",\"operation_ids\":[\"k8s.pods.list\",\"k8s.events.list\",\"k8s.pods.logs\"],\"origin\":\"https://kubernetes.default.svc:443\",\"target_id\":\"k8s-agent-targets\",\"tenant\":\"hackathon\"},{\"allowed_cidrs\":[\"10.96.10.20/32\"],\"auth_audience\":null,\"ca_ref\":\"agentarium-trust\",\"endpoint_id\":\"test-receiver-v1\",\"environment\":\"test\",\"expected_tls_name\":\"receiver.agent-targets.svc\",\"expected_uri_san\":\"spiffe://agentarium.internal/ns/agent-targets/sa/receiver\",\"max_data_class\":\"synthetic\",\"model\":null,\"namespace\":null,\"operation_ids\":[\"receiver.submit\"],\"origin\":\"https://receiver.agent-targets.svc:8443\",\"target_id\":\"receiver-primary\",\"tenant\":\"hackathon\"},{\"allowed_cidrs\":[\"10.96.10.21/32\"],\"auth_audience\":null,\"ca_ref\":\"agentarium-trust\",\"endpoint_id\":\"test-receiver-v1\",\"environment\":\"test\",\"expected_tls_name\":\"receiver-probe.agent-targets.svc\",\"expected_uri_san\":\"spiffe://agentarium.internal/ns/agent-targets/sa/receiver-probe\",\"max_data_class\":\"synthetic\",\"model\":null,\"namespace\":null,\"operation_ids\":[\"receiver.submit\"],\"origin\":\"https://receiver-probe.agent-targets.svc:8443\",\"target_id\":\"receiver-probe\",\"tenant\":\"hackathon\"}]}",
+    "catalog_digest": "f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8"
+  },
+  "catalog_variants": [
+    {
+      "id": "receiver-origin-changed",
+      "note": "catalog.json_value with targets[receiver-primary].origin replaced; catalog_version unchanged",
+      "target_id": "receiver-primary",
+      "origin": "https://receiver.agent-targets.svc:9443",
+      "catalog_digest": "84ba686c43bf58be6298759d6922155b732141690060dd880e44020ead0ba1ab"
+    }
+  ],
+  "model_profiles": {
+    "agent": {
+      "max_output_tokens": 8192,
+      "max_request_bytes": 65536,
+      "generation_config": {
+        "temperature": 0.2,
+        "maxOutputTokens": 8192,
+        "candidateCount": 1
+      },
+      "response_schema": null
+    },
+    "policy_proposal": {
+      "max_output_tokens": 8192,
+      "max_request_bytes": 65536,
+      "generation_config": {
+        "temperature": 0,
+        "maxOutputTokens": 8192
+      },
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "builder_params": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "intent_check": {
+      "max_output_tokens": 1024,
+      "max_request_bytes": 16384,
+      "generation_config": {
+        "temperature": 0,
+        "maxOutputTokens": 1024
+      },
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "overall": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "discovery": {
+      "max_output_tokens": 8192,
+      "max_request_bytes": 65536,
+      "generation_config": {
+        "temperature": 0,
+        "maxOutputTokens": 8192
+      },
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "destination_template": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "trusted_default": {
+    "action_id": "8c1e6f2a-1b2c-4d3e-8f40-5a6b7c8d9e0f",
+    "request_id": "0f9e8d7c-6b5a-4f3e-8d2c-1b0a9f8e7d6c",
+    "authenticated_actor": "user:alice@example.com",
+    "session_kind": "user",
+    "session_id": "51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+    "workload_id": "agent-runtime-0",
+    "tenant": "hackathon",
+    "environment": "test",
+    "workload_data_state": {
+      "data_class_high_water": "synthetic",
+      "data_sources": [
+        "fixture:receiver-safe-v1"
+      ]
+    }
+  },
+  "jcs": [
+    {
+      "id": "rfc8785-arrays",
+      "source": "RFC 8785 examples via upstream testdata/arrays.json",
+      "input": "[\n  56,\n  {\n    \"d\": true,\n    \"10\": null,\n    \"1\": [ ]\n  }\n]\n",
+      "rfc_expected": "[56,{\"1\":[],\"10\":null,\"d\":true}]",
+      "expected_jcs": "[56,{\"1\":[],\"10\":null,\"d\":true}]",
+      "expected_sha256": "099601b171cafed97c333f8878d68e7f8c8f795412adb34b2fdcf0e7c7beac42"
+    },
+    {
+      "id": "rfc8785-french",
+      "source": "RFC 8785 examples via upstream testdata/french.json",
+      "input": "{\n  \"peach\": \"This sorting order\",\n  \"péché\": \"is wrong according to French\",\n  \"pêche\": \"but canonicalization MUST\",\n  \"sin\":   \"ignore locale\"\n}\n",
+      "rfc_expected": "{\"peach\":\"This sorting order\",\"péché\":\"is wrong according to French\",\"pêche\":\"but canonicalization MUST\",\"sin\":\"ignore locale\"}",
+      "expected_jcs": "{\"peach\":\"This sorting order\",\"péché\":\"is wrong according to French\",\"pêche\":\"but canonicalization MUST\",\"sin\":\"ignore locale\"}",
+      "expected_sha256": "d99d0ebdcb0033cb858cfa830ae46bc0fb3309413b271f1da828c89901a27ed5"
+    },
+    {
+      "id": "rfc8785-structures",
+      "source": "RFC 8785 examples via upstream testdata/structures.json",
+      "input": "{\n  \"1\": {\"f\": {\"f\": \"hi\",\"F\": 5} ,\"\\n\": 56.0},\n  \"10\": { },\n  \"\": \"empty\",\n  \"a\": { },\n  \"111\": [ {\"e\": \"yes\",\"E\": \"no\" } ],\n  \"A\": { }\n}",
+      "rfc_expected": "{\"\":\"empty\",\"1\":{\"\\n\":56,\"f\":{\"F\":5,\"f\":\"hi\"}},\"10\":{},\"111\":[{\"E\":\"no\",\"e\":\"yes\"}],\"A\":{},\"a\":{}}",
+      "expected_jcs": "{\"\":\"empty\",\"1\":{\"\\n\":56,\"f\":{\"F\":5,\"f\":\"hi\"}},\"10\":{},\"111\":[{\"E\":\"no\",\"e\":\"yes\"}],\"A\":{},\"a\":{}}",
+      "expected_sha256": "605f65004ec2db7692522a0852c22f1c989e036d547e88963d1a3143cf3195d5"
+    },
+    {
+      "id": "rfc8785-unicode",
+      "source": "RFC 8785 examples via upstream testdata/unicode.json",
+      "input": "{\n  \"Unnormalized Unicode\":\"A\\u030a\"\n}\n",
+      "rfc_expected": "{\"Unnormalized Unicode\":\"Å\"}",
+      "expected_jcs": "{\"Unnormalized Unicode\":\"Å\"}",
+      "expected_sha256": "0d99aad92a125196ff887876643fd3206786a84ddce2cee52ba4ad256d2381d3"
+    },
+    {
+      "id": "rfc8785-values",
+      "source": "RFC 8785 examples via upstream testdata/values.json",
+      "input": "{\n  \"numbers\": [333333333.33333329, 1E30, 4.50, 2e-3, 0.000000000000000000000000001],\n  \"string\": \"\\u20ac$\\u000F\\u000aA'\\u0042\\u0022\\u005c\\\\\\\"\\/\",\n  \"literals\": [null, true, false]\n}",
+      "rfc_expected": "{\"literals\":[null,true,false],\"numbers\":[333333333.3333333,1e+30,4.5,0.002,1e-27],\"string\":\"€$\\u000f\\nA'B\\\"\\\\\\\\\\\"/\"}",
+      "expected_jcs": "{\"literals\":[null,true,false],\"numbers\":[333333333.3333333,1e+30,4.5,0.002,1e-27],\"string\":\"€$\\u000f\\nA'B\\\"\\\\\\\\\\\"/\"}",
+      "expected_sha256": "2d5e01a318d0f0879ab568c4be289c8b1f64ef8921a53c6277d5e069978baacb",
+      "library_only": true
+    },
+    {
+      "id": "rfc8785-weird",
+      "source": "RFC 8785 examples via upstream testdata/weird.json",
+      "input": "{\n  \"\\u20ac\": \"Euro Sign\",\n  \"\\r\": \"Carriage Return\",\n  \"\\u000a\": \"Newline\",\n  \"1\": \"One\",\n  \"\\u0080\": \"Control\\u007f\",\n  \"\\ud83d\\ude02\": \"Smiley\",\n  \"\\u00f6\": \"Latin Small Letter O With Diaeresis\",\n  \"\\ufb33\": \"Hebrew Letter Dalet With Dagesh\",\n  \"</script>\": \"Browser Challenge\"\n}\n",
+      "rfc_expected": "{\"\\n\":\"Newline\",\"\\r\":\"Carriage Return\",\"1\":\"One\",\"</script>\":\"Browser Challenge\",\"\":\"Control\",\"ö\":\"Latin Small Letter O With Diaeresis\",\"€\":\"Euro Sign\",\"😂\":\"Smiley\",\"דּ\":\"Hebrew Letter Dalet With Dagesh\"}",
+      "expected_jcs": "{\"\\n\":\"Newline\",\"\\r\":\"Carriage Return\",\"1\":\"One\",\"</script>\":\"Browser Challenge\",\"\":\"Control\",\"ö\":\"Latin Small Letter O With Diaeresis\",\"€\":\"Euro Sign\",\"😂\":\"Smiley\",\"דּ\":\"Hebrew Letter Dalet With Dagesh\"}",
+      "expected_sha256": "6af595a9aa80110b964b4de3f82a05fa6ae7423005019bacfa2620dddc4e94d1"
+    },
+    {
+      "id": "non-bmp-keys",
+      "source": "UTF-16 code unit order differs from code point order",
+      "input": "{\"\\ufb33\":2,\"\\ud83d\\ude02\":1,\"a\":3,\"\\uffff\":4,\"\\ud800\\udc00\":5}",
+      "expected_jcs": "{\"a\":3,\"𐀀\":5,\"😂\":1,\"דּ\":2,\"￿\":4}",
+      "expected_sha256": "9e4ff5e7ef0991a2f2c2dc0354f09aaa92cea58e9190340a7eb38dc1e4cca430"
+    },
+    {
+      "id": "non-bmp-raw-utf8",
+      "source": "same keys as non-bmp-keys written as raw UTF-8",
+      "input": "{\"דּ\":2,\"😂\":1,\"a\":3,\"￿\":4,\"𐀀\":5}",
+      "expected_jcs": "{\"a\":3,\"𐀀\":5,\"😂\":1,\"דּ\":2,\"￿\":4}",
+      "expected_sha256": "9e4ff5e7ef0991a2f2c2dc0354f09aaa92cea58e9190340a7eb38dc1e4cca430"
+    },
+    {
+      "id": "decimals-library-only",
+      "source": "decimal serialization (library check only; request bodies reject decimals)",
+      "input": "{\"n\":[333333333.33333329,1E30,4.50,2e-3,0.000000000000000000000000001,-0,1e21,1e-7,0.1,1.2345678901234568e20,-1.5e-10]}",
+      "expected_jcs": "{\"n\":[333333333.3333333,1e+30,4.5,0.002,1e-27,0,1e+21,1e-7,0.1,123456789012345680000,-1.5e-10]}",
+      "expected_sha256": "03d2b342f4a6ab1a8b449056cdd9c132f0bcce1b69bebb70ea0230251a0056d1",
+      "library_only": true
+    },
+    {
+      "id": "integer-max-safe",
+      "source": "largest accepted integer",
+      "input": "{\"max\":9007199254740991,\"min\":-9007199254740991}",
+      "expected_jcs": "{\"max\":9007199254740991,\"min\":-9007199254740991}",
+      "expected_sha256": "63546eb60913dcb1cdd5118f7bf4885beed344af930c8a9d5f38fad243fd4819"
+    },
+    {
+      "id": "control-escapes",
+      "source": "control characters and escapes",
+      "input": "[\"\\u0000\\u001f\\u007f\\b\\f\\n\\r\\t\\\"\\\\\\/\"]",
+      "expected_jcs": "[\"\\u0000\\u001f\\b\\f\\n\\r\\t\\\"\\\\/\"]",
+      "expected_sha256": "926904f08a4e7d912485476766b8c9898baf2a8d9d8b2574fd1279e085d13317"
+    },
+    {
+      "id": "integral-decimal-in-range",
+      "source": "integral values written with a fraction or exponent inside ±(2^53-1) are accepted and serialize as integers",
+      "input": "{\"a\":100.0,\"b\":1e15,\"c\":-9007199254740991.0,\"d\":2.50e1}",
+      "expected_jcs": "{\"a\":100,\"b\":1000000000000000,\"c\":-9007199254740991,\"d\":25}",
+      "expected_sha256": "1618ca21539edb019f116a391870ee1f008e16645ddf523b4b289f1bbd24d5d9"
+    }
+  ],
+  "jcs_reject": [
+    {
+      "id": "duplicate-key",
+      "input": "{\"a\":1,\"a\":2}"
+    },
+    {
+      "id": "lone-high-surrogate",
+      "input": "{\"a\":\"\\ud800\"}"
+    },
+    {
+      "id": "lone-low-surrogate",
+      "input": "{\"a\":\"\\udc00\"}"
+    },
+    {
+      "id": "invalid-utf8",
+      "input_hex": "7b2261223a22c328227d"
+    },
+    {
+      "id": "nan",
+      "input": "{\"a\":NaN}"
+    },
+    {
+      "id": "top-level-scalar",
+      "input": "\"x\""
+    },
+    {
+      "id": "integer-2-53",
+      "input": "{\"a\":9007199254740992}"
+    },
+    {
+      "id": "integral-decimal-2-53-plus-1",
+      "note": "9007199254740993.0 would serialize like 2^53",
+      "input": "{\"a\":9007199254740993.0}"
+    },
+    {
+      "id": "integral-decimal-neg-2-53",
+      "input": "{\"a\":-9007199254740992.0}"
+    },
+    {
+      "id": "integral-exponent-1e16",
+      "input": "{\"a\":1e16}"
+    }
+  ],
+  "strict_reject": [
+    {
+      "id": "duplicate-key",
+      "note": "same key twice",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.list\",\"operation_id\":\"k8s.pods.list\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\"},\"arguments\":{},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "duplicate-key-nested",
+      "note": "same key twice inside requested_target",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.list\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\",\"target_id\":\"receiver-primary\"},\"arguments\":{},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "case-only-duplicate",
+      "note": "keys equal under strings.ToLower",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"Session_ID\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.list\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\"},\"arguments\":{},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "tag-case-mismatch",
+      "note": "outer key differs from struct tag only by case",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"Operation_ID\":\"k8s.pods.list\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\"},\"arguments\":{},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "invalid-utf8",
+      "note": "0xC3 0x28 inside a string",
+      "raw_hex": "7b2273657373696f6e5f6964223a2235316162326333642d346535662d346136622d386337642d396530663161326233633464222c226f7065726174696f6e5f6964223a226b38732e706f64732e6c6f6773222c227265717565737465645f746172676574223a7b227461726765745f6964223a226b38732d6167656e742d74617267657473222c22706f645f6e616d65223a2264656d6f2d6170692d37643966222c22636f6e7461696e6572223a22617070227d2c22617267756d656e7473223a7b227461696c5f6c696e6573223a3130302c226c696d69745f6279746573223a36353533367d2c22636c69656e745f726571756573745f6b6579223a227265712d30303030c328303031227d",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "lone-high-surrogate",
+      "note": "\\uD800 not followed by a low surrogate",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.logs\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\",\"pod_name\":\"demo-api-7d9f\",\"container\":\"app\"},\"arguments\":{\"tail_lines\":100,\"limit_bytes\":65536},\"client_request_key\":\"req-0000\\ud800x\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "lone-low-surrogate",
+      "note": "\\uDC00 alone",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.logs\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\",\"pod_name\":\"demo-api-7d9f\",\"container\":\"app\"},\"arguments\":{\"tail_lines\":100,\"limit_bytes\":65536},\"client_request_key\":\"req-0000\\udc00x\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "reversed-surrogates",
+      "note": "\\uDC00\\uD800",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.logs\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\",\"pod_name\":\"demo-api-7d9f\",\"container\":\"app\"},\"arguments\":{\"tail_lines\":100,\"limit_bytes\":65536},\"client_request_key\":\"req-0000\\udc00\\ud800\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "nan",
+      "note": "NaN is not JSON",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.logs\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\",\"pod_name\":\"demo-api-7d9f\",\"container\":\"app\"},\"arguments\":{\"tail_lines\":NaN,\"limit_bytes\":65536},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "infinity",
+      "note": "Infinity is not JSON",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.logs\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\",\"pod_name\":\"demo-api-7d9f\",\"container\":\"app\"},\"arguments\":{\"tail_lines\":Infinity,\"limit_bytes\":65536},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "integer-2-53",
+      "note": "9007199254740992 = 2^53 is outside ±(2^53-1)",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.logs\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\",\"pod_name\":\"demo-api-7d9f\",\"container\":\"app\"},\"arguments\":{\"tail_lines\":9007199254740992,\"limit_bytes\":65536},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "integer-neg-2-53",
+      "note": "-9007199254740992",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.logs\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\",\"pod_name\":\"demo-api-7d9f\",\"container\":\"app\"},\"arguments\":{\"tail_lines\":-9007199254740992,\"limit_bytes\":65536},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "decimal",
+      "note": "100.0 has a fraction",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.logs\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\",\"pod_name\":\"demo-api-7d9f\",\"container\":\"app\"},\"arguments\":{\"tail_lines\":100.0,\"limit_bytes\":65536},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "exponent",
+      "note": "1e2 has an exponent",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.logs\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\",\"pod_name\":\"demo-api-7d9f\",\"container\":\"app\"},\"arguments\":{\"tail_lines\":1e2,\"limit_bytes\":65536},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "depth-17",
+      "note": "17 nested containers (top-level object is depth 1)",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.list\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\"},\"arguments\":{},\"client_request_key\":\"req-00000001\",\"x\":[[[[[[[[[[[[[[[1]]]]]]]]]]]]]]]}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "key-129-bytes",
+      "note": "object key longer than 128 bytes",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.list\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\"},\"arguments\":{\"kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk\":1},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "trailing-value",
+      "note": "second top-level value",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.list\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\"},\"arguments\":{},\"client_request_key\":\"req-00000001\"} {}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "trailing-garbage",
+      "note": "garbage after the value",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.list\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\"},\"arguments\":{},\"client_request_key\":\"req-00000001\"}x",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "raw-url-outer",
+      "note": "raw URL field in the outer ClientAction",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.list\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\"},\"arguments\":{},\"client_request_key\":\"req-00000001\",\"url\":\"https://evil.example/\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "top-level-array",
+      "note": "ClientAction must be an object",
+      "raw": "[{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.list\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\"},\"arguments\":{},\"client_request_key\":\"req-00000001\"}]",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "missing-client-request-key",
+      "note": "outer key missing",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.list\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\"},\"arguments\":{}}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "uppercase-session-id",
+      "note": "session_id must be a lowercase UUID",
+      "raw": "{\"session_id\":\"51AB2C3D-4E5F-4A6B-8C7D-9E0F1A2B3C4D\",\"operation_id\":\"k8s.pods.list\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\"},\"arguments\":{},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "short-client-request-key",
+      "note": "client_request_key shorter than 8",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.list\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\"},\"arguments\":{},\"client_request_key\":\"short\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "arguments-array",
+      "note": "arguments must be an object",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.list\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\"},\"arguments\":[],\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    }
+  ],
+  "normalize": [
+    {
+      "id": "k8s-pods-list",
+      "note": "3.2 valid example",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.list\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\"},\"arguments\":{},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": null,
+        "hash_object_template": {
+          "operation_id": "k8s.pods.list",
+          "canonical_target": {
+            "target_id": "k8s-agent-targets",
+            "route_id": "pod-list-v1",
+            "namespace": "agent-targets"
+          },
+          "disclosure_fields": [],
+          "content_digest": null,
+          "limits": {
+            "limit": 100,
+            "response_bytes": 1048576
+          },
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": null,
+        "content_jcs": null,
+        "content_digest": null,
+        "hash_jcs": "{\"canonical_target\":{\"namespace\":\"agent-targets\",\"route_id\":\"pod-list-v1\",\"target_id\":\"k8s-agent-targets\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":null,\"disclosure_fields\":[],\"environment\":\"test\",\"limits\":{\"limit\":100,\"response_bytes\":1048576},\"operation_id\":\"k8s.pods.list\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "dbcdff756437b64a02f7b587b96bfdd6a4bd4161d9ee9c712c297b64b4050431",
+        "wire_body_digest": null
+      }
+    },
+    {
+      "id": "k8s-events-list",
+      "note": "3.2 valid example",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.events.list\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\"},\"arguments\":{},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": null,
+        "hash_object_template": {
+          "operation_id": "k8s.events.list",
+          "canonical_target": {
+            "target_id": "k8s-agent-targets",
+            "route_id": "event-list-v1",
+            "namespace": "agent-targets"
+          },
+          "disclosure_fields": [],
+          "content_digest": null,
+          "limits": {
+            "limit": 100,
+            "response_bytes": 1048576
+          },
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": null,
+        "content_jcs": null,
+        "content_digest": null,
+        "hash_jcs": "{\"canonical_target\":{\"namespace\":\"agent-targets\",\"route_id\":\"event-list-v1\",\"target_id\":\"k8s-agent-targets\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":null,\"disclosure_fields\":[],\"environment\":\"test\",\"limits\":{\"limit\":100,\"response_bytes\":1048576},\"operation_id\":\"k8s.events.list\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "9a75405893437a1d320e1674b3c892ad7b9395a6e2ce73e044150a5acd2bb041",
+        "wire_body_digest": null
+      }
+    },
+    {
+      "id": "k8s-pods-logs",
+      "note": "3.2 valid example",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.logs\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\",\"pod_name\":\"demo-api-7d9f\",\"container\":\"app\"},\"arguments\":{\"tail_lines\":100,\"limit_bytes\":65536},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": null,
+        "hash_object_template": {
+          "operation_id": "k8s.pods.logs",
+          "canonical_target": {
+            "target_id": "k8s-agent-targets",
+            "route_id": "pod-log-v1",
+            "namespace": "agent-targets",
+            "pod_name": "demo-api-7d9f",
+            "container": "app"
+          },
+          "disclosure_fields": [],
+          "content_digest": null,
+          "limits": {
+            "tail_lines": 100,
+            "limit_bytes": 65536
+          },
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": null,
+        "content_jcs": null,
+        "content_digest": null,
+        "hash_jcs": "{\"canonical_target\":{\"container\":\"app\",\"namespace\":\"agent-targets\",\"pod_name\":\"demo-api-7d9f\",\"route_id\":\"pod-log-v1\",\"target_id\":\"k8s-agent-targets\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":null,\"disclosure_fields\":[],\"environment\":\"test\",\"limits\":{\"limit_bytes\":65536,\"tail_lines\":100},\"operation_id\":\"k8s.pods.logs\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "a01dc221dc1bb8dcaacb4249093994058761b9d279fc40a512f7a856f9c8a1f5",
+        "wire_body_digest": null
+      }
+    },
+    {
+      "id": "k8s-pods-logs-tail-50",
+      "note": "limits change",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.logs\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\",\"pod_name\":\"demo-api-7d9f\",\"container\":\"app\"},\"arguments\":{\"tail_lines\":50,\"limit_bytes\":65536},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": null,
+        "hash_object_template": {
+          "operation_id": "k8s.pods.logs",
+          "canonical_target": {
+            "target_id": "k8s-agent-targets",
+            "route_id": "pod-log-v1",
+            "namespace": "agent-targets",
+            "pod_name": "demo-api-7d9f",
+            "container": "app"
+          },
+          "disclosure_fields": [],
+          "content_digest": null,
+          "limits": {
+            "tail_lines": 50,
+            "limit_bytes": 65536
+          },
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": null,
+        "content_jcs": null,
+        "content_digest": null,
+        "hash_jcs": "{\"canonical_target\":{\"container\":\"app\",\"namespace\":\"agent-targets\",\"pod_name\":\"demo-api-7d9f\",\"route_id\":\"pod-log-v1\",\"target_id\":\"k8s-agent-targets\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":null,\"disclosure_fields\":[],\"environment\":\"test\",\"limits\":{\"limit_bytes\":65536,\"tail_lines\":50},\"operation_id\":\"k8s.pods.logs\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "d7eacb1f75d67da9bdf7f7b4e9b6fb41957b31c706087300966123a140bfe022",
+        "wire_body_digest": null
+      }
+    },
+    {
+      "id": "k8s-pods-logs-keyorder",
+      "note": "same request, different key order and whitespace",
+      "raw": "{ \"arguments\" : { \"limit_bytes\" : 65536 , \"tail_lines\" : 100 } , \"client_request_key\" : \"req-00000001\" ,\n \"requested_target\" : {\"container\":\"app\",\"pod_name\":\"demo-api-7d9f\",\"target_id\":\"k8s-agent-targets\"}, \"operation_id\":\"k8s.pods.logs\", \"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\" }",
+      "expect": {
+        "content_input_template": null,
+        "hash_object_template": {
+          "operation_id": "k8s.pods.logs",
+          "canonical_target": {
+            "target_id": "k8s-agent-targets",
+            "route_id": "pod-log-v1",
+            "namespace": "agent-targets",
+            "pod_name": "demo-api-7d9f",
+            "container": "app"
+          },
+          "disclosure_fields": [],
+          "content_digest": null,
+          "limits": {
+            "tail_lines": 100,
+            "limit_bytes": 65536
+          },
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": null,
+        "content_jcs": null,
+        "content_digest": null,
+        "hash_jcs": "{\"canonical_target\":{\"container\":\"app\",\"namespace\":\"agent-targets\",\"pod_name\":\"demo-api-7d9f\",\"route_id\":\"pod-log-v1\",\"target_id\":\"k8s-agent-targets\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":null,\"disclosure_fields\":[],\"environment\":\"test\",\"limits\":{\"limit_bytes\":65536,\"tail_lines\":100},\"operation_id\":\"k8s.pods.logs\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "a01dc221dc1bb8dcaacb4249093994058761b9d279fc40a512f7a856f9c8a1f5",
+        "wire_body_digest": null
+      }
+    },
+    {
+      "id": "k8s-pods-list-limit",
+      "note": "3.2 reject: unknown key in arguments",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.list\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\"},\"arguments\":{\"limit\":500},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "k8s-events-list-kube-system",
+      "note": "3.2 reject: unregistered target",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.events.list\",\"requested_target\":{\"target_id\":\"k8s-kube-system\"},\"arguments\":{},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 403,
+        "reason_codes": [
+          "ENDPOINT_NOT_REGISTERED"
+        ],
+        "rule_id": "normalize.endpoint_registered.v1"
+      }
+    },
+    {
+      "id": "k8s-pods-logs-tail-500",
+      "note": "3.2 reject: tail_lines out of range",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.logs\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\",\"pod_name\":\"demo-api-7d9f\",\"container\":\"app\"},\"arguments\":{\"tail_lines\":500,\"limit_bytes\":65536},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "k8s-pods-logs-uppercase-pod",
+      "note": "pod_name must be lowercase DNS-1123",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.logs\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\",\"pod_name\":\"Demo-API\",\"container\":\"app\"},\"arguments\":{\"tail_lines\":1,\"limit_bytes\":1},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "k8s-pods-logs-namespace-override",
+      "note": "namespace cannot be requested",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.logs\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\",\"pod_name\":\"demo-api-7d9f\",\"container\":\"app\",\"namespace\":\"kube-system\"},\"arguments\":{\"tail_lines\":1,\"limit_bytes\":1},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "k8s-tag-case",
+      "note": "key differs from struct tag only by case",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.list\",\"requested_target\":{\"Target_ID\":\"k8s-agent-targets\"},\"arguments\":{},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "k8s-target-wrong-op",
+      "note": "target registered but not for this operation",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.pods.list\",\"requested_target\":{\"target_id\":\"receiver-primary\"},\"arguments\":{},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 403,
+        "reason_codes": [
+          "ENDPOINT_NOT_REGISTERED"
+        ],
+        "rule_id": "normalize.endpoint_registered.v1"
+      }
+    },
+    {
+      "id": "receiver",
+      "note": "3.2 valid example",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"receiver.submit\",\"requested_target\":{\"target_id\":\"receiver-primary\"},\"arguments\":{\"payload\":{\"summary\":\"3 pods restarted\",\"email\":null}},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": {
+          "summary": "3 pods restarted",
+          "email": null
+        },
+        "hash_object_template": {
+          "operation_id": "receiver.submit",
+          "canonical_target": {
+            "target_id": "receiver-primary",
+            "route_id": "submissions-v1"
+          },
+          "disclosure_fields": [
+            "summary"
+          ],
+          "content_digest": "$content_digest",
+          "limits": {},
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": "content",
+        "content_jcs": "{\"email\":null,\"summary\":\"3 pods restarted\"}",
+        "content_digest": "d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1",
+        "hash_jcs": "{\"canonical_target\":{\"route_id\":\"submissions-v1\",\"target_id\":\"receiver-primary\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":\"d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1\",\"disclosure_fields\":[\"summary\"],\"environment\":\"test\",\"limits\":{},\"operation_id\":\"receiver.submit\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "e1809c6acc82485f37d79570946b958c450009c3e497d33e98c8ab46797df7a8",
+        "wire_body_digest": "d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1"
+      }
+    },
+    {
+      "id": "receiver-keyorder",
+      "note": "payload and outer key order, whitespace",
+      "raw": "{\"client_request_key\":\"req-00000001\",\"arguments\":{\"payload\":{\"email\":null,\"summary\":\"3 pods restarted\"}},\"requested_target\":{\"target_id\":\"receiver-primary\"},\"operation_id\":\"receiver.submit\",\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\"}\n",
+      "expect": {
+        "content_input_template": {
+          "summary": "3 pods restarted",
+          "email": null
+        },
+        "hash_object_template": {
+          "operation_id": "receiver.submit",
+          "canonical_target": {
+            "target_id": "receiver-primary",
+            "route_id": "submissions-v1"
+          },
+          "disclosure_fields": [
+            "summary"
+          ],
+          "content_digest": "$content_digest",
+          "limits": {},
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": "content",
+        "content_jcs": "{\"email\":null,\"summary\":\"3 pods restarted\"}",
+        "content_digest": "d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1",
+        "hash_jcs": "{\"canonical_target\":{\"route_id\":\"submissions-v1\",\"target_id\":\"receiver-primary\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":\"d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1\",\"disclosure_fields\":[\"summary\"],\"environment\":\"test\",\"limits\":{},\"operation_id\":\"receiver.submit\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "e1809c6acc82485f37d79570946b958c450009c3e497d33e98c8ab46797df7a8",
+        "wire_body_digest": "d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1"
+      }
+    },
+    {
+      "id": "receiver-other-key",
+      "note": "client_request_key is not in action_digest",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"receiver.submit\",\"requested_target\":{\"target_id\":\"receiver-primary\"},\"arguments\":{\"payload\":{\"summary\":\"3 pods restarted\",\"email\":null}},\"client_request_key\":\"req-other-key-0002\"}",
+      "expect": {
+        "content_input_template": {
+          "summary": "3 pods restarted",
+          "email": null
+        },
+        "hash_object_template": {
+          "operation_id": "receiver.submit",
+          "canonical_target": {
+            "target_id": "receiver-primary",
+            "route_id": "submissions-v1"
+          },
+          "disclosure_fields": [
+            "summary"
+          ],
+          "content_digest": "$content_digest",
+          "limits": {},
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": "content",
+        "content_jcs": "{\"email\":null,\"summary\":\"3 pods restarted\"}",
+        "content_digest": "d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1",
+        "hash_jcs": "{\"canonical_target\":{\"route_id\":\"submissions-v1\",\"target_id\":\"receiver-primary\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":\"d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1\",\"disclosure_fields\":[\"summary\"],\"environment\":\"test\",\"limits\":{},\"operation_id\":\"receiver.submit\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "e1809c6acc82485f37d79570946b958c450009c3e497d33e98c8ab46797df7a8",
+        "wire_body_digest": "d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1"
+      }
+    },
+    {
+      "id": "receiver-high-water",
+      "note": "raised workload_data_state does not change action_digest",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"receiver.submit\",\"requested_target\":{\"target_id\":\"receiver-primary\"},\"arguments\":{\"payload\":{\"summary\":\"3 pods restarted\",\"email\":null}},\"client_request_key\":\"req-00000001\"}",
+      "trusted_override": {
+        "workload_data_state": {
+          "data_class_high_water": "internal",
+          "data_sources": [
+            "fixture:receiver-safe-v1",
+            "k8s:agent-targets/logs"
+          ]
+        }
+      },
+      "expect": {
+        "content_input_template": {
+          "summary": "3 pods restarted",
+          "email": null
+        },
+        "hash_object_template": {
+          "operation_id": "receiver.submit",
+          "canonical_target": {
+            "target_id": "receiver-primary",
+            "route_id": "submissions-v1"
+          },
+          "disclosure_fields": [
+            "summary"
+          ],
+          "content_digest": "$content_digest",
+          "limits": {},
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": "content",
+        "content_jcs": "{\"email\":null,\"summary\":\"3 pods restarted\"}",
+        "content_digest": "d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1",
+        "hash_jcs": "{\"canonical_target\":{\"route_id\":\"submissions-v1\",\"target_id\":\"receiver-primary\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":\"d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1\",\"disclosure_fields\":[\"summary\"],\"environment\":\"test\",\"limits\":{},\"operation_id\":\"receiver.submit\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "e1809c6acc82485f37d79570946b958c450009c3e497d33e98c8ab46797df7a8",
+        "wire_body_digest": "d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1"
+      }
+    },
+    {
+      "id": "receiver-probe",
+      "note": "different receiver target",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"receiver.submit\",\"requested_target\":{\"target_id\":\"receiver-probe\"},\"arguments\":{\"payload\":{\"summary\":\"3 pods restarted\",\"email\":null}},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": {
+          "summary": "3 pods restarted",
+          "email": null
+        },
+        "hash_object_template": {
+          "operation_id": "receiver.submit",
+          "canonical_target": {
+            "target_id": "receiver-probe",
+            "route_id": "submissions-v1"
+          },
+          "disclosure_fields": [
+            "summary"
+          ],
+          "content_digest": "$content_digest",
+          "limits": {},
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": "content",
+        "content_jcs": "{\"email\":null,\"summary\":\"3 pods restarted\"}",
+        "content_digest": "d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1",
+        "hash_jcs": "{\"canonical_target\":{\"route_id\":\"submissions-v1\",\"target_id\":\"receiver-probe\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":\"d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1\",\"disclosure_fields\":[\"summary\"],\"environment\":\"test\",\"limits\":{},\"operation_id\":\"receiver.submit\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "33e36336ba7884f5ee7cd42e820bf3126be3dbee4594a49aa4ae8adabb3272a9",
+        "wire_body_digest": "d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1"
+      }
+    },
+    {
+      "id": "receiver-summary-changed",
+      "note": "payload change",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"receiver.submit\",\"requested_target\":{\"target_id\":\"receiver-primary\"},\"arguments\":{\"payload\":{\"summary\":\"4 pods restarted\",\"email\":null}},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": {
+          "summary": "4 pods restarted",
+          "email": null
+        },
+        "hash_object_template": {
+          "operation_id": "receiver.submit",
+          "canonical_target": {
+            "target_id": "receiver-primary",
+            "route_id": "submissions-v1"
+          },
+          "disclosure_fields": [
+            "summary"
+          ],
+          "content_digest": "$content_digest",
+          "limits": {},
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": "content",
+        "content_jcs": "{\"email\":null,\"summary\":\"4 pods restarted\"}",
+        "content_digest": "ad4942f692dc18a9bfe3342a37ca5bfeb584a294f4e6e7d81d358a3c42d1fdc7",
+        "hash_jcs": "{\"canonical_target\":{\"route_id\":\"submissions-v1\",\"target_id\":\"receiver-primary\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":\"ad4942f692dc18a9bfe3342a37ca5bfeb584a294f4e6e7d81d358a3c42d1fdc7\",\"disclosure_fields\":[\"summary\"],\"environment\":\"test\",\"limits\":{},\"operation_id\":\"receiver.submit\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "66911e2d80d6c74926c8c9060eee51b002052f8091656a877109a0465bdbf4f3",
+        "wire_body_digest": "ad4942f692dc18a9bfe3342a37ca5bfeb584a294f4e6e7d81d358a3c42d1fdc7"
+      }
+    },
+    {
+      "id": "receiver-email",
+      "note": "email disclosed: disclosure fields change",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"receiver.submit\",\"requested_target\":{\"target_id\":\"receiver-primary\"},\"arguments\":{\"payload\":{\"summary\":\"3 pods restarted\",\"email\":\"ops-team\"}},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": {
+          "summary": "3 pods restarted",
+          "email": "ops-team"
+        },
+        "hash_object_template": {
+          "operation_id": "receiver.submit",
+          "canonical_target": {
+            "target_id": "receiver-primary",
+            "route_id": "submissions-v1"
+          },
+          "disclosure_fields": [
+            "email",
+            "summary"
+          ],
+          "content_digest": "$content_digest",
+          "limits": {},
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": "content",
+        "content_jcs": "{\"email\":\"ops-team\",\"summary\":\"3 pods restarted\"}",
+        "content_digest": "893440cd294f50e4169cb9c4d48d513e5aabdfa61ba5ae6b3b211f6ce3107fed",
+        "hash_jcs": "{\"canonical_target\":{\"route_id\":\"submissions-v1\",\"target_id\":\"receiver-primary\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":\"893440cd294f50e4169cb9c4d48d513e5aabdfa61ba5ae6b3b211f6ce3107fed\",\"disclosure_fields\":[\"email\",\"summary\"],\"environment\":\"test\",\"limits\":{},\"operation_id\":\"receiver.submit\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "bd739c53cb02ca7cae43525952df62250eea1d7f088c0a98e7644b2d1bb4dc9d",
+        "wire_body_digest": "893440cd294f50e4169cb9c4d48d513e5aabdfa61ba5ae6b3b211f6ce3107fed"
+      }
+    },
+    {
+      "id": "receiver-email-keyorder",
+      "note": "payload keys in another order: disclosure_fields and content stay the same",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"receiver.submit\",\"requested_target\":{\"target_id\":\"receiver-primary\"},\"arguments\":{\"payload\":{\"email\":\"ops-team\",\"summary\":\"3 pods restarted\"}},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": {
+          "summary": "3 pods restarted",
+          "email": "ops-team"
+        },
+        "hash_object_template": {
+          "operation_id": "receiver.submit",
+          "canonical_target": {
+            "target_id": "receiver-primary",
+            "route_id": "submissions-v1"
+          },
+          "disclosure_fields": [
+            "email",
+            "summary"
+          ],
+          "content_digest": "$content_digest",
+          "limits": {},
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": "content",
+        "content_jcs": "{\"email\":\"ops-team\",\"summary\":\"3 pods restarted\"}",
+        "content_digest": "893440cd294f50e4169cb9c4d48d513e5aabdfa61ba5ae6b3b211f6ce3107fed",
+        "hash_jcs": "{\"canonical_target\":{\"route_id\":\"submissions-v1\",\"target_id\":\"receiver-primary\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":\"893440cd294f50e4169cb9c4d48d513e5aabdfa61ba5ae6b3b211f6ce3107fed\",\"disclosure_fields\":[\"email\",\"summary\"],\"environment\":\"test\",\"limits\":{},\"operation_id\":\"receiver.submit\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "bd739c53cb02ca7cae43525952df62250eea1d7f088c0a98e7644b2d1bb4dc9d",
+        "wire_body_digest": "893440cd294f50e4169cb9c4d48d513e5aabdfa61ba5ae6b3b211f6ce3107fed"
+      }
+    },
+    {
+      "id": "receiver-env-prod",
+      "note": "environment change",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"receiver.submit\",\"requested_target\":{\"target_id\":\"receiver-primary\"},\"arguments\":{\"payload\":{\"summary\":\"3 pods restarted\",\"email\":null}},\"client_request_key\":\"req-00000001\"}",
+      "trusted_override": {
+        "environment": "prod"
+      },
+      "expect": {
+        "content_input_template": {
+          "summary": "3 pods restarted",
+          "email": null
+        },
+        "hash_object_template": {
+          "operation_id": "receiver.submit",
+          "canonical_target": {
+            "target_id": "receiver-primary",
+            "route_id": "submissions-v1"
+          },
+          "disclosure_fields": [
+            "summary"
+          ],
+          "content_digest": "$content_digest",
+          "limits": {},
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "prod",
+          "tenant": "hackathon"
+        },
+        "wire": "content",
+        "content_jcs": "{\"email\":null,\"summary\":\"3 pods restarted\"}",
+        "content_digest": "d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1",
+        "hash_jcs": "{\"canonical_target\":{\"route_id\":\"submissions-v1\",\"target_id\":\"receiver-primary\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":\"d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1\",\"disclosure_fields\":[\"summary\"],\"environment\":\"prod\",\"limits\":{},\"operation_id\":\"receiver.submit\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "2fe0516014ebb867a391e3464bf618315d6ddd8558410bcb012327b0fdc793ff",
+        "wire_body_digest": "d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1"
+      }
+    },
+    {
+      "id": "receiver-tenant-other",
+      "note": "tenant change",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"receiver.submit\",\"requested_target\":{\"target_id\":\"receiver-primary\"},\"arguments\":{\"payload\":{\"summary\":\"3 pods restarted\",\"email\":null}},\"client_request_key\":\"req-00000001\"}",
+      "trusted_override": {
+        "tenant": "other-tenant"
+      },
+      "expect": {
+        "content_input_template": {
+          "summary": "3 pods restarted",
+          "email": null
+        },
+        "hash_object_template": {
+          "operation_id": "receiver.submit",
+          "canonical_target": {
+            "target_id": "receiver-primary",
+            "route_id": "submissions-v1"
+          },
+          "disclosure_fields": [
+            "summary"
+          ],
+          "content_digest": "$content_digest",
+          "limits": {},
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "other-tenant"
+        },
+        "wire": "content",
+        "content_jcs": "{\"email\":null,\"summary\":\"3 pods restarted\"}",
+        "content_digest": "d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1",
+        "hash_jcs": "{\"canonical_target\":{\"route_id\":\"submissions-v1\",\"target_id\":\"receiver-primary\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":\"d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1\",\"disclosure_fields\":[\"summary\"],\"environment\":\"test\",\"limits\":{},\"operation_id\":\"receiver.submit\",\"schema_version\":\"v1\",\"tenant\":\"other-tenant\"}",
+        "action_digest": "e1054c9539681c8eb20aae5ae8ea9920ac6a0d922520bbb0a961f4bd6c0ff6b5",
+        "wire_body_digest": "d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1"
+      }
+    },
+    {
+      "id": "receiver-catalog-changed",
+      "note": "same request under catalog variant receiver-origin-changed (same catalog_version, target origin changed): catalog_digest and action_digest change",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"receiver.submit\",\"requested_target\":{\"target_id\":\"receiver-primary\"},\"arguments\":{\"payload\":{\"summary\":\"3 pods restarted\",\"email\":null}},\"client_request_key\":\"req-00000001\"}",
+      "catalog_variant": "receiver-origin-changed",
+      "expect": {
+        "content_input_template": {
+          "summary": "3 pods restarted",
+          "email": null
+        },
+        "hash_object_template": {
+          "operation_id": "receiver.submit",
+          "canonical_target": {
+            "target_id": "receiver-primary",
+            "route_id": "submissions-v1"
+          },
+          "disclosure_fields": [
+            "summary"
+          ],
+          "content_digest": "$content_digest",
+          "limits": {},
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": "content",
+        "content_jcs": "{\"email\":null,\"summary\":\"3 pods restarted\"}",
+        "content_digest": "d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1",
+        "hash_jcs": "{\"canonical_target\":{\"route_id\":\"submissions-v1\",\"target_id\":\"receiver-primary\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"84ba686c43bf58be6298759d6922155b732141690060dd880e44020ead0ba1ab\",\"content_digest\":\"d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1\",\"disclosure_fields\":[\"summary\"],\"environment\":\"test\",\"limits\":{},\"operation_id\":\"receiver.submit\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "3ba5e5f6eb73ce9ddfb142c0a14ba97a67a6b7fabc4402c08a83d3ed07f0e84a",
+        "wire_body_digest": "d6f31f095bac6b27d03adc50296b786489a28b2b7d86ae662e201764ef788fb1"
+      }
+    },
+    {
+      "id": "receiver-escaped",
+      "note": "escaped and raw UTF-8 strings are the same value (non-BMP via surrogate pair)",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"receiver.submit\",\"requested_target\":{\"target_id\":\"receiver-primary\"},\"arguments\":{\"payload\":{\"summary\":\"caf\\u00e9 \\ud83d\\ude02 ok\",\"email\":null}},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": {
+          "summary": "café 😂 ok",
+          "email": null
+        },
+        "hash_object_template": {
+          "operation_id": "receiver.submit",
+          "canonical_target": {
+            "target_id": "receiver-primary",
+            "route_id": "submissions-v1"
+          },
+          "disclosure_fields": [
+            "summary"
+          ],
+          "content_digest": "$content_digest",
+          "limits": {},
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": "content",
+        "content_jcs": "{\"email\":null,\"summary\":\"café 😂 ok\"}",
+        "content_digest": "2bd265f611cb2cf5bc2c95091f529bade1d81904590166015dd847e6662b57bc",
+        "hash_jcs": "{\"canonical_target\":{\"route_id\":\"submissions-v1\",\"target_id\":\"receiver-primary\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":\"2bd265f611cb2cf5bc2c95091f529bade1d81904590166015dd847e6662b57bc\",\"disclosure_fields\":[\"summary\"],\"environment\":\"test\",\"limits\":{},\"operation_id\":\"receiver.submit\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "10c18d8fe86672aa745936c019cd2da1c9bafd5161a4ca1499ed3f43462eff38",
+        "wire_body_digest": "2bd265f611cb2cf5bc2c95091f529bade1d81904590166015dd847e6662b57bc"
+      }
+    },
+    {
+      "id": "receiver-raw-utf8",
+      "note": "raw UTF-8 form of receiver-escaped",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"receiver.submit\",\"requested_target\":{\"target_id\":\"receiver-primary\"},\"arguments\":{\"payload\":{\"summary\":\"café 😂 ok\",\"email\":null}},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": {
+          "summary": "café 😂 ok",
+          "email": null
+        },
+        "hash_object_template": {
+          "operation_id": "receiver.submit",
+          "canonical_target": {
+            "target_id": "receiver-primary",
+            "route_id": "submissions-v1"
+          },
+          "disclosure_fields": [
+            "summary"
+          ],
+          "content_digest": "$content_digest",
+          "limits": {},
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": "content",
+        "content_jcs": "{\"email\":null,\"summary\":\"café 😂 ok\"}",
+        "content_digest": "2bd265f611cb2cf5bc2c95091f529bade1d81904590166015dd847e6662b57bc",
+        "hash_jcs": "{\"canonical_target\":{\"route_id\":\"submissions-v1\",\"target_id\":\"receiver-primary\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":\"2bd265f611cb2cf5bc2c95091f529bade1d81904590166015dd847e6662b57bc\",\"disclosure_fields\":[\"summary\"],\"environment\":\"test\",\"limits\":{},\"operation_id\":\"receiver.submit\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "10c18d8fe86672aa745936c019cd2da1c9bafd5161a4ca1499ed3f43462eff38",
+        "wire_body_digest": "2bd265f611cb2cf5bc2c95091f529bade1d81904590166015dd847e6662b57bc"
+      }
+    },
+    {
+      "id": "receiver-case-dup",
+      "note": "3.2 reject: case-only duplicate key (outer pre-scan covers the whole body)",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"receiver.submit\",\"requested_target\":{\"target_id\":\"receiver-primary\"},\"arguments\":{\"payload\":{\"summary\":\"x\",\"Summary\":\"y\"}},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "receiver-email-in-summary",
+      "note": "content checker: synthetic email inside allowed field",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"receiver.submit\",\"requested_target\":{\"target_id\":\"receiver-primary\"},\"arguments\":{\"payload\":{\"summary\":\"contact alice@example.com now\",\"email\":null}},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 403,
+        "reason_codes": [
+          "CONTENT_PATTERN_DENIED"
+        ],
+        "rule_id": "normalize.content_pattern.v1"
+      }
+    },
+    {
+      "id": "receiver-synthetic-id",
+      "note": "content checker: registered synthetic identifier",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"receiver.submit\",\"requested_target\":{\"target_id\":\"receiver-primary\"},\"arguments\":{\"payload\":{\"summary\":\"user SYN-USER-0002 restarted\",\"email\":null}},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 403,
+        "reason_codes": [
+          "CONTENT_PATTERN_DENIED"
+        ],
+        "rule_id": "normalize.content_pattern.v1"
+      }
+    },
+    {
+      "id": "receiver-missing-email-key",
+      "note": "all typed keys are required (nullable fields as null)",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"receiver.submit\",\"requested_target\":{\"target_id\":\"receiver-primary\"},\"arguments\":{\"payload\":{\"summary\":\"x\"}},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "receiver-empty-summary",
+      "note": "summary must be 1..4096 bytes",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"receiver.submit\",\"requested_target\":{\"target_id\":\"receiver-primary\"},\"arguments\":{\"payload\":{\"summary\":\"\",\"email\":null}},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "receiver-raw-url-target",
+      "note": "raw URL instead of a registered target",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"receiver.submit\",\"requested_target\":{\"target_id\":\"https://receiver.example.com/x\"},\"arguments\":{\"payload\":{\"summary\":\"3 pods restarted\",\"email\":null}},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "receiver-raw-url-key",
+      "note": "raw URL field in requested_target",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"receiver.submit\",\"requested_target\":{\"target_id\":\"receiver-primary\",\"url\":\"https://evil.example/\"},\"arguments\":{\"payload\":{\"summary\":\"3 pods restarted\",\"email\":null}},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "model-agent",
+      "note": "agent profile with all message kinds and one tool",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"model.generate\",\"requested_target\":{\"target_id\":\"agent-platform-gemini\",\"profile\":\"agent\"},\"arguments\":{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"messages\":[{\"kind\":\"text\",\"role\":\"user\",\"source\":\"system\",\"text\":\"You are a read-only assistant.\",\"ref\":null,\"function_name\":null},{\"kind\":\"text\",\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\",\"ref\":null,\"function_name\":null},{\"kind\":\"model_turn\",\"role\":\"model\",\"source\":null,\"text\":null,\"ref\":{\"ref\":\"model_turn\",\"action_id\":null,\"turn_index\":1},\"function_name\":null},{\"kind\":\"tool_result\",\"role\":\"user\",\"source\":\"tool_result\",\"text\":null,\"ref\":{\"ref\":\"action_result\",\"action_id\":\"2b7e4f10-3c2d-4e5f-9a6b-7c8d9e0f1a2b\",\"turn_index\":null},\"function_name\":\"submit_action\"}],\"tool_declarations\":[{\"name\":\"submit_action\",\"description\":\"Submit a typed action\",\"parameters\":{\"type\":\"object\",\"properties\":{\"operation_id\":{\"type\":\"string\"},\"limit\":{\"type\":\"integer\",\"maximum\":100}},\"required\":[\"operation_id\"]}}]},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": {
+          "conversation_id": "6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e",
+          "messages": [
+            {
+              "kind": "text",
+              "role": "user",
+              "source": "system",
+              "text": "You are a read-only assistant.",
+              "ref": null,
+              "function_name": null
+            },
+            {
+              "kind": "text",
+              "role": "user",
+              "source": "user",
+              "text": "요약해 줘",
+              "ref": null,
+              "function_name": null
+            },
+            {
+              "kind": "model_turn",
+              "role": "model",
+              "source": null,
+              "text": null,
+              "ref": {
+                "ref": "model_turn",
+                "action_id": null,
+                "turn_index": 1
+              },
+              "function_name": null
+            },
+            {
+              "kind": "tool_result",
+              "role": "user",
+              "source": "tool_result",
+              "text": null,
+              "ref": {
+                "ref": "action_result",
+                "action_id": "2b7e4f10-3c2d-4e5f-9a6b-7c8d9e0f1a2b",
+                "turn_index": null
+              },
+              "function_name": "submit_action"
+            }
+          ],
+          "generation_config_digest": {
+            "$digest_ref": "model_profiles.agent.generation_config"
+          },
+          "tool_declarations_digest": {
+            "$digest": [
+              {
+                "name": "submit_action",
+                "description": "Submit a typed action",
+                "parameters": {
+                  "type": "object",
+                  "properties": {
+                    "operation_id": {
+                      "type": "string"
+                    },
+                    "limit": {
+                      "type": "integer",
+                      "maximum": 100
+                    }
+                  },
+                  "required": [
+                    "operation_id"
+                  ]
+                }
+              }
+            ]
+          },
+          "response_schema_digest": null
+        },
+        "hash_object_template": {
+          "operation_id": "model.generate",
+          "canonical_target": {
+            "target_id": "agent-platform-gemini",
+            "route_id": "generate-content-v1",
+            "profile": "agent"
+          },
+          "disclosure_fields": [
+            "system",
+            "tool_result",
+            "user"
+          ],
+          "content_digest": "$content_digest",
+          "limits": {
+            "max_output_tokens": 8192,
+            "max_request_bytes": 65536
+          },
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": null,
+        "content_jcs": "{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"generation_config_digest\":\"d101a0729e93ff62d9fe703539c2afc71e9425ae99e5dafe189186a4cfff2077\",\"messages\":[{\"function_name\":null,\"kind\":\"text\",\"ref\":null,\"role\":\"user\",\"source\":\"system\",\"text\":\"You are a read-only assistant.\"},{\"function_name\":null,\"kind\":\"text\",\"ref\":null,\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\"},{\"function_name\":null,\"kind\":\"model_turn\",\"ref\":{\"action_id\":null,\"ref\":\"model_turn\",\"turn_index\":1},\"role\":\"model\",\"source\":null,\"text\":null},{\"function_name\":\"submit_action\",\"kind\":\"tool_result\",\"ref\":{\"action_id\":\"2b7e4f10-3c2d-4e5f-9a6b-7c8d9e0f1a2b\",\"ref\":\"action_result\",\"turn_index\":null},\"role\":\"user\",\"source\":\"tool_result\",\"text\":null}],\"response_schema_digest\":null,\"tool_declarations_digest\":\"fb27ed3a2fec56866001b3c68d997a73a18a5b32ac3c3ebb564555b2e23e4a05\"}",
+        "content_digest": "881a9f9d8501587ac519fa6b2607d13828fab49407253da58a493e092540e5d9",
+        "hash_jcs": "{\"canonical_target\":{\"profile\":\"agent\",\"route_id\":\"generate-content-v1\",\"target_id\":\"agent-platform-gemini\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":\"881a9f9d8501587ac519fa6b2607d13828fab49407253da58a493e092540e5d9\",\"disclosure_fields\":[\"system\",\"tool_result\",\"user\"],\"environment\":\"test\",\"limits\":{\"max_output_tokens\":8192,\"max_request_bytes\":65536},\"operation_id\":\"model.generate\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "d8d8edecdde70a2c6f88a71e06fd4028986947fc649baa8e15f6b6c8176b3f26",
+        "wire_body_digest": null
+      }
+    },
+    {
+      "id": "model-agent-tool-param-case-dup",
+      "note": "case-only duplicate inside free-form tool parameters (property names are not struct tags; only the whole-body pre-scan catches it)",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"model.generate\",\"requested_target\":{\"target_id\":\"agent-platform-gemini\",\"profile\":\"agent\"},\"arguments\":{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"messages\":[{\"kind\":\"text\",\"role\":\"user\",\"source\":\"system\",\"text\":\"You are a read-only assistant.\",\"ref\":null,\"function_name\":null},{\"kind\":\"text\",\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\",\"ref\":null,\"function_name\":null},{\"kind\":\"model_turn\",\"role\":\"model\",\"source\":null,\"text\":null,\"ref\":{\"ref\":\"model_turn\",\"action_id\":null,\"turn_index\":1},\"function_name\":null},{\"kind\":\"tool_result\",\"role\":\"user\",\"source\":\"tool_result\",\"text\":null,\"ref\":{\"ref\":\"action_result\",\"action_id\":\"2b7e4f10-3c2d-4e5f-9a6b-7c8d9e0f1a2b\",\"turn_index\":null},\"function_name\":\"submit_action\"}],\"tool_declarations\":[{\"name\":\"submit_action\",\"description\":\"Submit a typed action\",\"parameters\":{\"type\":\"object\",\"properties\":{\"operation_id\":{\"type\":\"string\"},\"Operation_ID\":{\"type\":\"string\"},\"limit\":{\"type\":\"integer\",\"maximum\":100}},\"required\":[\"operation_id\"]}}]},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "model-agent-tool-keyorder",
+      "note": "tool parameters key order does not matter",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"model.generate\",\"requested_target\":{\"target_id\":\"agent-platform-gemini\",\"profile\":\"agent\"},\"arguments\":{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"messages\":[{\"kind\":\"text\",\"role\":\"user\",\"source\":\"system\",\"text\":\"You are a read-only assistant.\",\"ref\":null,\"function_name\":null},{\"kind\":\"text\",\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\",\"ref\":null,\"function_name\":null},{\"kind\":\"model_turn\",\"role\":\"model\",\"source\":null,\"text\":null,\"ref\":{\"ref\":\"model_turn\",\"action_id\":null,\"turn_index\":1},\"function_name\":null},{\"kind\":\"tool_result\",\"role\":\"user\",\"source\":\"tool_result\",\"text\":null,\"ref\":{\"ref\":\"action_result\",\"action_id\":\"2b7e4f10-3c2d-4e5f-9a6b-7c8d9e0f1a2b\",\"turn_index\":null},\"function_name\":\"submit_action\"}],\"tool_declarations\":[{\"description\":\"Submit a typed action\",\"parameters\":{\"required\":[\"operation_id\"],\"properties\":{\"limit\":{\"maximum\":100,\"type\":\"integer\"},\"operation_id\":{\"type\":\"string\"}},\"type\":\"object\"},\"name\":\"submit_action\"}]},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": {
+          "conversation_id": "6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e",
+          "messages": [
+            {
+              "kind": "text",
+              "role": "user",
+              "source": "system",
+              "text": "You are a read-only assistant.",
+              "ref": null,
+              "function_name": null
+            },
+            {
+              "kind": "text",
+              "role": "user",
+              "source": "user",
+              "text": "요약해 줘",
+              "ref": null,
+              "function_name": null
+            },
+            {
+              "kind": "model_turn",
+              "role": "model",
+              "source": null,
+              "text": null,
+              "ref": {
+                "ref": "model_turn",
+                "action_id": null,
+                "turn_index": 1
+              },
+              "function_name": null
+            },
+            {
+              "kind": "tool_result",
+              "role": "user",
+              "source": "tool_result",
+              "text": null,
+              "ref": {
+                "ref": "action_result",
+                "action_id": "2b7e4f10-3c2d-4e5f-9a6b-7c8d9e0f1a2b",
+                "turn_index": null
+              },
+              "function_name": "submit_action"
+            }
+          ],
+          "generation_config_digest": {
+            "$digest_ref": "model_profiles.agent.generation_config"
+          },
+          "tool_declarations_digest": {
+            "$digest": [
+              {
+                "name": "submit_action",
+                "description": "Submit a typed action",
+                "parameters": {
+                  "type": "object",
+                  "properties": {
+                    "operation_id": {
+                      "type": "string"
+                    },
+                    "limit": {
+                      "type": "integer",
+                      "maximum": 100
+                    }
+                  },
+                  "required": [
+                    "operation_id"
+                  ]
+                }
+              }
+            ]
+          },
+          "response_schema_digest": null
+        },
+        "hash_object_template": {
+          "operation_id": "model.generate",
+          "canonical_target": {
+            "target_id": "agent-platform-gemini",
+            "route_id": "generate-content-v1",
+            "profile": "agent"
+          },
+          "disclosure_fields": [
+            "system",
+            "tool_result",
+            "user"
+          ],
+          "content_digest": "$content_digest",
+          "limits": {
+            "max_output_tokens": 8192,
+            "max_request_bytes": 65536
+          },
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": null,
+        "content_jcs": "{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"generation_config_digest\":\"d101a0729e93ff62d9fe703539c2afc71e9425ae99e5dafe189186a4cfff2077\",\"messages\":[{\"function_name\":null,\"kind\":\"text\",\"ref\":null,\"role\":\"user\",\"source\":\"system\",\"text\":\"You are a read-only assistant.\"},{\"function_name\":null,\"kind\":\"text\",\"ref\":null,\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\"},{\"function_name\":null,\"kind\":\"model_turn\",\"ref\":{\"action_id\":null,\"ref\":\"model_turn\",\"turn_index\":1},\"role\":\"model\",\"source\":null,\"text\":null},{\"function_name\":\"submit_action\",\"kind\":\"tool_result\",\"ref\":{\"action_id\":\"2b7e4f10-3c2d-4e5f-9a6b-7c8d9e0f1a2b\",\"ref\":\"action_result\",\"turn_index\":null},\"role\":\"user\",\"source\":\"tool_result\",\"text\":null}],\"response_schema_digest\":null,\"tool_declarations_digest\":\"fb27ed3a2fec56866001b3c68d997a73a18a5b32ac3c3ebb564555b2e23e4a05\"}",
+        "content_digest": "881a9f9d8501587ac519fa6b2607d13828fab49407253da58a493e092540e5d9",
+        "hash_jcs": "{\"canonical_target\":{\"profile\":\"agent\",\"route_id\":\"generate-content-v1\",\"target_id\":\"agent-platform-gemini\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":\"881a9f9d8501587ac519fa6b2607d13828fab49407253da58a493e092540e5d9\",\"disclosure_fields\":[\"system\",\"tool_result\",\"user\"],\"environment\":\"test\",\"limits\":{\"max_output_tokens\":8192,\"max_request_bytes\":65536},\"operation_id\":\"model.generate\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "d8d8edecdde70a2c6f88a71e06fd4028986947fc649baa8e15f6b6c8176b3f26",
+        "wire_body_digest": null
+      }
+    },
+    {
+      "id": "model-agent-tool-changed",
+      "note": "tool declaration change",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"model.generate\",\"requested_target\":{\"target_id\":\"agent-platform-gemini\",\"profile\":\"agent\"},\"arguments\":{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"messages\":[{\"kind\":\"text\",\"role\":\"user\",\"source\":\"system\",\"text\":\"You are a read-only assistant.\",\"ref\":null,\"function_name\":null},{\"kind\":\"text\",\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\",\"ref\":null,\"function_name\":null},{\"kind\":\"model_turn\",\"role\":\"model\",\"source\":null,\"text\":null,\"ref\":{\"ref\":\"model_turn\",\"action_id\":null,\"turn_index\":1},\"function_name\":null},{\"kind\":\"tool_result\",\"role\":\"user\",\"source\":\"tool_result\",\"text\":null,\"ref\":{\"ref\":\"action_result\",\"action_id\":\"2b7e4f10-3c2d-4e5f-9a6b-7c8d9e0f1a2b\",\"turn_index\":null},\"function_name\":\"submit_action\"}],\"tool_declarations\":[{\"name\":\"submit_action\",\"description\":\"Submit a typed action now\",\"parameters\":{\"type\":\"object\",\"properties\":{\"operation_id\":{\"type\":\"string\"},\"limit\":{\"type\":\"integer\",\"maximum\":100}},\"required\":[\"operation_id\"]}}]},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": {
+          "conversation_id": "6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e",
+          "messages": [
+            {
+              "kind": "text",
+              "role": "user",
+              "source": "system",
+              "text": "You are a read-only assistant.",
+              "ref": null,
+              "function_name": null
+            },
+            {
+              "kind": "text",
+              "role": "user",
+              "source": "user",
+              "text": "요약해 줘",
+              "ref": null,
+              "function_name": null
+            },
+            {
+              "kind": "model_turn",
+              "role": "model",
+              "source": null,
+              "text": null,
+              "ref": {
+                "ref": "model_turn",
+                "action_id": null,
+                "turn_index": 1
+              },
+              "function_name": null
+            },
+            {
+              "kind": "tool_result",
+              "role": "user",
+              "source": "tool_result",
+              "text": null,
+              "ref": {
+                "ref": "action_result",
+                "action_id": "2b7e4f10-3c2d-4e5f-9a6b-7c8d9e0f1a2b",
+                "turn_index": null
+              },
+              "function_name": "submit_action"
+            }
+          ],
+          "generation_config_digest": {
+            "$digest_ref": "model_profiles.agent.generation_config"
+          },
+          "tool_declarations_digest": {
+            "$digest": [
+              {
+                "name": "submit_action",
+                "description": "Submit a typed action now",
+                "parameters": {
+                  "type": "object",
+                  "properties": {
+                    "operation_id": {
+                      "type": "string"
+                    },
+                    "limit": {
+                      "type": "integer",
+                      "maximum": 100
+                    }
+                  },
+                  "required": [
+                    "operation_id"
+                  ]
+                }
+              }
+            ]
+          },
+          "response_schema_digest": null
+        },
+        "hash_object_template": {
+          "operation_id": "model.generate",
+          "canonical_target": {
+            "target_id": "agent-platform-gemini",
+            "route_id": "generate-content-v1",
+            "profile": "agent"
+          },
+          "disclosure_fields": [
+            "system",
+            "tool_result",
+            "user"
+          ],
+          "content_digest": "$content_digest",
+          "limits": {
+            "max_output_tokens": 8192,
+            "max_request_bytes": 65536
+          },
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": null,
+        "content_jcs": "{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"generation_config_digest\":\"d101a0729e93ff62d9fe703539c2afc71e9425ae99e5dafe189186a4cfff2077\",\"messages\":[{\"function_name\":null,\"kind\":\"text\",\"ref\":null,\"role\":\"user\",\"source\":\"system\",\"text\":\"You are a read-only assistant.\"},{\"function_name\":null,\"kind\":\"text\",\"ref\":null,\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\"},{\"function_name\":null,\"kind\":\"model_turn\",\"ref\":{\"action_id\":null,\"ref\":\"model_turn\",\"turn_index\":1},\"role\":\"model\",\"source\":null,\"text\":null},{\"function_name\":\"submit_action\",\"kind\":\"tool_result\",\"ref\":{\"action_id\":\"2b7e4f10-3c2d-4e5f-9a6b-7c8d9e0f1a2b\",\"ref\":\"action_result\",\"turn_index\":null},\"role\":\"user\",\"source\":\"tool_result\",\"text\":null}],\"response_schema_digest\":null,\"tool_declarations_digest\":\"0c23f3a79ad29b545886d4e6ae20aa826aa67c5a99258a9902760ad78a175a6e\"}",
+        "content_digest": "6d546c8feb730b3ac12883cdef0a89e917a6601ab8476b17d56f95f91d0f3a5d",
+        "hash_jcs": "{\"canonical_target\":{\"profile\":\"agent\",\"route_id\":\"generate-content-v1\",\"target_id\":\"agent-platform-gemini\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":\"6d546c8feb730b3ac12883cdef0a89e917a6601ab8476b17d56f95f91d0f3a5d\",\"disclosure_fields\":[\"system\",\"tool_result\",\"user\"],\"environment\":\"test\",\"limits\":{\"max_output_tokens\":8192,\"max_request_bytes\":65536},\"operation_id\":\"model.generate\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "e145edc3c5f4cc310e017ac615189037cca035e1a74e72600fb1ef4dae500d7f",
+        "wire_body_digest": null
+      }
+    },
+    {
+      "id": "model-agent-simple",
+      "note": "3.2 valid example",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"model.generate\",\"requested_target\":{\"target_id\":\"agent-platform-gemini\",\"profile\":\"agent\"},\"arguments\":{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"messages\":[{\"kind\":\"text\",\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\",\"ref\":null,\"function_name\":null}],\"tool_declarations\":[]},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": {
+          "conversation_id": "6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e",
+          "messages": [
+            {
+              "kind": "text",
+              "role": "user",
+              "source": "user",
+              "text": "요약해 줘",
+              "ref": null,
+              "function_name": null
+            }
+          ],
+          "generation_config_digest": {
+            "$digest_ref": "model_profiles.agent.generation_config"
+          },
+          "tool_declarations_digest": {
+            "$digest": []
+          },
+          "response_schema_digest": null
+        },
+        "hash_object_template": {
+          "operation_id": "model.generate",
+          "canonical_target": {
+            "target_id": "agent-platform-gemini",
+            "route_id": "generate-content-v1",
+            "profile": "agent"
+          },
+          "disclosure_fields": [
+            "user"
+          ],
+          "content_digest": "$content_digest",
+          "limits": {
+            "max_output_tokens": 8192,
+            "max_request_bytes": 65536
+          },
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": null,
+        "content_jcs": "{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"generation_config_digest\":\"d101a0729e93ff62d9fe703539c2afc71e9425ae99e5dafe189186a4cfff2077\",\"messages\":[{\"function_name\":null,\"kind\":\"text\",\"ref\":null,\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\"}],\"response_schema_digest\":null,\"tool_declarations_digest\":\"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945\"}",
+        "content_digest": "7283bf347af9bc7380fe2419b1761b7eddc32a435c26b78b866cc22c3bab6a51",
+        "hash_jcs": "{\"canonical_target\":{\"profile\":\"agent\",\"route_id\":\"generate-content-v1\",\"target_id\":\"agent-platform-gemini\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":\"7283bf347af9bc7380fe2419b1761b7eddc32a435c26b78b866cc22c3bab6a51\",\"disclosure_fields\":[\"user\"],\"environment\":\"test\",\"limits\":{\"max_output_tokens\":8192,\"max_request_bytes\":65536},\"operation_id\":\"model.generate\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "9ebb509fb7cdf95231e1bcc885674cd6ad344aeec78f07ab6ebcf3d307607eb4",
+        "wire_body_digest": null
+      }
+    },
+    {
+      "id": "model-discovery-simple",
+      "note": "profile change (same messages, no tools)",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"model.generate\",\"requested_target\":{\"target_id\":\"agent-platform-gemini\",\"profile\":\"discovery\"},\"arguments\":{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"messages\":[{\"kind\":\"text\",\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\",\"ref\":null,\"function_name\":null}],\"tool_declarations\":[]},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": {
+          "conversation_id": "6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e",
+          "messages": [
+            {
+              "kind": "text",
+              "role": "user",
+              "source": "user",
+              "text": "요약해 줘",
+              "ref": null,
+              "function_name": null
+            }
+          ],
+          "generation_config_digest": {
+            "$digest_ref": "model_profiles.discovery.generation_config"
+          },
+          "tool_declarations_digest": {
+            "$digest": []
+          },
+          "response_schema_digest": {
+            "$digest_ref": "model_profiles.discovery.response_schema"
+          }
+        },
+        "hash_object_template": {
+          "operation_id": "model.generate",
+          "canonical_target": {
+            "target_id": "agent-platform-gemini",
+            "route_id": "generate-content-v1",
+            "profile": "discovery"
+          },
+          "disclosure_fields": [
+            "user"
+          ],
+          "content_digest": "$content_digest",
+          "limits": {
+            "max_output_tokens": 8192,
+            "max_request_bytes": 65536
+          },
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": null,
+        "content_jcs": "{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"generation_config_digest\":\"dfa3f86a4c99de11c0719f78925c29123b81d5d5ffdcd7129e008db08446659a\",\"messages\":[{\"function_name\":null,\"kind\":\"text\",\"ref\":null,\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\"}],\"response_schema_digest\":\"f3d77a78051f1b003e4479d47cd38312d2f9fefa443414306dd9d904547cd780\",\"tool_declarations_digest\":\"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945\"}",
+        "content_digest": "ba3ef5c13ea512856cc568e5909ad0faa897c2ba2bd6c7f822c60597fc236ac5",
+        "hash_jcs": "{\"canonical_target\":{\"profile\":\"discovery\",\"route_id\":\"generate-content-v1\",\"target_id\":\"agent-platform-gemini\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":\"ba3ef5c13ea512856cc568e5909ad0faa897c2ba2bd6c7f822c60597fc236ac5\",\"disclosure_fields\":[\"user\"],\"environment\":\"test\",\"limits\":{\"max_output_tokens\":8192,\"max_request_bytes\":65536},\"operation_id\":\"model.generate\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "3aae2b8b1158ac20ef48fb9e9407e20127243a7349bfe3f6ced99f9b17086d52",
+        "wire_body_digest": null
+      }
+    },
+    {
+      "id": "model-policy-proposal-user",
+      "note": "3.2: schema-valid; user session with policy_proposal is denied later by Rego, not by Normalize",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"model.generate\",\"requested_target\":{\"target_id\":\"agent-platform-gemini\",\"profile\":\"policy_proposal\"},\"arguments\":{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"messages\":[{\"kind\":\"text\",\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\",\"ref\":null,\"function_name\":null}],\"tool_declarations\":[],\"phase\":\"final\"},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": {
+          "conversation_id": "6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e",
+          "messages": [
+            {
+              "kind": "text",
+              "role": "user",
+              "source": "user",
+              "text": "요약해 줘",
+              "ref": null,
+              "function_name": null
+            }
+          ],
+          "generation_config_digest": {
+            "$digest_ref": "model_profiles.policy_proposal.generation_config"
+          },
+          "tool_declarations_digest": {
+            "$digest": []
+          },
+          "response_schema_digest": {
+            "$digest_ref": "model_profiles.policy_proposal.response_schema"
+          },
+          "phase": "final"
+        },
+        "hash_object_template": {
+          "operation_id": "model.generate",
+          "canonical_target": {
+            "target_id": "agent-platform-gemini",
+            "route_id": "generate-content-v1",
+            "profile": "policy_proposal"
+          },
+          "disclosure_fields": [
+            "user"
+          ],
+          "content_digest": "$content_digest",
+          "limits": {
+            "max_output_tokens": 8192,
+            "max_request_bytes": 65536
+          },
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": null,
+        "content_jcs": "{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"generation_config_digest\":\"dfa3f86a4c99de11c0719f78925c29123b81d5d5ffdcd7129e008db08446659a\",\"messages\":[{\"function_name\":null,\"kind\":\"text\",\"ref\":null,\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\"}],\"phase\":\"final\",\"response_schema_digest\":\"2836343bdef21a8ddb36b32cf5218e058b3233d1481da25793c802e78695a644\",\"tool_declarations_digest\":\"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945\"}",
+        "content_digest": "886f11338e9f35763dd4d2134998c5e970f6f959cab4bbdfc05bc2f6577cb188",
+        "hash_jcs": "{\"canonical_target\":{\"profile\":\"policy_proposal\",\"route_id\":\"generate-content-v1\",\"target_id\":\"agent-platform-gemini\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":\"886f11338e9f35763dd4d2134998c5e970f6f959cab4bbdfc05bc2f6577cb188\",\"disclosure_fields\":[\"user\"],\"environment\":\"test\",\"limits\":{\"max_output_tokens\":8192,\"max_request_bytes\":65536},\"operation_id\":\"model.generate\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "62ebd8657bc106f4112529b69770adfc032b0e18fffc4332910a9f7fe0925c99",
+        "wire_body_digest": null
+      }
+    },
+    {
+      "id": "model-discovery-with-tools",
+      "note": "non-agent profile requires tool_declarations = []",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"model.generate\",\"requested_target\":{\"target_id\":\"agent-platform-gemini\",\"profile\":\"discovery\"},\"arguments\":{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"messages\":[{\"kind\":\"text\",\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\",\"ref\":null,\"function_name\":null}],\"tool_declarations\":[{\"name\":\"submit_action\",\"description\":\"Submit a typed action\",\"parameters\":{\"type\":\"object\",\"properties\":{\"operation_id\":{\"type\":\"string\"},\"limit\":{\"type\":\"integer\",\"maximum\":100}},\"required\":[\"operation_id\"]}}]},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "model-bad-profile",
+      "note": "profile not in enum",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"model.generate\",\"requested_target\":{\"target_id\":\"agent-platform-gemini\",\"profile\":\"admin\"},\"arguments\":{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"messages\":[{\"kind\":\"text\",\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\",\"ref\":null,\"function_name\":null}],\"tool_declarations\":[]},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "model-no-messages",
+      "note": "messages must have 1..64 entries",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"model.generate\",\"requested_target\":{\"target_id\":\"agent-platform-gemini\",\"profile\":\"agent\"},\"arguments\":{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"messages\":[],\"tool_declarations\":[]},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "model-text-with-ref",
+      "note": "text message must not carry ref",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"model.generate\",\"requested_target\":{\"target_id\":\"agent-platform-gemini\",\"profile\":\"agent\"},\"arguments\":{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"messages\":[{\"kind\":\"text\",\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\",\"ref\":{\"ref\":\"action_result\",\"action_id\":\"2b7e4f10-3c2d-4e5f-9a6b-7c8d9e0f1a2b\",\"turn_index\":null},\"function_name\":null}],\"tool_declarations\":[]},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "model-tool-declarations-null",
+      "note": "null for a non-nullable array",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"model.generate\",\"requested_target\":{\"target_id\":\"agent-platform-gemini\",\"profile\":\"agent\"},\"arguments\":{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"messages\":[{\"kind\":\"text\",\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\",\"ref\":null,\"function_name\":null}],\"tool_declarations\":null},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "evidence-action-read",
+      "note": "3.2 valid example",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"evidence.action.read\",\"requested_target\":{\"target_id\":\"evidence-api\",\"resource_id\":\"2b7e4f10-3c2d-4e5f-9a6b-7c8d9e0f1a2b\"},\"arguments\":{},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": null,
+        "hash_object_template": {
+          "operation_id": "evidence.action.read",
+          "canonical_target": {
+            "target_id": "evidence-api",
+            "route_id": "evidence-action-v1",
+            "resource_id": "2b7e4f10-3c2d-4e5f-9a6b-7c8d9e0f1a2b"
+          },
+          "disclosure_fields": [],
+          "content_digest": null,
+          "limits": {
+            "response_bytes": 65536
+          },
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": null,
+        "content_jcs": null,
+        "content_digest": null,
+        "hash_jcs": "{\"canonical_target\":{\"resource_id\":\"2b7e4f10-3c2d-4e5f-9a6b-7c8d9e0f1a2b\",\"route_id\":\"evidence-action-v1\",\"target_id\":\"evidence-api\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":null,\"disclosure_fields\":[],\"environment\":\"test\",\"limits\":{\"response_bytes\":65536},\"operation_id\":\"evidence.action.read\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "44561ddd6626412b9f0eef957e089c6e4544d820bb27191044fcdc6235a5adf7",
+        "wire_body_digest": null
+      }
+    },
+    {
+      "id": "evidence-bundle-read",
+      "note": "3.2 valid example",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"evidence.bundle.read\",\"requested_target\":{\"target_id\":\"evidence-api\",\"resource_id\":\"3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f\"},\"arguments\":{},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": null,
+        "hash_object_template": {
+          "operation_id": "evidence.bundle.read",
+          "canonical_target": {
+            "target_id": "evidence-api",
+            "route_id": "evidence-bundle-v1",
+            "resource_id": "3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f"
+          },
+          "disclosure_fields": [],
+          "content_digest": null,
+          "limits": {
+            "response_bytes": 65536
+          },
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": null,
+        "content_jcs": null,
+        "content_digest": null,
+        "hash_jcs": "{\"canonical_target\":{\"resource_id\":\"3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f\",\"route_id\":\"evidence-bundle-v1\",\"target_id\":\"evidence-api\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":null,\"disclosure_fields\":[],\"environment\":\"test\",\"limits\":{\"response_bytes\":65536},\"operation_id\":\"evidence.bundle.read\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "db42fa5f9cc66541c7f8a958851a1c8da1bbc2d21ee2766b514c640eaca8ce7a",
+        "wire_body_digest": null
+      }
+    },
+    {
+      "id": "evidence-regression-read",
+      "note": "3.2 valid example",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"evidence.regression.read\",\"requested_target\":{\"target_id\":\"evidence-api\",\"resource_id\":\"9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d\"},\"arguments\":{},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": null,
+        "hash_object_template": {
+          "operation_id": "evidence.regression.read",
+          "canonical_target": {
+            "target_id": "evidence-api",
+            "route_id": "evidence-regression-v1",
+            "resource_id": "9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d"
+          },
+          "disclosure_fields": [],
+          "content_digest": null,
+          "limits": {
+            "response_bytes": 65536
+          },
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": null,
+        "content_jcs": null,
+        "content_digest": null,
+        "hash_jcs": "{\"canonical_target\":{\"resource_id\":\"9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d\",\"route_id\":\"evidence-regression-v1\",\"target_id\":\"evidence-api\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":null,\"disclosure_fields\":[],\"environment\":\"test\",\"limits\":{\"response_bytes\":65536},\"operation_id\":\"evidence.regression.read\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "f66f5abc15f91ead2dd493838f526edade43baa378e987033cfdf432d268269b",
+        "wire_body_digest": null
+      }
+    },
+    {
+      "id": "evidence-action-dotdot",
+      "note": "3.2 reject: resource_id ../x",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"evidence.action.read\",\"requested_target\":{\"target_id\":\"evidence-api\",\"resource_id\":\"../x\"},\"arguments\":{},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "evidence-bundle-uppercase",
+      "note": "3.2 reject: uppercase hex",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"evidence.bundle.read\",\"requested_target\":{\"target_id\":\"evidence-api\",\"resource_id\":\"ABC\"},\"arguments\":{},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "evidence-regression-args",
+      "note": "3.2 reject: arguments must be {}",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"evidence.regression.read\",\"requested_target\":{\"target_id\":\"evidence-api\",\"resource_id\":\"9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d\"},\"arguments\":{\"run_id\":\"9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d\"},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "discovery-source-read",
+      "note": "3.2 valid example",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"discovery.source.read\",\"requested_target\":{\"target_id\":\"discovery-snapshots\",\"snapshot_id\":\"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1\",\"path\":\"httpx/_client.py\"},\"arguments\":{\"start_line\":1,\"end_line\":200},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": null,
+        "hash_object_template": {
+          "operation_id": "discovery.source.read",
+          "canonical_target": {
+            "target_id": "discovery-snapshots",
+            "route_id": "discovery-files-v1",
+            "snapshot_id": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+            "path": "httpx/_client.py"
+          },
+          "disclosure_fields": [],
+          "content_digest": null,
+          "limits": {
+            "start_line": 1,
+            "end_line": 200,
+            "response_bytes": 65536
+          },
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": null,
+        "content_jcs": null,
+        "content_digest": null,
+        "hash_jcs": "{\"canonical_target\":{\"path\":\"httpx/_client.py\",\"route_id\":\"discovery-files-v1\",\"snapshot_id\":\"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1\",\"target_id\":\"discovery-snapshots\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":null,\"disclosure_fields\":[],\"environment\":\"test\",\"limits\":{\"end_line\":200,\"response_bytes\":65536,\"start_line\":1},\"operation_id\":\"discovery.source.read\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "ff3cd9d810d04a872894d934fccc5b5b6ddb0c2d21b6b046f34326464e67de0d",
+        "wire_body_digest": null
+      }
+    },
+    {
+      "id": "discovery-source-900",
+      "note": "3.2 reject: more than 400 lines",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"discovery.source.read\",\"requested_target\":{\"target_id\":\"discovery-snapshots\",\"snapshot_id\":\"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1\",\"path\":\"httpx/_client.py\"},\"arguments\":{\"start_line\":1,\"end_line\":900},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "discovery-source-dotdot",
+      "note": "path must not contain ..",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"discovery.source.read\",\"requested_target\":{\"target_id\":\"discovery-snapshots\",\"snapshot_id\":\"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1\",\"path\":\"httpx/../../etc/passwd\"},\"arguments\":{\"start_line\":1,\"end_line\":2},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "discovery-source-url",
+      "note": "raw URL as path",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"discovery.source.read\",\"requested_target\":{\"target_id\":\"discovery-snapshots\",\"snapshot_id\":\"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1\",\"path\":\"https://evil.example/x\"},\"arguments\":{\"start_line\":1,\"end_line\":2},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "discovery-callgraph-read",
+      "note": "3.2 valid example",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"discovery.callgraph.read\",\"requested_target\":{\"target_id\":\"discovery-snapshots\",\"snapshot_id\":\"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1\",\"symbol\":\"httpx.Client.send\"},\"arguments\":{\"depth\":2},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": null,
+        "hash_object_template": {
+          "operation_id": "discovery.callgraph.read",
+          "canonical_target": {
+            "target_id": "discovery-snapshots",
+            "route_id": "discovery-callgraph-v1",
+            "snapshot_id": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+            "symbol": "httpx.Client.send"
+          },
+          "disclosure_fields": [],
+          "content_digest": null,
+          "limits": {
+            "depth": 2,
+            "response_bytes": 65536
+          },
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": null,
+        "content_jcs": null,
+        "content_digest": null,
+        "hash_jcs": "{\"canonical_target\":{\"route_id\":\"discovery-callgraph-v1\",\"snapshot_id\":\"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1\",\"symbol\":\"httpx.Client.send\",\"target_id\":\"discovery-snapshots\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":null,\"disclosure_fields\":[],\"environment\":\"test\",\"limits\":{\"depth\":2,\"response_bytes\":65536},\"operation_id\":\"discovery.callgraph.read\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "6598f4c571f1b1128c63e50fb5520b2b1237f637d371c45157df992f53ed7b53",
+        "wire_body_digest": null
+      }
+    },
+    {
+      "id": "discovery-callgraph-decimal",
+      "note": "3.2 reject: depth 1.5 (decimal; rejected by the whole-body pre-scan)",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"discovery.callgraph.read\",\"requested_target\":{\"target_id\":\"discovery-snapshots\",\"snapshot_id\":\"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1\",\"symbol\":\"httpx.Client.send\"},\"arguments\":{\"depth\":1.5},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": ""
+      }
+    },
+    {
+      "id": "discovery-callgraph-depth-4",
+      "note": "depth out of range",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"discovery.callgraph.read\",\"requested_target\":{\"target_id\":\"discovery-snapshots\",\"snapshot_id\":\"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1\",\"symbol\":\"httpx.Client.send\"},\"arguments\":{\"depth\":4},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "unknown-operation",
+      "note": "operation not in catalog",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"k8s.secrets.list\",\"requested_target\":{\"target_id\":\"k8s-agent-targets\"},\"arguments\":{},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 403,
+        "reason_codes": [
+          "ENDPOINT_NOT_REGISTERED"
+        ],
+        "rule_id": "normalize.endpoint_registered.v1"
+      }
+    },
+    {
+      "id": "model-policy-proposal-exploration",
+      "note": "exploration binds phase and a null response_schema_digest",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"model.generate\",\"requested_target\":{\"target_id\":\"agent-platform-gemini\",\"profile\":\"policy_proposal\"},\"arguments\":{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"messages\":[{\"kind\":\"text\",\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\",\"ref\":null,\"function_name\":null}],\"tool_declarations\":[],\"phase\":\"exploration\"},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "content_input_template": {
+          "conversation_id": "6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e",
+          "messages": [
+            {
+              "kind": "text",
+              "role": "user",
+              "source": "user",
+              "text": "요약해 줘",
+              "ref": null,
+              "function_name": null
+            }
+          ],
+          "generation_config_digest": {
+            "$digest_ref": "model_profiles.policy_proposal.generation_config"
+          },
+          "tool_declarations_digest": {
+            "$digest": []
+          },
+          "response_schema_digest": null,
+          "phase": "exploration"
+        },
+        "hash_object_template": {
+          "operation_id": "model.generate",
+          "canonical_target": {
+            "target_id": "agent-platform-gemini",
+            "route_id": "generate-content-v1",
+            "profile": "policy_proposal"
+          },
+          "disclosure_fields": [
+            "user"
+          ],
+          "content_digest": "$content_digest",
+          "limits": {
+            "max_output_tokens": 8192,
+            "max_request_bytes": 65536
+          },
+          "catalog_digest": "$catalog_digest",
+          "canonicalization_version": "v1",
+          "schema_version": "v1",
+          "environment": "test",
+          "tenant": "hackathon"
+        },
+        "wire": null,
+        "content_jcs": "{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"generation_config_digest\":\"dfa3f86a4c99de11c0719f78925c29123b81d5d5ffdcd7129e008db08446659a\",\"messages\":[{\"function_name\":null,\"kind\":\"text\",\"ref\":null,\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\"}],\"phase\":\"exploration\",\"response_schema_digest\":null,\"tool_declarations_digest\":\"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945\"}",
+        "content_digest": "8316741e41fcb5f9fae9bc192892c8bfe2a0b63a8eabbe7ef696e63c5cb8d73b",
+        "hash_jcs": "{\"canonical_target\":{\"profile\":\"policy_proposal\",\"route_id\":\"generate-content-v1\",\"target_id\":\"agent-platform-gemini\"},\"canonicalization_version\":\"v1\",\"catalog_digest\":\"f84db51a354d41dc9489338de52b7dd183e37141125f818e0ebe585b1f6b16c8\",\"content_digest\":\"8316741e41fcb5f9fae9bc192892c8bfe2a0b63a8eabbe7ef696e63c5cb8d73b\",\"disclosure_fields\":[\"user\"],\"environment\":\"test\",\"limits\":{\"max_output_tokens\":8192,\"max_request_bytes\":65536},\"operation_id\":\"model.generate\",\"schema_version\":\"v1\",\"tenant\":\"hackathon\"}",
+        "action_digest": "22409cbb8ec688e7c3fe5b34f446d26f42dea46d15c8a3fe1470bdce9784fb1e",
+        "wire_body_digest": null
+      }
+    },
+    {
+      "id": "model-phase-reject-missing",
+      "note": "phase is required only for policy_proposal, with exact enum values",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"model.generate\",\"requested_target\":{\"target_id\":\"agent-platform-gemini\",\"profile\":\"policy_proposal\"},\"arguments\":{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"messages\":[{\"kind\":\"text\",\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\",\"ref\":null,\"function_name\":null}],\"tool_declarations\":[]},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "model-phase-reject-case",
+      "note": "phase is required only for policy_proposal, with exact enum values",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"model.generate\",\"requested_target\":{\"target_id\":\"agent-platform-gemini\",\"profile\":\"policy_proposal\"},\"arguments\":{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"messages\":[{\"kind\":\"text\",\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\",\"ref\":null,\"function_name\":null}],\"tool_declarations\":[],\"phase\":\"Final\"},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "model-phase-reject-null-agent",
+      "note": "phase is required only for policy_proposal, with exact enum values",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"model.generate\",\"requested_target\":{\"target_id\":\"agent-platform-gemini\",\"profile\":\"agent\"},\"arguments\":{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"messages\":[{\"kind\":\"text\",\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\",\"ref\":null,\"function_name\":null}],\"tool_declarations\":[],\"phase\":null},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    },
+    {
+      "id": "model-phase-reject-discovery",
+      "note": "phase is required only for policy_proposal, with exact enum values",
+      "raw": "{\"session_id\":\"51ab2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d\",\"operation_id\":\"model.generate\",\"requested_target\":{\"target_id\":\"agent-platform-gemini\",\"profile\":\"discovery\"},\"arguments\":{\"conversation_id\":\"6f1c2d3e-4a5b-4c6d-8e7f-901a2b3c4d5e\",\"messages\":[{\"kind\":\"text\",\"role\":\"user\",\"source\":\"user\",\"text\":\"요약해 줘\",\"ref\":null,\"function_name\":null}],\"tool_declarations\":[],\"phase\":\"final\"},\"client_request_key\":\"req-00000001\"}",
+      "expect": {
+        "http_status": 422,
+        "reason_codes": [
+          "SCHEMA_INVALID"
+        ],
+        "rule_id": "normalize.schema.v1"
+      }
+    }
+  ],
+  "equivalence": [
+    {
+      "id": "logs-key-order",
+      "same": true,
+      "cases": [
+        "k8s-pods-logs",
+        "k8s-pods-logs-keyorder"
+      ]
+    },
+    {
+      "id": "receiver-representation",
+      "same": true,
+      "cases": [
+        "receiver",
+        "receiver-keyorder",
+        "receiver-other-key",
+        "receiver-high-water"
+      ]
+    },
+    {
+      "id": "receiver-escapes",
+      "same": true,
+      "cases": [
+        "receiver-escaped",
+        "receiver-raw-utf8"
+      ]
+    },
+    {
+      "id": "tool-parameters-key-order",
+      "same": true,
+      "cases": [
+        "model-agent",
+        "model-agent-tool-keyorder"
+      ]
+    },
+    {
+      "id": "policy-meaning-changes",
+      "same": false,
+      "cases": [
+        "receiver",
+        "receiver-probe",
+        "receiver-summary-changed",
+        "receiver-email",
+        "receiver-env-prod",
+        "receiver-tenant-other"
+      ]
+    },
+    {
+      "id": "limits-change",
+      "same": false,
+      "cases": [
+        "k8s-pods-logs",
+        "k8s-pods-logs-tail-50"
+      ]
+    },
+    {
+      "id": "profile-change",
+      "same": false,
+      "cases": [
+        "model-agent-simple",
+        "model-discovery-simple",
+        "model-policy-proposal-user"
+      ]
+    },
+    {
+      "id": "tool-declaration-change",
+      "same": false,
+      "cases": [
+        "model-agent",
+        "model-agent-tool-changed"
+      ]
+    },
+    {
+      "id": "list-operations-differ",
+      "same": false,
+      "cases": [
+        "k8s-pods-list",
+        "k8s-events-list"
+      ]
+    },
+    {
+      "id": "disclosure-fields-order",
+      "same": true,
+      "cases": [
+        "receiver-email",
+        "receiver-email-keyorder"
+      ]
+    },
+    {
+      "id": "catalog-change",
+      "same": false,
+      "cases": [
+        "receiver",
+        "receiver-catalog-changed"
+      ]
+    },
+    {
+      "id": "phase-change",
+      "same": false,
+      "cases": [
+        "model-policy-proposal-user",
+        "model-policy-proposal-exploration"
+      ]
+    }
+  ]
+}

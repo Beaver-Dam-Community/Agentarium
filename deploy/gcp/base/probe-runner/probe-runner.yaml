@@ -1,0 +1,312 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "probe-runner",
+        "namespace": "agent-exec"
+      },
+      "automountServiceAccountToken": false
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "DaemonSet",
+      "metadata": {
+        "name": "probe-runner",
+        "namespace": "agent-exec"
+      },
+      "spec": {
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/name": "probe-runner"
+          }
+        },
+        "updateStrategy": {
+          "type": "RollingUpdate",
+          "rollingUpdate": {
+            "maxUnavailable": 1
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/name": "probe-runner"
+            }
+          },
+          "spec": {
+            "serviceAccountName": "probe-runner",
+            "automountServiceAccountToken": false,
+            "nodeSelector": {
+              "node-restriction.kubernetes.io/agentarium-role": "exec"
+            },
+            "schedulerName": "default-scheduler",
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 10001,
+              "runAsGroup": 10001,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "terminationGracePeriodSeconds": 10,
+            "tolerations": [
+              {
+                "key": "agentarium-role",
+                "operator": "Equal",
+                "value": "exec",
+                "effect": "NoSchedule"
+              },
+              {
+                "key": "agentarium.io/observe-not-ready",
+                "operator": "Equal",
+                "value": "true",
+                "effect": "NoSchedule"
+              }
+            ],
+            "containers": [
+              {
+                "name": "probe-runner",
+                "image": "${PROBE_RUNNER_IMAGE}",
+                "command": [
+                  "/probe/bin/probe-runner"
+                ],
+                "env": [
+                  {
+                    "name": "AGENTARIUM_TOKEN_FILE",
+                    "value": "/run/agentarium/identity/token"
+                  },
+                  {
+                    "name": "AGENTARIUM_TRUST_BUNDLE_PEM",
+                    "value": "${TRUST_BUNDLE_PEM}"
+                  },
+                  {
+                    "name": "AGENTARIUM_BOOTSTRAP_URL",
+                    "value": "https://${GATEWAY_CLUSTER_IP}:8443"
+                  },
+                  {
+                    "name": "AGENTARIUM_REPORT_URL",
+                    "value": "https://${GATEWAY_CLUSTER_IP}:8443"
+                  },
+                  {
+                    "name": "AGENTARIUM_PROBE_SINK",
+                    "value": "${PROBE_SINK_CLUSTER_IP}:8443"
+                  }
+                ],
+                "securityContext": {
+                  "runAsNonRoot": true,
+                  "runAsUser": 10001,
+                  "runAsGroup": 10001,
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "20m",
+                    "memory": "32Mi",
+                    "ephemeral-storage": "16Mi"
+                  },
+                  "limits": {
+                    "cpu": "200m",
+                    "memory": "64Mi",
+                    "ephemeral-storage": "64Mi"
+                  }
+                },
+                "volumeMounts": [
+                  {
+                    "name": "work",
+                    "mountPath": "/work"
+                  },
+                  {
+                    "name": "identity",
+                    "mountPath": "/run/agentarium/identity",
+                    "readOnly": true
+                  }
+                ]
+              }
+            ],
+            "volumes": [
+              {
+                "name": "work",
+                "emptyDir": {
+                  "sizeLimit": "16Mi"
+                }
+              },
+              {
+                "name": "identity",
+                "projected": {
+                  "sources": [
+                    {
+                      "serviceAccountToken": {
+                        "path": "token",
+                        "expirationSeconds": 600,
+                        "audience": "agentarium-identity"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "probe-runner",
+        "namespace": "agent-adapters"
+      },
+      "automountServiceAccountToken": false
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "DaemonSet",
+      "metadata": {
+        "name": "probe-runner",
+        "namespace": "agent-adapters"
+      },
+      "spec": {
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/name": "probe-runner"
+          }
+        },
+        "updateStrategy": {
+          "type": "RollingUpdate",
+          "rollingUpdate": {
+            "maxUnavailable": 1
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/name": "probe-runner"
+            }
+          },
+          "spec": {
+            "serviceAccountName": "probe-runner",
+            "automountServiceAccountToken": false,
+            "nodeSelector": {
+              "node-restriction.kubernetes.io/agentarium-role": "control"
+            },
+            "schedulerName": "default-scheduler",
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 10001,
+              "runAsGroup": 10001,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "terminationGracePeriodSeconds": 10,
+            "tolerations": [
+              {
+                "key": "agentarium.io/observe-not-ready",
+                "operator": "Equal",
+                "value": "true",
+                "effect": "NoSchedule"
+              }
+            ],
+            "containers": [
+              {
+                "name": "probe-runner",
+                "image": "${PROBE_RUNNER_IMAGE}",
+                "command": [
+                  "/probe/bin/probe-runner"
+                ],
+                "env": [
+                  {
+                    "name": "AGENTARIUM_TOKEN_FILE",
+                    "value": "/run/agentarium/identity/token"
+                  },
+                  {
+                    "name": "AGENTARIUM_TRUST_BUNDLE_PEM",
+                    "value": "${TRUST_BUNDLE_PEM}"
+                  },
+                  {
+                    "name": "AGENTARIUM_BOOTSTRAP_URL",
+                    "value": "https://workload-identity.agent-control.svc:8443"
+                  },
+                  {
+                    "name": "AGENTARIUM_REPORT_URL",
+                    "value": "https://control-health.agent-observe.svc:8443"
+                  },
+                  {
+                    "name": "AGENTARIUM_PROBE_SINK",
+                    "value": "${PROBE_SINK_CLUSTER_IP}:8443"
+                  }
+                ],
+                "securityContext": {
+                  "runAsNonRoot": true,
+                  "runAsUser": 10001,
+                  "runAsGroup": 10001,
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "20m",
+                    "memory": "32Mi",
+                    "ephemeral-storage": "16Mi"
+                  },
+                  "limits": {
+                    "cpu": "200m",
+                    "memory": "64Mi",
+                    "ephemeral-storage": "64Mi"
+                  }
+                },
+                "volumeMounts": [
+                  {
+                    "name": "work",
+                    "mountPath": "/work"
+                  },
+                  {
+                    "name": "identity",
+                    "mountPath": "/run/agentarium/identity",
+                    "readOnly": true
+                  }
+                ]
+              }
+            ],
+            "volumes": [
+              {
+                "name": "work",
+                "emptyDir": {
+                  "sizeLimit": "16Mi"
+                }
+              },
+              {
+                "name": "identity",
+                "projected": {
+                  "sources": [
+                    {
+                      "serviceAccountToken": {
+                        "path": "token",
+                        "expirationSeconds": 600,
+                        "audience": "agentarium-identity"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "run_id": "20261014-task01-q0-min",
+  "task_id": "TASK-01",
+  "run_kind": "q0_min_observation",
+  "implementation_commit": "91bb1c7aa8aaf0c7e80c2badbc2bf6474b63425f",
+  "environment": {
+    "project_id": "karrot-rina",
+    "cluster": "agentarium-prod",
+    "cluster_uid": "4489172407144a57bf6a4914d26ed16e22f5d20a9fde42de81eb2f62a770fe9a",
+    "kubernetes_version": "1.36.4-gke.1495002",
+    "node": "gke-agentarium-prod-exec-pool-eaf0304a-x10z (exec-pool)",
+    "node_os": "Container-Optimized OS from Google",
+    "kernel": "6.12.105+",
+    "container_runtime": "containerd://2.2.7",
+    "datapath_provider": "ADVANCED_DATAPATH",
+    "nodelocal_dns_cache": false
+  },
+  "sensor": {
+    "chart": "cilium/tetragon 1.7.1",
+    "chart_tgz_sha256": "79ec0f7d35b6fcad99ca317348deac136c00b674430c28be17aa818d2015c632",
+    "values_file": "deploy/gcp/sensors/tetragon-values.yaml",
+    "values_sha256": "f390cf6b233d78157b4ac6210629bc3cd744ce78b66885212de3289330ad32e8",
+    "enable_process_ns": true,
+    "export_deny_list": {
+      "run1": "chart default (namespace \"\", cilium, kube-system)",
+      "run2": "namespace cilium, kube-system (committed value)"
+    },
+    "values_sha256_target": "deploy/gcp/sensors/tetragon-values.yaml at implementation_commit (before the later \\${IMAGE_REPOSITORY} and affinity edits); run1 applied it as is, run2 added the overlay below",
+    "run2_overlay": "tetragon.exportDenyList: {\"health_check\":true}\\n{\"namespace\":[\"cilium\", \"kube-system\"]}"
+  },
+  "inputs": {
+    "images": {
+      "tetragon": "asia-northeast3-docker.pkg.dev/karrot-rina/agentarium/tetragon@sha256:255f3d403e615f6a6f557cf4f197a5db3959ace9ad7003309f5e0d4b4300c815",
+      "hubble-export-stdout": "asia-northeast3-docker.pkg.dev/karrot-rina/agentarium/hubble-export-stdout@sha256:500914cfc9b84963f667cae588f3a00a60a91b22dab8efdac041c3f5c27e9c50",
+      "busybox (log reader)": "asia-northeast3-docker.pkg.dev/karrot-rina/agentarium/busybox@sha256:66a6306db78bf2dbf3487f293aa8d6990d8e506fdffab9cc43fe422becf886e4",
+      "q0-stimulus": "asia-northeast3-docker.pkg.dev/karrot-rina/agentarium/q0-stimulus@sha256:ea0daa3ffc1b325ff1eb13933497ce4a331d4881db96b637fc9c05e4d3c59e87"
+    },
+    "fixture_set_files": [
+      "tests/platform/q0/cmd/q0-stimulus/main.go",
+      "sensors/tetragon/policies/network.yaml",
+      "sensors/tetragon/policies/tcp-state.yaml",
+      "sensors/tetragon/policies/file-access.yaml",
+      "deploy/gcp/sensors/tetragon-values.yaml",
+      "deploy/gcp/base/network/network-logging.yaml"
+    ],
+    "stimuli_per_kind": 30,
+    "tcp_target": "kube-dns ClusterIP 10.30.0.10:53",
+    "protected_path": "/work/protected-fixture (emptyDir)",
+    "raw": "raw/ (sanitized; see raw/README.md)"
+  },
+  "fixture_set_digest": "7d7d7b7b9abb67a5be82f4cb8a236a91fe72d3e363e270156994197fd4bb7e37",
+  "repetitions": {
+    "kernel": 2,
+    "netpol": 1
+  },
+  "clock": "2026-10-14T13:16Z..13:20Z",
+  "post_run": "stimulus/reader Pods, temporary NetworkPolicy and ServiceAccounts deleted; probe image lists re-rendered empty; Tetragon, TracingPolicies, NetworkLogging and the sensors image list left in place for TASK-09/06",
+  "analysis": {
+    "script": "tests/platform/q0/analyze_q0_min.py",
+    "script_sha256": "272dc2123f41e41ebaa5b86b2e2044359a2e24acd6fdb76af5d31049890c1d8c",
+    "tcp_state_join": "same node + sock cookie (kernel sock pointer, reused) + source address/port + event time at or after the connect"
+  }
+}

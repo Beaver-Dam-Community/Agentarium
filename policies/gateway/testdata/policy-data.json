@@ -1,0 +1,29 @@
+{
+  "_comment": "Test-only policy data for decision.rego. Not production data; production service_profiles, adapter_constraints and sensor_rules are decided in issue #30. standing_rules are the COMMON Appendix A initial rules.",
+  "adapter_constraints": {},
+  "receiver": {"allowed_disclosure_fields": ["summary"]},
+  "sensor_rules": {},
+  "service_profiles": {
+    "activation_probe": {"operation_ids": ["receiver.submit"], "model_profiles": [], "target_ids": ["receiver-probe"]},
+    "policy_proposal": {"operation_ids": ["evidence.action.read", "model.generate"], "model_profiles": ["policy_proposal"], "target_ids": ["agent-platform-gemini", "evidence-api"]}
+  },
+  "standing_rules": {
+    "standing.k8s_read.v1": {
+      "standing_rule_id": "standing.k8s_read.v1", "session_kind": "user", "profile": null,
+      "operation_ids": ["k8s.pods.list", "k8s.events.list", "k8s.pods.logs"],
+      "target_pattern": "k8s-agent-targets", "limits": {"limit": 100, "tailLines": 200, "limitBytes": 65536},
+      "data_profile": "synthetic", "session_budget": 100
+    },
+    "standing.model_synthetic.v1": {
+      "standing_rule_id": "standing.model_synthetic.v1", "session_kind": "user", "profile": "agent",
+      "operation_ids": ["model.generate"], "target_pattern": "agent-platform-gemini",
+      "limits": {"request_bytes": 65536}, "data_profile": "synthetic", "session_budget": 50
+    },
+    "probe.activation.v1": {
+      "standing_rule_id": "probe.activation.v1", "session_kind": "service", "profile": "activation_probe",
+      "operation_ids": ["receiver.submit"], "target_pattern": "receiver-probe",
+      "disclosure_fields": ["summary"], "limits": {"request_bytes": 4096},
+      "data_profile": "synthetic", "session_budget": 4
+    }
+  }
+}

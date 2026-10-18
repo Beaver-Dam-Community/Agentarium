@@ -1,0 +1,19 @@
+# Copied verbatim from docs/tech-specs/TASK-09-node-sensor.md 3.2.
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicy                # cluster scope: state transitions in softirq context do not match cgroup filters
+metadata:
+  name: agentarium-tcp-state
+spec:
+  kprobes:
+    - call: tcp_set_state
+      syscall: false
+      args:
+        - index: 0
+          type: sock
+        - index: 1
+          type: int
+      selectors:
+        - matchArgs:
+            - index: 1
+              operator: Equal
+              values: ["1", "7"]   # TCP_ESTABLISHED, TCP_CLOSE

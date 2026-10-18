@@ -1,0 +1,64 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "DaemonSet",
+  "metadata": {
+    "name": "tetragon",
+    "resourceVersion": "123",
+    "uid": "0f6c7b8e-0000-4000-8000-000000000001",
+    "creationTimestamp": "2026-10-01T00:00:00Z",
+    "generation": 3,
+    "managedFields": [
+      {
+        "manager": "kubectl",
+        "operation": "Apply"
+      }
+    ],
+    "namespace": "agent-sensors",
+    "labels": {
+      "app.kubernetes.io/name": "tetragon"
+    },
+    "annotations": {
+      "deprecated.daemonset.template.generation": "3"
+    }
+  },
+  "spec": {
+    "selector": {
+      "matchLabels": {
+        "app.kubernetes.io/name": "tetragon"
+      }
+    },
+    "updateStrategy": {
+      "type": "RollingUpdate"
+    },
+    "template": {
+      "metadata": {
+        "creationTimestamp": null,
+        "labels": {
+          "app.kubernetes.io/name": "tetragon"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "tetragon",
+            "image": "quay.io/cilium/tetragon@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "args": [
+              "--config-dir=/etc/tetragon/tetragon.conf.d/"
+            ]
+          }
+        ],
+        "tolerations": [
+          {
+            "key": "agentarium.io/observe-not-ready",
+            "operator": "Exists",
+            "effect": "NoSchedule"
+          }
+        ]
+      }
+    }
+  },
+  "status": {
+    "numberReady": 5,
+    "desiredNumberScheduled": 5
+  }
+}

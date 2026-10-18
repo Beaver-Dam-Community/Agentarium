@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "targets.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["targets"],
+  "properties": {
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "target_id", "endpoint_id", "environment", "tenant", "origin", "expected_tls_name",
+          "ca_ref", "allowed_cidrs", "max_data_class", "operation_ids"
+        ],
+        "if": {"required": ["ca_ref"], "properties": {"ca_ref": {"const": "agentarium-trust"}}},
+        "then": {"required": ["expected_uri_san"]},
+        "else": {"not": {"required": ["expected_uri_san"]}},
+        "properties": {
+          "target_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,62}$"},
+          "endpoint_id": {"type": "string"},
+          "environment": {"type": "string"},
+          "tenant": {"type": "string"},
+          "origin": {"type": "string", "pattern": "^https://[a-z0-9.-]+(:[0-9]{1,5})?$"},
+          "expected_tls_name": {"type": "string"},
+          "expected_uri_san": {
+            "type": "string",
+            "pattern": "^spiffe://agentarium\\.internal/ns/[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?/sa/[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$"
+          },
+          "ca_ref": {"enum": ["system", "cluster", "agentarium-trust"]},
+          "auth_audience": {"type": ["string", "null"]},
+          "allowed_cidrs": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "max_data_class": {"enum": ["none", "synthetic", "internal", "confidential"]},
+          "operation_ids": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "namespace": {"type": ["string", "null"]},
+          "model": {
+            "type": ["object", "null"],
+            "additionalProperties": false,
+            "properties": {
+              "project": {"type": "string"},
+              "location": {"type": "string"},
+              "model_id": {"type": "string"}
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+# Copied verbatim from docs/tech-specs/TASK-06-egress-credentials.md 3.4.
+apiVersion: networking.gke.io/v1alpha1
+kind: NetworkLogging
+metadata:
+  name: default
+spec:
+  cluster:
+    allow:
+      log: true
+      delegate: true     # log allows only for annotated NetworkPolicies
+    deny:
+      log: true
+      delegate: false    # log denies in every Namespace

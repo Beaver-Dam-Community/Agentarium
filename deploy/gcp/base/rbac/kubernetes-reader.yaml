@@ -1,0 +1,35 @@
+# TASK-06 3.2: the API adapter's ceiling is agent-targets pod/event reads.
+# The adapter still checks the approved namespace, Pod UID and content limits.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kubernetes-reader
+  namespace: agent-adapters
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: agentarium-kubernetes-reader
+  namespace: agent-targets
+rules:
+  - apiGroups: [""]
+    resources: [pods, events]
+    verbs: [get, list]
+  - apiGroups: [""]
+    resources: [pods/log]
+    verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: agentarium-kubernetes-reader
+  namespace: agent-targets
+subjects:
+  - kind: ServiceAccount
+    name: kubernetes-reader
+    namespace: agent-adapters
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: agentarium-kubernetes-reader

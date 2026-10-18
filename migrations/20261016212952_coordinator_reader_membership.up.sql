@@ -1,0 +1,14 @@
+-- TASK-03: make coordinator_app a member of coordinator_reader.
+--
+-- COMMON's role table puts coordinator_reader under TASK-03, and TASK-03's
+-- role table makes coordinator_app its member. The role and its grants
+-- (health SELECT, decisions SELECT, and EXECUTE on the health row lock
+-- functions) are created by the TASK-10 and TASK-04 migrations;
+-- 20261016180757_coordinator_dispatch left the membership to a later
+-- migration. Without it the coordinator cannot read through
+-- coordinator_reader or call health.lock_dispatch_holds and
+-- health.lock_dispatch_node.
+--
+-- INHERIT (the default) so that coordinator_app uses the reader's
+-- privileges directly. No UPDATE on health.* is granted.
+GRANT coordinator_reader TO coordinator_app;

@@ -1,0 +1,199 @@
+# TASK-09 3.6 runtime lifecycle recorder: one Pod per exec/control node in
+# agent-sensors (KSA lifecycle-recorder), on the Pod network (TASK-06 3.1
+# lifecycle-recorder-allow). Only the containerd-proxy container mounts
+# /run/containerd/containerd.sock; it forwards Events/Subscribe, Containers
+# Get/List and CRI ContainerStatus (reduced responses) on a Pod-local socket
+# and denies every other method (TASK-09 3.6 containerd access boundary). The
+# non-root recorder reads that socket, stats cgroups through a read-only
+# /sys/fs/cgroup mount, keeps its WAL in /var/lib/agentarium/lifecycle-spool
+# (TASK-01 3.2.1), sends LifecycleRecords to TASK-07 and RUNTIME_RECORD_MISSING
+# gaps plus the lifecycle-recorder lease to control-health.
+#
+# RENDER NOTE: ${LIFECYCLE_RECORDER_IMAGE} and ${CONTAINERD_PROXY_IMAGE}
+# (digests listed in AGENT_SENSORS_IMAGES), ${CLUSTER_UID} and
+# ${RECORDER_VERSION} are install inputs. The containerd socket path and mount
+# permission on GKE COS, the CRI label keys and the systemd cgroupsPath
+# conversion are Q0 items.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: lifecycle-recorder
+  namespace: agent-sensors
+  labels: {app.kubernetes.io/name: lifecycle-recorder}
+automountServiceAccountToken: false
+---
+# Its own Node only (metadata.uid, status.nodeInfo.bootID) for the epoch.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: agentarium-lifecycle-recorder
+rules:
+  - apiGroups: [""]
+    resources: [nodes]
+    verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: agentarium-lifecycle-recorder
+subjects:
+  - kind: ServiceAccount
+    name: lifecycle-recorder
+    namespace: agent-sensors
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: agentarium-lifecycle-recorder
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agentarium-lifecycle-recorder
+  namespace: agent-sensors
+  labels: {app.kubernetes.io/name: lifecycle-recorder}
+data:
+  config.json: |
+    {
+      "version": "${RECORDER_VERSION}",
+      "containerd_socket": "/run/agentarium-containerd/containerd.sock",
+      "cgroup_root": "/host/sys/fs/cgroup",
+      "spool_dir": "/var/lib/agentarium/lifecycle-spool",
+      "spool_capacity_bytes": 268435456,
+      "boot_id_path": "/proc/sys/kernel/random/boot_id",
+      "cluster_uid": "${CLUSTER_UID}",
+      "collector_origin": "https://audit-writer.agent-observe.svc:8443",
+      "health_origin": "https://control-health.agent-observe.svc:8443",
+      "identity_origin": "https://workload-identity.agent-control.svc:8443",
+      "identity_peer_san": "spiffe://agentarium.internal/ns/agent-control/sa/workload-identity",
+      "token_file": "/var/run/agentarium-bootstrap/token",
+      "ca_file": "/etc/agentarium-trust/ca.pem"
+    }
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: lifecycle-recorder
+  namespace: agent-sensors
+  labels: {app.kubernetes.io/name: lifecycle-recorder}
+spec:
+  selector:
+    matchLabels: {app.kubernetes.io/name: lifecycle-recorder}
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate: {maxUnavailable: 1}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/name: lifecycle-recorder}
+    spec:
+      serviceAccountName: lifecycle-recorder
+      # No container gets a token by default; only the recorder container
+      # mounts the two projected tokens below.
+      automountServiceAccountToken: false
+      hostNetwork: false
+      terminationGracePeriodSeconds: 30
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - {key: node-restriction.kubernetes.io/agentarium-role, operator: In, values: [exec, control]}
+                  - {key: kubernetes.io/os, operator: In, values: [linux]}
+      tolerations:
+        - {key: agentarium-role, operator: Equal, value: exec, effect: NoSchedule}
+        - {key: agentarium.io/observe-not-ready, operator: Equal, value: "true", effect: NoSchedule}
+      securityContext:
+        seccompProfile: {type: RuntimeDefault}
+      initContainers:
+        # Hands the hostPath spool to the recorder's uid/gid; CAP_CHOWN only.
+        - name: spool-owner
+          image: "${LIFECYCLE_RECORDER_IMAGE}"
+          args: ["--prepare-spool", "/var/lib/agentarium/lifecycle-spool", "--spool-owner", "65532", "--spool-group", "65532"]
+          securityContext:
+            runAsUser: 0
+            runAsNonRoot: false
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL], add: [CHOWN]}
+          resources:
+            requests: {cpu: 10m, memory: 16Mi}
+            limits: {memory: 32Mi}
+          volumeMounts:
+            - {name: spool, mountPath: /var/lib/agentarium/lifecycle-spool}
+      containers:
+        # Node-root boundary: the only container with the containerd socket.
+        # Root to open the root-owned socket, group 65532 so the recorder can
+        # connect to the 0660 proxy socket; no capabilities, no token, no
+        # network use.
+        - name: containerd-proxy
+          image: "${CONTAINERD_PROXY_IMAGE}"
+          args: ["--upstream", "/run/containerd/containerd.sock", "--listen", "/run/agentarium-containerd/containerd.sock"]
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 65532
+            runAsNonRoot: false
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 10m, memory: 16Mi}
+            limits: {memory: 64Mi}
+          volumeMounts:
+            - {name: containerd, mountPath: /run/containerd/containerd.sock}
+            - {name: proxy, mountPath: /run/agentarium-containerd}
+        - name: lifecycle-recorder
+          image: "${LIFECYCLE_RECORDER_IMAGE}"
+          args: ["--config", "/etc/agentarium/lifecycle-recorder/config.json"]
+          env:
+            - name: NODE_NAME
+              valueFrom: {fieldRef: {fieldPath: spec.nodeName}}
+          securityContext:
+            runAsUser: 65532
+            runAsGroup: 65532
+            runAsNonRoot: true
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 20m, memory: 32Mi}
+            limits: {memory: 128Mi}
+          volumeMounts:
+            - {name: proxy, mountPath: /run/agentarium-containerd}
+            - {name: cgroup, mountPath: /host/sys/fs/cgroup, readOnly: true}
+            - {name: spool, mountPath: /var/lib/agentarium/lifecycle-spool}
+            - {name: config, mountPath: /etc/agentarium/lifecycle-recorder, readOnly: true}
+            - {name: trust, mountPath: /etc/agentarium-trust, readOnly: true}
+            - {name: bootstrap, mountPath: /var/run/agentarium-bootstrap, readOnly: true}
+            - {name: kube-api, mountPath: /var/run/secrets/kubernetes.io/serviceaccount, readOnly: true}
+      volumes:
+        - name: containerd
+          hostPath: {path: /run/containerd/containerd.sock, type: Socket}
+        - name: proxy
+          emptyDir: {medium: Memory, sizeLimit: 1Mi}
+        - name: cgroup
+          hostPath: {path: /sys/fs/cgroup, type: Directory}
+        - name: spool
+          hostPath: {path: /var/lib/agentarium/lifecycle-spool, type: DirectoryOrCreate}
+        - name: config
+          configMap: {name: agentarium-lifecycle-recorder}
+        - name: trust
+          configMap: {name: agentarium-trust}
+        - name: bootstrap
+          projected:
+            sources:
+              - serviceAccountToken: {path: token, expirationSeconds: 600, audience: agentarium-identity}
+        # Own Node get (node epoch); what automount would give, but only to
+        # the recorder container.
+        - name: kube-api
+          projected:
+            sources:
+              - serviceAccountToken: {path: token, expirationSeconds: 3607}
+              - configMap:
+                  name: kube-root-ca.crt
+                  items: [{key: ca.crt, path: ca.crt}]
+              - downwardAPI:
+                  items:
+                    - path: namespace
+                      fieldRef: {fieldPath: metadata.namespace}

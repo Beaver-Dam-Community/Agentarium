@@ -1,0 +1,10 @@
+# TYPE tetragon_observer_ringbuf_events_lost_total counter
+tetragon_observer_ringbuf_events_lost_total 7
+# TYPE tetragon_observer_ringbuf_queue_events_lost_total counter
+tetragon_observer_ringbuf_queue_events_lost_total 11
+# TYPE tetragon_notify_overflowed_events_total counter
+tetragon_notify_overflowed_events_total 13
+# TYPE tetragon_export_ratelimit_events_dropped_total counter
+tetragon_export_ratelimit_events_dropped_total 17
+# TYPE tetragon_events_total counter
+tetragon_events_total{binary="/probe/bin/marker",namespace="agent-observe",type="PROCESS_EXEC"} 25

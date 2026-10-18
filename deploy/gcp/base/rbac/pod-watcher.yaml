@@ -1,0 +1,25 @@
+# TASK-09 3.6 (Pod watcher): LIST and WATCH Pods for the namespace scope.
+# TASK-07 3.3 uses scope namespace/agent-exec; no other scope is specified.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: agentarium-pod-watcher
+  namespace: agent-exec
+rules:
+  - apiGroups: [""]
+    resources: [pods]
+    verbs: [list, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: agentarium-pod-watcher
+  namespace: agent-exec
+subjects:
+  - kind: ServiceAccount
+    name: pod-watcher
+    namespace: agent-observe
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: agentarium-pod-watcher

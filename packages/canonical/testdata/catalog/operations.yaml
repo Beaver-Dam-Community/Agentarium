@@ -1,0 +1,251 @@
+# Synthetic test catalog for packages/canonical unit tests and vectors.json.
+# Not the deployed catalog (that is catalog/gcp/, TASK-02 Appendix A).
+catalog_version: test-2026-10-11
+operations:
+  - operation_id: k8s.pods.list
+    endpoint_id: k8s-api-v1
+    service_id: kubernetes
+    adapter_id: kubernetes-reader
+    transport: https_rest
+    method: GET
+    route_id: pod-list-v1
+    route_template: /api/v1/namespaces/{namespace}/pods
+    effect_type: read
+    disclosure: {kind: none}
+    credential_binding: null
+    limits:
+      limit: {max: 100, fixed: 100}
+    retry_policy: none
+    idempotency_support: none
+    evidence_strategy: response_only
+    evidence_level_max: accepted
+    evidence_deadline_seconds: 0
+    intent_check_on_standing_rule: true
+    response_data_class: synthetic
+    redact_fields: []
+    response_limit_bytes: 1048576
+    description: "agent-targets namespace의 Pod 목록을 읽는다"
+    schema_version: v1
+    owner: platform-team
+  - operation_id: k8s.events.list
+    endpoint_id: k8s-api-v1
+    service_id: kubernetes
+    adapter_id: kubernetes-reader
+    transport: https_rest
+    method: GET
+    route_id: event-list-v1
+    route_template: /api/v1/namespaces/{namespace}/events
+    effect_type: read
+    disclosure: {kind: none}
+    credential_binding: null
+    limits:
+      limit: {max: 100, fixed: 100}
+    retry_policy: none
+    idempotency_support: none
+    evidence_strategy: response_only
+    evidence_level_max: accepted
+    evidence_deadline_seconds: 0
+    intent_check_on_standing_rule: true
+    response_data_class: synthetic
+    redact_fields: []
+    response_limit_bytes: 1048576
+    description: "agent-targets namespace의 이벤트 목록을 읽는다"
+    schema_version: v1
+    owner: platform-team
+  - operation_id: k8s.pods.logs
+    endpoint_id: k8s-api-v1
+    service_id: kubernetes
+    adapter_id: kubernetes-reader
+    transport: https_rest
+    method: GET
+    route_id: pod-log-v1
+    route_template: /api/v1/namespaces/{namespace}/pods/{pod_name}/log
+    effect_type: read
+    disclosure: {kind: none}
+    credential_binding: null          # projected KSA token (TASK-05)
+    limits:
+      tail_lines: {min: 1, max: 200}
+      limit_bytes: {min: 1, max: 1048576}
+    retry_policy: none
+    idempotency_support: none
+    evidence_strategy: response_only
+    evidence_level_max: accepted
+    evidence_deadline_seconds: 0
+    intent_check_on_standing_rule: true
+    response_data_class: synthetic
+    redact_fields: []
+    response_limit_bytes: 1048576
+    description: "agent-targets namespace의 등록 Pod 로그 마지막 몇 줄을 읽는다"
+    schema_version: v1
+    owner: platform-team
+  - operation_id: receiver.submit
+    endpoint_id: test-receiver-v1
+    service_id: test-receiver
+    adapter_id: receiver-sender
+    transport: https_rest
+    method: POST
+    route_id: submissions-v1
+    route_template: /test/v1/submissions
+    effect_type: external_send
+    disclosure: {kind: payload_fields}
+    credential_binding: receiver-api-key
+    limits: {}
+    retry_policy: none
+    idempotency_support: idempotency_key
+    evidence_strategy: receiver_receipt
+    evidence_level_max: effect_verified
+    evidence_deadline_seconds: 30
+    intent_check_on_standing_rule: false
+    response_data_class: none
+    redact_fields: []
+    response_limit_bytes: 65536
+    content_checks: {fields: [summary], email_pattern: true, synthetic_identifiers: ["SYN-USER-0001", "SYN-USER-0002"]}
+    description: "자체 시험 receiver에 승인된 요약을 보낸다"
+    schema_version: v1
+    owner: platform-team
+  - operation_id: model.generate
+    endpoint_id: agent-platform-v1
+    service_id: agent-platform
+    adapter_id: model
+    transport: https_rest
+    method: POST
+    route_id: generate-content-v1
+    route_template: /v1/projects/{project}/locations/{location}/publishers/google/models/{model_id}:generateContent
+    effect_type: model_disclosure
+    disclosure: {kind: message_sources}
+    credential_binding: null
+    limits: {}
+    retry_policy: none
+    idempotency_support: none
+    evidence_strategy: provider_response
+    evidence_level_max: accepted
+    evidence_deadline_seconds: 0
+    intent_check_on_standing_rule: true
+    model_profiles: [agent, policy_proposal, intent_check, discovery]
+    response_data_class: inherit
+    redact_fields: []
+    response_limit_bytes: 1048576
+    description: "Agent Platform Gemini generateContent를 호출한다"
+    schema_version: v1
+    owner: platform-team
+  - operation_id: evidence.action.read
+    endpoint_id: evidence-api-v1
+    service_id: evidence
+    adapter_id: evidence-reader
+    transport: https_rest
+    method: GET
+    route_id: evidence-action-v1
+    route_template: /internal/evidence/actions/{resource_id}
+    effect_type: read
+    disclosure: {kind: none}
+    credential_binding: null
+    limits: {}
+    retry_policy: none
+    idempotency_support: none
+    evidence_strategy: response_only
+    evidence_level_max: accepted
+    evidence_deadline_seconds: 0
+    intent_check_on_standing_rule: false
+    response_data_class: internal
+    redact_fields: ["/attempts/*/peer", "/a~1b"]
+    response_limit_bytes: 65536
+    description: "정제된 action 증거를 읽는다"
+    schema_version: v1
+    owner: platform-team
+  - operation_id: evidence.bundle.read
+    endpoint_id: evidence-api-v1
+    service_id: evidence
+    adapter_id: evidence-reader
+    transport: https_rest
+    method: GET
+    route_id: evidence-bundle-v1
+    route_template: /internal/evidence/bundles/{resource_id}
+    effect_type: read
+    disclosure: {kind: none}
+    credential_binding: null
+    limits: {}
+    retry_policy: none
+    idempotency_support: none
+    evidence_strategy: response_only
+    evidence_level_max: accepted
+    evidence_deadline_seconds: 0
+    intent_check_on_standing_rule: false
+    response_data_class: internal
+    redact_fields: []
+    response_limit_bytes: 65536
+    description: "정제된 bundle 증거를 읽는다"
+    schema_version: v1
+    owner: platform-team
+  - operation_id: evidence.regression.read
+    endpoint_id: evidence-api-v1
+    service_id: evidence
+    adapter_id: evidence-reader
+    transport: https_rest
+    method: GET
+    route_id: evidence-regression-v1
+    route_template: /internal/evidence/regressions/{resource_id}
+    effect_type: read
+    disclosure: {kind: none}
+    credential_binding: null
+    limits: {}
+    retry_policy: none
+    idempotency_support: none
+    evidence_strategy: response_only
+    evidence_level_max: accepted
+    evidence_deadline_seconds: 0
+    intent_check_on_standing_rule: false
+    response_data_class: internal
+    redact_fields: []
+    response_limit_bytes: 65536
+    description: "정제된 회귀 시험 증거를 읽는다"
+    schema_version: v1
+    owner: platform-team
+  - operation_id: discovery.source.read
+    endpoint_id: discovery-snapshots-v1
+    service_id: discovery
+    adapter_id: evidence-reader
+    transport: https_rest
+    method: GET
+    route_id: discovery-files-v1
+    route_template: /internal/discovery/snapshots/{snapshot_id}/files
+    effect_type: read
+    disclosure: {kind: none}
+    credential_binding: null
+    limits: {}
+    retry_policy: none
+    idempotency_support: none
+    evidence_strategy: response_only
+    evidence_level_max: accepted
+    evidence_deadline_seconds: 0
+    intent_check_on_standing_rule: false
+    response_data_class: internal
+    redact_fields: []
+    response_limit_bytes: 65536
+    description: "discovery snapshot의 소스 줄 범위를 읽는다"
+    schema_version: v1
+    owner: platform-team
+  - operation_id: discovery.callgraph.read
+    endpoint_id: discovery-snapshots-v1
+    service_id: discovery
+    adapter_id: evidence-reader
+    transport: https_rest
+    method: GET
+    route_id: discovery-callgraph-v1
+    route_template: /internal/discovery/snapshots/{snapshot_id}/callgraph
+    effect_type: read
+    disclosure: {kind: none}
+    credential_binding: null
+    limits:
+      depth: {min: 1, max: 3}
+    retry_policy: none
+    idempotency_support: none
+    evidence_strategy: response_only
+    evidence_level_max: accepted
+    evidence_deadline_seconds: 0
+    intent_check_on_standing_rule: false
+    response_data_class: internal
+    redact_fields: []
+    response_limit_bytes: 65536
+    description: "discovery snapshot의 call graph를 읽는다"
+    schema_version: v1
+    owner: platform-team

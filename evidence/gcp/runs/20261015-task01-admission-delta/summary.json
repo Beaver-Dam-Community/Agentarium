@@ -1,0 +1,34 @@
+{
+  "task_id": "TASK-01",
+  "status": "pass",
+  "implementation_commit": "a4e98ec2aa54416d58d8eb70dbf2de5b3f21a61a",
+  "image_digest": null,
+  "environment_manifest": "manifest.json",
+  "policy_bundle_id": null,
+  "policy_epoch": null,
+  "run_id": "20261015-task01-admission-delta",
+  "run_kind": "platform_admission_live",
+  "fixture_set_digest": "851244bc9372281c07445183a5f06b97d82bd65ba076431595c046f2192ed9b7",
+  "baseline_bundle_digest": null,
+  "candidate_digest": null,
+  "expected_cases": 21,
+  "observed_cases": 21,
+  "passed": 21,
+  "failed": 0,
+  "unknown": 0,
+  "metrics": null,
+  "invariants": null,
+  "release_eligible": null,
+  "startup_capture": null,
+  "evidence_refs": [
+    "expected.json",
+    "observed.jsonl",
+    "report.md",
+    "tests/platform/admission/live_delta_check.py"
+  ],
+  "limitations": [
+    "single repetition",
+    "node-readiness cases use dryRun=All with a temporary RBAC grant equal to the spec permissions; the controller itself is not deployed",
+    "the agent-sensors allowed case is the running Tetragon DaemonSet; forbidden cases are dry-run variants of its Pod template"
+  ]
+}

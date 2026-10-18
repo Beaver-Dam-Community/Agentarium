@@ -1,0 +1,11 @@
+DROP TABLE IF EXISTS discovery.discovery_producer_epochs;
+DROP TABLE IF EXISTS discovery.discovery_event_outbox;
+DROP TABLE IF EXISTS discovery.discovery_candidate_transitions;
+DROP TABLE IF EXISTS discovery.discovery_candidates;
+DROP FUNCTION IF EXISTS discovery.discovery_candidates_log();
+DROP FUNCTION IF EXISTS discovery.discovery_candidates_guard();
+DROP FUNCTION IF EXISTS discovery.discovery_append_only();
+DROP TABLE IF EXISTS discovery.discovery_runs;
+DROP TABLE IF EXISTS discovery.discovery_snapshot_requests;
+DROP TABLE IF EXISTS discovery.discovery_snapshots;
+DROP SCHEMA IF EXISTS discovery;

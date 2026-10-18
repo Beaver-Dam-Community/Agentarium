@@ -1,0 +1,11 @@
+# TASK-01 role Namespaces, PSS labels and agent-exec quotas
+# (docs/tech-specs/TASK-01-gke-platform.md 3, 3.2.1, 3.3).
+#
+# RENDER NOTE: namespaces.yaml contains the ${PSS_VERSION} placeholder,
+# rendered from deploy/gcp/environment.lock.json ("v" + gke.kubernetes_minor).
+# Render before apply; a remaining ${...} token is a render failure.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespaces.yaml
+  - agent-exec-resources.yaml

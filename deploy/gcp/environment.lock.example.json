@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "environment": "prod",
+  "project": {
+    "id": "REPLACE_WITH_PROJECT_ID",
+    "location": "REPLACE_WITH_REGION_OR_ZONE"
+  },
+  "gke": {
+    "mode": "standard",
+    "release_channel": "REGULAR",
+    "kubernetes_minor": "REPLACE_WITH_REGULAR_DEFAULT_MINOR_1.33_OR_LATER",
+    "datapath_provider": "ADVANCED_DATAPATH",
+    "private_nodes": true,
+    "ip_family": "IPV4",
+    "control_plane": {
+      "dns_endpoint_allow_external_traffic": true,
+      "private_endpoint_only": true,
+      "master_global_access": false,
+      "authorized_networks": []
+    }
+  },
+  "network": {
+    "node_cidr": "10.10.0.0/20",
+    "pods_range": "10.20.0.0/16",
+    "services_range": "10.30.0.0/20",
+    "gateway_cluster_ip": "10.30.0.20"
+  },
+  "node_pools": {
+    "exec": {
+      "machine_type": "e2-standard-4",
+      "node_count": 2,
+      "taints": [
+        "agentarium-role=exec:NoSchedule",
+        "agentarium.io/observe-not-ready=true:NoSchedule"
+      ],
+      "labels": {
+        "node-restriction.kubernetes.io/agentarium-role": "exec"
+      },
+      "disk_size_gb": 50,
+      "disk_type": "pd-balanced"
+    },
+    "control": {
+      "machine_type": "e2-standard-4",
+      "node_count": 3,
+      "taints": [
+        "agentarium.io/observe-not-ready=true:NoSchedule"
+      ],
+      "labels": {
+        "node-restriction.kubernetes.io/agentarium-role": "control"
+      },
+      "disk_size_gb": 50,
+      "disk_type": "pd-balanced"
+    },
+    "system": {
+      "machine_type": "e2-standard-2",
+      "node_count": 1,
+      "taints": [
+        "components.gke.io/gke-managed-components=true:NoSchedule"
+      ],
+      "labels": {
+        "node-restriction.kubernetes.io/agentarium-role": "system"
+      },
+      "disk_size_gb": 30,
+      "disk_type": "pd-balanced"
+    },
+    "image_type": "COS_CONTAINERD",
+    "auto_repair": {
+      "exec": false,
+      "control": true,
+      "system": true
+    },
+    "workload_metadata": "GKE_METADATA"
+  },
+  "startup_capture": [
+    {
+      "node_pool": "exec-pool",
+      "runtime_profile_digest": null,
+      "value": "unsupported",
+      "measurement": "not_measured",
+      "q0_run_id": null,
+      "node_runtime": null
+    }
+  ],
+  "storage": {
+    "evidence_bucket": "REPLACE_WITH_EVIDENCE_BUCKET",
+    "summary_bucket": "REPLACE_WITH_SUMMARY_BUCKET",
+    "bundle_bucket": "REPLACE_WITH_BUNDLE_BUCKET",
+    "decision_input_exports_bucket": "REPLACE_WITH_DECISION_INPUT_EXPORTS_BUCKET",
+    "regression_requests_bucket": "REPLACE_WITH_REGRESSION_REQUESTS_BUCKET",
+    "regression_reports_bucket": "REPLACE_WITH_REGRESSION_REPORTS_BUCKET",
+    "discovery_bucket": "REPLACE_WITH_DISCOVERY_BUCKET",
+    "cloudsql_instance": "REPLACE_WITH_PROJECT_ID:REPLACE_WITH_REGION:REPLACE_WITH_INSTANCE"
+  },
+  "keys": {
+    "bundle_signing_key": "projects/REPLACE_WITH_PROJECT_ID/locations/REPLACE_WITH_REGION/keyRings/REPLACE_WITH_KEY_RING/cryptoKeys/REPLACE_WITH_BUNDLE_KEY",
+    "bundle_key_id": "prod-v1",
+    "manifest_signing_key": "projects/REPLACE_WITH_PROJECT_ID/locations/REPLACE_WITH_REGION/keyRings/REPLACE_WITH_KEY_RING/cryptoKeys/REPLACE_WITH_MANIFEST_KEY"
+  },
+  "cloudsql": {
+    "database_version": "REPLACE_WITH_POSTGRES_VERSION",
+    "edition": "REPLACE_WITH_EDITION",
+    "tier": "REPLACE_WITH_TIER",
+    "availability_type": "REPLACE_WITH_AVAILABILITY_TYPE",
+    "private_service_access_range": "REPLACE_WITH_PSA_CIDR"
+  },
+  "pki": {
+    "ca_pool": "REPLACE_WITH_CA_POOL_ID",
+    "certificate_authority_id": "REPLACE_WITH_ROOT_CA_ID",
+    "ca_common_name": "REPLACE_WITH_ROOT_CA_COMMON_NAME",
+    "ca_organization": "REPLACE_WITH_ROOT_CA_ORGANIZATION",
+    "ca_lifetime": "REPLACE_WITH_CA_LIFETIME_SECONDS",
+    "ca_key_algorithm": "REPLACE_WITH_CAS_KEY_ALGORITHM"
+  },
+  "tetragon": {
+    "enable_process_ns": true
+  },
+  "identity": {
+    "claim_key_secret": "REPLACE_WITH_projects/PROJECT_NUMBER/secrets/NAME",
+    "claim_key_version": "REPLACE_WITH_NUMERIC_VERSION",
+    "oidc_audiences": ["REPLACE_WITH_OIDC_CLIENT_ID.apps.googleusercontent.com"],
+    "oidc_allowed_hd": ["REPLACE_WITH_WORKSPACE_DOMAIN"]
+  },
+  "receiver": {
+    "cluster_ip": "10.30.0.21",
+    "probe_cluster_ip": "10.30.0.22",
+    "receiver_mode": "idempotent",
+    "api_key_secret": "REPLACE_WITH_projects/PROJECT_NUMBER/secrets/NAME",
+    "api_key_versions": ["REPLACE_WITH_NUMERIC_VERSION"]
+  },
+  "baseline_digests": {
+    "admission": "REPLACE_WITH_INSTALLER_GENERATED_SHA256",
+    "exec_rbac": "REPLACE_WITH_INSTALLER_GENERATED_SHA256",
+    "network_policy": "REPLACE_WITH_INSTALLER_GENERATED_SHA256",
+    "node_pool_config": "REPLACE_WITH_INSTALLER_GENERATED_SHA256",
+    "sensor_policy": "REPLACE_WITH_INSTALLER_GENERATED_SHA256",
+    "sensor_release_policies": "REPLACE_WITH_INSTALLER_GENERATED_SHA256"
+  }
+}

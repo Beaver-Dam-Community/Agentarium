@@ -1,0 +1,63 @@
+{
+  "agent": [
+    {
+      "name": "submit_action",
+      "description": "Submit one typed action through the gateway.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "operation_id": {
+            "type": "string"
+          },
+          "requested_target": {
+            "type": "object"
+          },
+          "arguments": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "operation_id",
+          "requested_target",
+          "arguments"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "poll_action",
+      "description": "Read the result of an action submitted by this session.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "action_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "request_approval",
+      "description": "Read the result of an action submitted by this session.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "action_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action_id"
+        ],
+        "additionalProperties": false
+      }
+    }
+  ],
+  "policy_proposal": [],
+  "intent_check": [],
+  "discovery": []
+}

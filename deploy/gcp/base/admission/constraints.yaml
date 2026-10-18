@@ -1,0 +1,51 @@
+# Admission policy params (paramRef targets).
+# Source: docs/tech-specs/TASK-01-gke-platform.md 3.2 (agent-exec-constraints
+# keys and agent-role-constraints key table) and 3.2.1 (agent-sensors.images).
+#
+# RENDER NOTE: every ${NAME} token is a placeholder that the renderer fills
+# from deploy/gcp/environment.lock.json and CI build outputs before apply.
+# A missing value must fail rendering; never substitute `latest` or an
+# arbitrary image (spec 3.2). Image lists are comma-separated digest
+# references (LOCATION-docker.pkg.dev/PROJECT/agentarium/<name>@sha256:DIGEST).
+#   ${RUNTIME_IMAGE}             CI-built runtime image digest reference
+#   ${PROBE_IMAGES}              TASK-10 probe runner image digests
+#   ${FIXTURE_IMAGES}            TASK-09/13 short Pod fixture image digests
+#   ${PROBE_ENTRYPOINTS}         "<image digest ref>=<entrypoint path>" pairs
+#   ${GUARDED_RUNTIME_ENABLED}   "true" only with a startup_guard_gate pass record, else "false"
+#   ${FORBIDDEN_ANNOTATION_KEYS} NRI annotation keys from the Q0 runtime profile
+#   ${AGENT_*_IMAGES}            per-Namespace service image digests (+ cloud-sql-proxy)
+#   ${AGENT_SENSORS_IMAGES}      tetragon, sensors/exporter, lifecycle-recorder,
+#                                runtime-guard, sensors/netpol-collector
+#   ${TETRAGON_HOST_PATHS}       exactly the TASK-01 3.2.1 tetragon list (render.py enforces it)
+#   ${TETRAGON_IMAGE}            the one Tetragon image digest, also in AGENT_SENSORS_IMAGES
+# Only the platform deployer may modify these ConfigMaps (spec 3.2).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agent-exec-constraints
+  namespace: agent-control
+data:
+  runtimeImage: "${RUNTIME_IMAGE}"
+  runtimeCommand: /app/bin/agent-runtime
+  probeImages: "${PROBE_IMAGES}"
+  fixtureImages: "${FIXTURE_IMAGES}"
+  probeEntrypoints: "${PROBE_ENTRYPOINTS}"
+  guardedRuntimeEnabled: "${GUARDED_RUNTIME_ENABLED}"
+  forbiddenAnnotationKeys: "${FORBIDDEN_ANNOTATION_KEYS}"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agent-role-constraints
+  namespace: agent-control
+data:
+  agent-control.images: "${AGENT_CONTROL_IMAGES}"
+  agent-adapters.images: "${AGENT_ADAPTERS_IMAGES}"
+  agent-observe.images: "${AGENT_OBSERVE_IMAGES}"
+  agent-release.images: "${AGENT_RELEASE_IMAGES}"
+  agent-targets.images: "${AGENT_TARGETS_IMAGES}"
+  forbiddenAnnotationKeys: "${FORBIDDEN_ANNOTATION_KEYS}"
+  # SPEC-QUESTION: placement of these two keys, see agent-sensors.yaml.
+  agent-sensors.images: "${AGENT_SENSORS_IMAGES}"
+  agent-sensors.tetragon.hostPaths: "${TETRAGON_HOST_PATHS}"
+  agent-sensors.tetragon.image: "${TETRAGON_IMAGE}"

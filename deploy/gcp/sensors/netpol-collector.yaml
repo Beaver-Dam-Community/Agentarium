@@ -1,0 +1,143 @@
+# TASK-09 6 / TASK-10 3.7 network-policy node collector (M2-9). One Pod per
+# exec/control node in agent-sensors (TASK-06 3.1: hostNetwork DaemonSet,
+# KSA netpol-collector). It reads /var/log/network read-only, keeps its own WAL
+# in /var/lib/agentarium/netpol-spool (TASK-01 3.2.1 hostPath table), sends
+# NetworkPolicyRecords to agent-observe/correlation (#170) and reports the
+# netpol-collector lease. It requests no hold.
+#
+# RENDER NOTE: ${NETPOL_COLLECTOR_IMAGE} (digest listed in AGENT_SENSORS_IMAGES),
+# ${CLUSTER_UID}, ${NETPOL_NORMALIZATION_VERSION} and ${NETPOL_VERSION} are install
+# inputs. anetd rotation naming, file mode and mount permission are Q0 items
+# (#103); only the live file is read, and a rotation while stopped is reported
+# as rotation_loss instead of guessed.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: netpol-collector
+  namespace: agent-sensors
+  labels: {app.kubernetes.io/name: netpol-collector}
+automountServiceAccountToken: false
+---
+# The collector code reads only its own Node (metadata.uid,
+# status.nodeInfo.bootID, spec.podCIDRs) to build the node/boot epoch. RBAC
+# cannot name one Node per DaemonSet Pod (resourceNames is fixed per role), so
+# the grant is `get` on every Node; the token cannot list or watch.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: agentarium-netpol-collector
+rules:
+  - apiGroups: [""]
+    resources: [nodes]
+    verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: agentarium-netpol-collector
+subjects:
+  - kind: ServiceAccount
+    name: netpol-collector
+    namespace: agent-sensors
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: agentarium-netpol-collector
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agentarium-netpol-collector
+  namespace: agent-sensors
+  labels: {app.kubernetes.io/name: netpol-collector}
+data:
+  config.json: |
+    {
+      "version": "${NETPOL_VERSION}",
+      "live_file": "/var/log/network/policy_action.log",
+      "max_line_bytes": 1048576,
+      "spool_dir": "/var/lib/agentarium/netpol-spool",
+      "spool_capacity_bytes": 268435456,
+      "boot_id_path": "/proc/sys/kernel/random/boot_id",
+      "cluster_uid": "${CLUSTER_UID}",
+      "normalization_version": "${NETPOL_NORMALIZATION_VERSION}",
+      "receiver_origin": "https://correlation.agent-observe.svc:8443",
+      "health_origin": "https://control-health.agent-observe.svc:8443",
+      "identity_origin": "https://policy-gateway.agent-control.svc:8443",
+      "identity_peer_san": "spiffe://agentarium.internal/ns/agent-control/sa/policy-gateway",
+      "token_file": "/var/run/agentarium-bootstrap/token",
+      "ca_file": "/etc/agentarium-trust/ca.pem",
+      "final_flush_seconds": 45
+    }
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: netpol-collector
+  namespace: agent-sensors
+  labels: {app.kubernetes.io/name: netpol-collector}
+spec:
+  selector:
+    matchLabels: {app.kubernetes.io/name: netpol-collector}
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate: {maxUnavailable: 1}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/name: netpol-collector}
+    spec:
+      serviceAccountName: netpol-collector
+      automountServiceAccountToken: true
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      # final_flush_seconds (45) plus margin: SIGTERM -> read to EOF -> ack.
+      terminationGracePeriodSeconds: 60
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - {key: node-restriction.kubernetes.io/agentarium-role, operator: In, values: [exec, control]}
+                  - {key: kubernetes.io/os, operator: In, values: [linux]}
+      tolerations:
+        - {key: agentarium-role, operator: Equal, value: exec, effect: NoSchedule}
+        - {key: agentarium.io/observe-not-ready, operator: Equal, value: "true", effect: NoSchedule}
+      containers:
+        - name: netpol-collector
+          image: "${NETPOL_COLLECTOR_IMAGE}"
+          args: ["--config", "/etc/agentarium/netpol-collector/config.json"]
+          env:
+            - name: NODE_NAME
+              valueFrom: {fieldRef: {fieldPath: spec.nodeName}}
+          # Root without capabilities: the dataplane writes the node file as
+          # root and the spool is owner-only (permissions are a Q0 item).
+          securityContext:
+            runAsUser: 0
+            runAsNonRoot: false
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+            seccompProfile: {type: RuntimeDefault}
+          resources:
+            requests: {cpu: 20m, memory: 32Mi}
+            limits: {memory: 128Mi}
+          volumeMounts:
+            - {name: policy-log, mountPath: /var/log/network, readOnly: true}
+            - {name: spool, mountPath: /var/lib/agentarium/netpol-spool}
+            - {name: config, mountPath: /etc/agentarium/netpol-collector, readOnly: true}
+            - {name: trust, mountPath: /etc/agentarium-trust, readOnly: true}
+            - {name: bootstrap, mountPath: /var/run/agentarium-bootstrap, readOnly: true}
+      volumes:
+        - name: policy-log
+          hostPath: {path: /var/log/network, type: Directory}
+        - name: spool
+          hostPath: {path: /var/lib/agentarium/netpol-spool, type: DirectoryOrCreate}
+        - name: config
+          configMap: {name: agentarium-netpol-collector}
+        - name: trust
+          configMap: {name: agentarium-trust}
+        - name: bootstrap
+          projected:
+            sources:
+              - serviceAccountToken: {path: token, expirationSeconds: 600, audience: agentarium-identity}

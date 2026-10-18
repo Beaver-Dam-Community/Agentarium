@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agentarium approval console</title>
+<link rel="stylesheet" href="/style.css">
+<script type="module" src="/app.js"></script>
+</head>
+<body>
+<header>
+  <h1>Agentarium approval console</h1>
+  <p class="muted">Local console. Approvals go to identity with your Google ID token, which never reaches this page.</p>
+</header>
+<main>
+  <p id="key-missing" class="error" hidden>No console key. Open the URL printed by the console, including the <code>#k=</code> part.</p>
+
+  <section class="panel">
+    <h2>Session</h2>
+    <form id="watch-form">
+      <label for="session-id">Session ID</label>
+      <input id="session-id" name="session_id" autocomplete="off" spellcheck="false" required>
+      <button type="submit">Watch</button>
+    </form>
+    <details>
+      <summary>Start a session</summary>
+      <form id="create-form">
+        <label for="workload-id">Workload ID</label>
+        <input id="workload-id" name="workload_id" value="agent-exec/agent-runtime" required>
+        <label for="task-statement">Task statement</label>
+        <textarea id="task-statement" name="task_statement" rows="3" maxlength="4000" required></textarea>
+        <label for="operation-ids">Operation IDs (comma separated)</label>
+        <input id="operation-ids" name="operation_ids" value="receiver.submit" required>
+        <label for="target-ids">Target IDs (comma separated)</label>
+        <input id="target-ids" name="target_ids" value="receiver-primary" required>
+        <button type="submit">Start session</button>
+      </form>
+    </details>
+    <p id="poll-status" class="muted"></p>
+  </section>
+
+  <section>
+    <h2>Timeline</h2>
+    <ol id="timeline" class="timeline"></ol>
+  </section>
+</main>
+</body>
+</html>

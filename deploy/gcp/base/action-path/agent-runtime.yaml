@@ -1,0 +1,160 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "agent-runtime",
+        "namespace": "agent-exec"
+      },
+      "automountServiceAccountToken": false
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Pod",
+      "metadata": {
+        "name": "agent-runtime-demo",
+        "namespace": "agent-exec",
+        "labels": {
+          "app.kubernetes.io/name": "agent-runtime"
+        }
+      },
+      "spec": {
+        "serviceAccountName": "agent-runtime",
+        "automountServiceAccountToken": false,
+        "priorityClassName": "agentarium-runtime",
+        "nodeSelector": {
+          "node-restriction.kubernetes.io/agentarium-role": "exec"
+        },
+        "schedulerName": "default-scheduler",
+        "restartPolicy": "Never",
+        "securityContext": {
+          "runAsNonRoot": true,
+          "runAsUser": 10001,
+          "runAsGroup": 10001,
+          "seccompProfile": {
+            "type": "RuntimeDefault"
+          }
+        },
+        "tolerations": [
+          {
+            "key": "agentarium-role",
+            "operator": "Equal",
+            "value": "exec",
+            "effect": "NoSchedule"
+          }
+        ],
+        "containers": [
+          {
+            "name": "agent-runtime",
+            "image": "${RUNTIME_IMAGE}",
+            "command": [
+              "/app/bin/agent-runtime"
+            ],
+            "env": [
+              {
+                "name": "AGENTARIUM_GATEWAY_URL",
+                "value": "https://${GATEWAY_CLUSTER_IP}:8443"
+              },
+              {
+                "name": "AGENTARIUM_GATEWAY_SAN",
+                "value": "spiffe://agentarium.internal/ns/agent-control/sa/policy-gateway"
+              },
+              {
+                "name": "AGENTARIUM_TRUST_BUNDLE_PEM",
+                "value": "${TRUST_BUNDLE_PEM}"
+              },
+              {
+                "name": "AGENTARIUM_TOKEN_FILE",
+                "value": "/run/agentarium/identity/token"
+              },
+              {
+                "name": "AGENTARIUM_WORKER_PATH",
+                "value": "/app/bin/agent-worker"
+              },
+              {
+                "name": "AGENTARIUM_SCRATCH_ROOT",
+                "value": "/work"
+              },
+              {
+                "name": "AGENTARIUM_MAX_CONCURRENT_WORKERS",
+                "value": "1"
+              },
+              {
+                "name": "AGENTARIUM_RUNTIME_VERSION",
+                "value": "${RELEASE_VERSION}"
+              },
+              {
+                "name": "AGENTARIUM_DEMO_TARGET_ID",
+                "value": "receiver-primary"
+              },
+              {
+                "name": "AGENTARIUM_DEMO_SUMMARY",
+                "value": "M3-1 GKE demo submission"
+              }
+            ],
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 10001,
+              "runAsGroup": 10001,
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "500m",
+                "memory": "512Mi",
+                "ephemeral-storage": "256Mi"
+              },
+              "limits": {
+                "cpu": "1",
+                "memory": "512Mi",
+                "ephemeral-storage": "1Gi"
+              }
+            },
+            "volumeMounts": [
+              {
+                "name": "work",
+                "mountPath": "/work"
+              },
+              {
+                "name": "identity",
+                "mountPath": "/run/agentarium/identity",
+                "readOnly": true
+              }
+            ]
+          }
+        ],
+        "volumes": [
+          {
+            "name": "work",
+            "emptyDir": {
+              "sizeLimit": "512Mi"
+            }
+          },
+          {
+            "name": "identity",
+            "projected": {
+              "sources": [
+                {
+                  "serviceAccountToken": {
+                    "path": "token",
+                    "expirationSeconds": 600,
+                    "audience": "agentarium-identity"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

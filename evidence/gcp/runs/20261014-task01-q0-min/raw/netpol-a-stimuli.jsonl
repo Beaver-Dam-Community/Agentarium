@@ -1,0 +1,14 @@
+{"kind":"start","seq":0,"time":"2026-10-14T13:19:18.760260365Z","pid":1,"ok":true}
+{"kind":"process","seq":0,"time":"2026-10-14T13:19:18.763632013Z","pid":11,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":1,"time":"2026-10-14T13:19:18.767069217Z","pid":15,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":2,"time":"2026-10-14T13:19:18.840795699Z","pid":19,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"tcp","seq":0,"time":"2026-10-14T13:19:18.843345689Z","local":"10.20.1.6:33966","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":1,"time":"2026-10-14T13:19:18.894722619Z","local":"10.20.1.6:33968","remote":"10.30.0.10:53","ok":true}
+{"kind":"tcp","seq":2,"time":"2026-10-14T13:19:18.946060608Z","local":"10.20.1.6:33978","remote":"10.30.0.10:53","ok":true}
+{"kind":"file_open_allowed","seq":0,"time":"2026-10-14T13:19:18.99675605Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":1,"time":"2026-10-14T13:19:18.996855682Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":2,"time":"2026-10-14T13:19:18.996909682Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_denied","seq":0,"time":"2026-10-14T13:19:18.996979944Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":1,"time":"2026-10-14T13:19:18.997167068Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":2,"time":"2026-10-14T13:19:18.997195134Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"done","seq":0,"time":"2026-10-14T13:19:18.997201733Z","ok":true}

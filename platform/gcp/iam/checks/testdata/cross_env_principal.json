@@ -1,0 +1,12 @@
+{
+  "bindings": [
+    {
+      "members": [
+        "principal://iam.googleapis.com/projects/222222222222/locations/global/workloadIdentityPools/example-regression.svc.id.goog/subject/ns/agent-release/sa/regression-runner"
+      ],
+      "role": "roles/storage.objectViewer"
+    }
+  ],
+  "etag": "BwYAAAAAAAA=",
+  "version": 1
+}

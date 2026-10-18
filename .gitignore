@@ -1,0 +1,39 @@
+# Terraform local data and state
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+.terraform.tfstate.lock.info
+crash.log
+crash.*.log
+
+# Local variables and saved plans may contain secrets
+*.tfvars
+*.tfvars.json
+*.tfplan
+tfplan
+
+# Local credentials and machine-specific files
+.env
+.env.*
+!.env.example
+.DS_Store
+
+# Commit .terraform.lock.hcl for reproducible provider versions.
+
+# oh-my-claudecode local agent state
+.omc/
+**/.omc/
+
+# Go build output
+/bin/
+/out/
+
+# Python
+__pycache__/
+.venv/
+.pytest_cache/
+
+
+# Per-person environment inputs (each person applies to their own project)
+deploy/gcp/environment.lock.json
+**/backend.hcl
