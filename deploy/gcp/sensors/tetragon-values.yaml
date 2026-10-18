@@ -1,0 +1,165 @@
+# Tetragon Helm values (TASK-09 3.1 Helm values to pin). Chart: cilium/tetragon 1.7.1.
+# Images are digest references in each environment's own Artifact Registry
+# repository (no Cloud NAT, TASK-01 4). ${IMAGE_REPOSITORY} is the
+# shared-resources output image_repository
+# (<region>-docker.pkg.dev/<project>/agentarium); mirror the upstream images
+# (quay.io/cilium/tetragon:v1.7.1, quay.io/cilium/hubble-export-stdout:v1.1.1)
+# there and keep the digests below. Render with:
+#   python3 deploy/gcp/sensors/render.py --values <values.json> --chart <tetragon-1.7.1.tgz> --out <dir>
+# render.py substitutes ${IMAGE_REPOSITORY} and ${EXPORTER_IMAGE}, runs
+# helm template, and post-renders the exporter sidecar (README.md).
+#
+# SPEC-QUESTION: TASK-09 does not say how CRDs are installed. The operator Pod's
+# KSA (tetragon-operator) is not an approved agent-sensors KSA (TASK-01 3.2.1),
+# so the operator is disabled and the chart installs the CRDs (crds.installMethod=helm).
+tetragon:
+  image:
+    override: ${IMAGE_REPOSITORY}/tetragon@sha256:255f3d403e615f6a6f557cf4f197a5db3959ace9ad7003309f5e0d4b4300c815
+  enableProcessNs: true
+  exportFilename: tetragon.log
+  exportFileMaxSizeMB: 10
+  exportFileMaxBackups: 5
+  # The inode checkpoint reader consumes uncompressed timestamp backups.
+  exportFileCompress: false
+  exportFilePerm: "600"
+  exportRateLimit: -1
+  # hostNetwork: bind metrics to loopback; only the exporter reads them.
+  prometheus:
+    address: "127.0.0.1"
+  # Q0: the chart default deny list drops namespace "", "cilium" and
+  # "kube-system". tcp_set_state events come from softirq context and are
+  # attributed to whatever task ran on the CPU (often no Pod, sometimes a
+  # kube-system or agent-sensors Pod), so any namespace rule drops some of them.
+  # Matched stimulus sockets (sock_ptr + tuple + time): default 10/30
+  # ESTABLISHED, 6/30 CLOSE; without "" 29/30, 25/30; health_check only 30/30,
+  # 30/30 (runs 20261014-task01-q0-min and 20261015-task01-q0-min-2). The
+  # exporter filters by lifecycle record and tuple instead (TASK-09 3.2).
+  exportDenyList: |-
+    {"health_check":true}
+# Pin the chart default used by the read-only exporter sidecar.
+exportDirectory: /var/run/cilium/tetragon
+# The exporter sidecar (TASK-09 3.1/3.3) uses the chart's export sidecar slot
+# with our image, command and mounts; hubble-export-stdout is not deployed.
+# It runs as UID 0 and GID 0 because Tetragon writes the export file as root
+# with mode 600 and the spool must be owner-only; it has no capabilities and a
+# read-only root filesystem. render.py marks the export-logs mount readOnly, which the
+# chart cannot express.
+export:
+  mode: stdout
+  securityContext:
+    runAsUser: 0
+    runAsGroup: 0
+    runAsNonRoot: false
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+    privileged: false
+    capabilities:
+      drop: [ALL]
+    seccompProfile:
+      type: RuntimeDefault
+  resources:
+    requests: {cpu: 50m, memory: 64Mi}
+    limits: {memory: 256Mi}
+  stdout:
+    image:
+      override: ${EXPORTER_IMAGE}
+    enabledCommand: true
+    commandOverride: ["/app"]
+    enabledArgs: true
+    argsOverride: ["--config", "/etc/agentarium/exporter/config.json"]
+    extraEnv:
+      - name: NODE_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: spec.nodeName
+    extraVolumeMounts:
+      - name: sensor-spool
+        mountPath: /var/lib/agentarium/sensor-spool
+      - name: exporter-config
+        mountPath: /etc/agentarium/exporter
+        readOnly: true
+      - name: identity-token
+        mountPath: /var/run/secrets/agentarium-identity
+        readOnly: true
+      - name: agentarium-trust
+        mountPath: /etc/agentarium-trust
+        readOnly: true
+      # Chart ConfigMap volume reused read-only for the TASK-09 3.5 capture
+      # check. The gRPC socket (/var/run/tetragon) is deliberately not
+      # mounted: it also serves policy changes (TASK-01 3.2.1).
+      - name: tetragon-config
+        mountPath: /etc/tetragon-config
+        readOnly: true
+      # Node nonce responder (TASK-09, #232): host procfs and cgroup2,
+      # recursively read-only without propagation, no capability (TASK-01
+      # 3.2.1). Do not deploy this before containerd-proxy is non-dumpable
+      # (#264): the exporter shares UID 0 with the proxy.
+      - name: host-proc-ro
+        mountPath: /host/proc
+        readOnly: true
+        recursiveReadOnly: Enabled
+        mountPropagation: None
+      - name: host-cgroup-ro
+        mountPath: /host/sys/fs/cgroup
+        readOnly: true
+        recursiveReadOnly: Enabled
+        mountPropagation: None
+# Spool (TASK-09 3.3 WAL), exporter config, projected identity bootstrap token
+# (audience agentarium-identity) and the CA bundle installed by TASK-06.
+extraVolumes:
+  - name: sensor-spool
+    hostPath:
+      path: /var/lib/agentarium/sensor-spool
+      type: DirectoryOrCreate
+  - name: exporter-config
+    configMap:
+      name: agentarium-exporter
+  - name: identity-token
+    projected:
+      sources:
+        - serviceAccountToken:
+            audience: agentarium-identity
+            expirationSeconds: 3600
+            path: token
+  - name: agentarium-trust
+    configMap:
+      name: agentarium-trust
+  - name: host-proc-ro
+    hostPath:
+      path: /proc
+      type: Directory
+  - name: host-cgroup-ro
+    hostPath:
+      path: /sys/fs/cgroup
+      type: Directory
+# hostNetwork stays true (chart default, TASK-09 3.1); the exporter must still
+# resolve cluster Service names for TASK-03/07/10.
+dnsPolicy: ClusterFirstWithHostNet
+tetragonOperator:
+  enabled: false
+crds:
+  installMethod: helm
+# Explicit list instead of the chart default "operator: Exists" (TASK-09 3.1):
+# the exec pool taint and the start taint; system-pool is not observed.
+tolerations:
+  - key: agentarium-role
+    operator: Equal
+    value: exec
+    effect: NoSchedule
+  - key: agentarium.io/observe-not-ready
+    operator: Equal
+    value: "true"
+    effect: NoSchedule
+# TASK-09 3.1: select the exec and control Linux nodes explicitly instead of
+# relying on the system-pool taint to keep Tetragon off other nodes.
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: node-restriction.kubernetes.io/agentarium-role
+              operator: In
+              values: [exec, control]
+            - key: kubernetes.io/os
+              operator: In
+              values: [linux]

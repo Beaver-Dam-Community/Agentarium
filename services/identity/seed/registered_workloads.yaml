@@ -1,0 +1,63 @@
+# identity.registered_workloads initial rows (TASK-03 chapter 9: install input).
+#
+# Source of truth for the KSA list: TASK-06 KSA table (TASK-01 "component
+# principals and operator groups"), operations project only. Role mapping:
+#   - agent-exec/agent-runtime                 -> runtime
+#   - agent-exec/probe-runner, start-fixture,
+#     agent-adapters/probe-runner              -> probe (Pod-bound, clientAuth only)
+#   - the four adapters                        -> adapter, adapter_id from the
+#                                                 TASK-02 catalog enum
+#   - every other KSA (netpol-collector too)   -> service
+#     (the lifecycle sources agent-sensors/lifecycle-recorder and
+#     agent-observe/pod-watcher keep role service; bootstrap.PodBound records
+#     their Pod UID so Pod deletion revokes their certificates)
+# service_principal is the KSA name, as in the TASK-03 3.4 service-session
+# profile table (intent-checker, policy-proposer, discovery, releaser).
+#
+# SPEC-QUESTION: TASK-03/COMMON do not state the adapter_id and
+# service_principal values or that start-fixture is a probe. Node runtime
+# bridge (role node_bridge) is not registered here: its issuance stays closed
+# until the spec names which KSA may request it.
+workloads:
+  - {namespace: agent-exec, ksa: agent-runtime, role: runtime}
+  - {namespace: agent-exec, ksa: probe-runner, role: probe}
+  - {namespace: agent-exec, ksa: start-fixture, role: probe}
+
+  - {namespace: agent-control, ksa: policy-gateway, role: service, service_principal: policy-gateway}
+  - {namespace: agent-control, ksa: workload-identity, role: service, service_principal: workload-identity}
+  - {namespace: agent-control, ksa: coordinator, role: service, service_principal: coordinator}
+  - {namespace: agent-control, ksa: credential-broker, role: service, service_principal: credential-broker}
+  - {namespace: agent-control, ksa: intent-checker, role: service, service_principal: intent-checker}
+  - {namespace: agent-control, ksa: node-readiness, role: service, service_principal: node-readiness}
+
+  - {namespace: agent-adapters, ksa: kubernetes-reader, role: adapter, adapter_id: kubernetes-reader}
+  - {namespace: agent-adapters, ksa: receiver-sender, role: adapter, adapter_id: receiver-sender}
+  - {namespace: agent-adapters, ksa: model-adapter, role: adapter, adapter_id: model}
+  - {namespace: agent-adapters, ksa: evidence-reader, role: adapter, adapter_id: evidence-reader}
+  - {namespace: agent-adapters, ksa: probe-runner, role: probe}
+
+  - {namespace: agent-observe, ksa: audit-writer, role: service, service_principal: audit-writer}
+  - {namespace: agent-observe, ksa: audit-exporter, role: service, service_principal: audit-exporter}
+  - {namespace: agent-observe, ksa: audit-verifier, role: service, service_principal: audit-verifier}
+  - {namespace: agent-observe, ksa: evidence-collector, role: service, service_principal: evidence-collector}
+  - {namespace: agent-observe, ksa: timeline, role: service, service_principal: timeline}
+  - {namespace: agent-observe, ksa: correlation, role: service, service_principal: correlation}
+  - {namespace: agent-observe, ksa: start-coordinator, role: service, service_principal: start-coordinator}
+  - {namespace: agent-observe, ksa: policy-proposer, role: service, service_principal: policy-proposer}
+  - {namespace: agent-observe, ksa: discovery, role: service, service_principal: discovery}
+  - {namespace: agent-observe, ksa: discovery-snapshot, role: service, service_principal: discovery-snapshot}
+  - {namespace: agent-observe, ksa: control-health, role: service, service_principal: control-health}
+  - {namespace: agent-observe, ksa: drift-probe, role: service, service_principal: drift-probe}
+  - {namespace: agent-observe, ksa: pod-watcher, role: service, service_principal: pod-watcher}
+
+  - {namespace: agent-sensors, ksa: tetragon, role: service, service_principal: tetragon}
+  - {namespace: agent-sensors, ksa: lifecycle-recorder, role: service, service_principal: lifecycle-recorder}
+  - {namespace: agent-sensors, ksa: runtime-guard, role: service, service_principal: runtime-guard}
+  - {namespace: agent-sensors, ksa: netpol-collector, role: service, service_principal: netpol-collector}
+
+  - {namespace: agent-release, ksa: releaser, role: service, service_principal: releaser}
+  - {namespace: agent-release, ksa: regression-dispatcher, role: service, service_principal: regression-dispatcher}
+
+  - {namespace: agent-targets, ksa: receiver, role: service, service_principal: receiver}
+  - {namespace: agent-targets, ksa: probe-sink, role: service, service_principal: probe-sink}
+  - {namespace: agent-targets, ksa: start-marker, role: service, service_principal: start-marker}

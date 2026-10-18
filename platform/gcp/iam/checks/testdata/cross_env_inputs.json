@@ -1,0 +1,8 @@
+{
+  "regression_project_id": "example-regression",
+  "regression_project_number": "222222222222",
+  "decision_input_exports_bucket": "example-decision-inputs",
+  "manifest_key": "projects/example-prod/locations/us-central1/keyRings/audit/cryptoKeys/manifest",
+  "regression_requests_bucket": "example-regression-requests",
+  "regression_reports_bucket": "example-regression-reports"
+}

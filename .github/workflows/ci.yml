@@ -1,0 +1,66 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: go mod tidy is clean
+        run: go mod tidy && git diff --exit-code go.mod go.sum
+      - run: make go-vet
+      - run: make go-test
+
+  canonical-crosscheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.11.0"
+      - run: make canonical-crosscheck
+
+  go-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: build the shared Go service image (no push)
+        run: docker build -f build/docker/go-service.Dockerfile --build-arg CMD=./packages/canonical/cmd/canonical-digest -t agentarium/canonical-digest:ci .
+      - name: image runs
+        run: echo '{"a":1}' | docker run --rm -i agentarium/canonical-digest:ci
+
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: make py-test
+      - name: egress check report tests
+        run: python3 -m unittest discover -s tests/egress
+
+  migrations:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: new migration versions are newer than main
+        run: |
+          base=$(git ls-tree --name-only origin/${{ github.base_ref }} migrations/ | sed -n 's#migrations/\([0-9]\{14\}\)_.*#\1#p' | sort | tail -1)
+          for f in $(git diff --name-only --diff-filter=A origin/${{ github.base_ref }}... -- 'migrations/*.sql'); do
+            v=$(basename "$f" | sed -n 's/^\([0-9]\{14\}\)_.*/\1/p')
+            [ -z "$v" ] && { echo "bad migration name: $f"; exit 1; }
+            [ -n "$base" ] && [ "$v" -le "$base" ] && { echo "$f version $v <= main $base"; exit 1; }
+          done
+          echo ok

@@ -1,0 +1,38 @@
+{
+  "run_id": "20261015-task01-q0-min-2",
+  "task_id": "TASK-01",
+  "run_kind": "q0_min_observation",
+  "implementation_commit": "6d01fe8511df41d9dfd2ed3154e50006ce3d1c07",
+  "environment": {
+    "project_id": "karrot-rina",
+    "cluster": "agentarium-prod",
+    "cluster_uid": "4489172407144a57bf6a4914d26ed16e22f5d20a9fde42de81eb2f62a770fe9a",
+    "kubernetes_version": "1.36.4-gke.1495002",
+    "node": "gke-agentarium-prod-exec-pool-eaf0304a-x10z (exec-pool)"
+  },
+  "sensor": {
+    "chart": "cilium/tetragon 1.7.1",
+    "chart_tgz_sha256": "79ec0f7d35b6fcad99ca317348deac136c00b674430c28be17aa818d2015c632",
+    "values_file": "deploy/gcp/sensors/tetragon-values.yaml",
+    "values_rendered_sha256": "1f8e21ac3e2626d30a904d8e2ae5ff165900f51d70eae5e3cb5cfed4135e00e2",
+    "export_deny_list": "{\"health_check\":true}",
+    "note": "the committed values file renders identically to what this run deployed (affinity + health_check-only deny list)"
+  },
+  "inputs": {
+    "stimuli_per_kind": 30,
+    "tcp_target": "kube-dns ClusterIP 10.30.0.10:53",
+    "analysis_script": "tests/platform/q0/analyze_q0_min.py",
+    "analysis_script_sha256": "272dc2123f41e41ebaa5b86b2e2044359a2e24acd6fdb76af5d31049890c1d8c",
+    "images": {
+      "q0-stimulus": "asia-northeast3-docker.pkg.dev/karrot-rina/agentarium/q0-stimulus@sha256:ea0daa3ffc1b325ff1eb13933497ce4a331d4881db96b637fc9c05e4d3c59e87"
+    },
+    "raw": "raw/ (sanitized)"
+  },
+  "repetitions": 1,
+  "clock": [
+    "2026-10-14T15:14:14Z",
+    "2026-10-14T15:15:59Z"
+  ],
+  "collection_wait_after_last_stimulus_seconds": 100,
+  "post_run": "stimulus Pod and SA deleted; probe image list re-rendered empty; agentarium-protected-file restored to the spec text (returnArg int); Tetragon left on the committed values"
+}

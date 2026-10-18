@@ -1,0 +1,31 @@
+{
+  "run_id": "20261015-task01-admission-delta",
+  "task_id": "TASK-01",
+  "run_kind": "platform_admission_live",
+  "implementation_commit": "a4e98ec2aa54416d58d8eb70dbf2de5b3f21a61a",
+  "tested_trees": {
+    "deploy/gcp/base": "7bfe43b02fa3eb31a5d90fea2445d718dedfbd1d",
+    "tests/platform/admission": "93667cbc6b7f5cac7c8150a394de83e7eb110d6b"
+  },
+  "environment": {
+    "project_id": "karrot-rina",
+    "cluster": "agentarium-prod",
+    "cluster_uid": "4489172407144a57bf6a4914d26ed16e22f5d20a9fde42de81eb2f62a770fe9a",
+    "kubernetes_version": "1.36.4-gke.1495002"
+  },
+  "inputs": {
+    "script": "tests/platform/admission/live_delta_check.py",
+    "script_sha256": "851244bc9372281c07445183a5f06b97d82bd65ba076431595c046f2192ed9b7",
+    "images": {
+      "target": "asia-northeast3-docker.pkg.dev/karrot-rina/agentarium/admission-sleeper@sha256:efebe46613059e183b9b55035376164162b49f46930c2423f98d131d439ae04d",
+      "probe": "asia-northeast3-docker.pkg.dev/karrot-rina/agentarium/q0-stimulus@sha256:ea0daa3ffc1b325ff1eb13933497ce4a331d4881db96b637fc9c05e4d3c59e87"
+    },
+    "render_values": "AGENT_TARGETS_IMAGES = target, PROBE_IMAGES/PROBE_ENTRYPOINTS = probe at /app/bin/probe-runner, sensors list = Tetragon/export-stdout/busybox; others empty"
+  },
+  "repetitions": 1,
+  "clock": [
+    "2026-10-14T15:08:39Z",
+    "2026-10-14T15:09:02Z"
+  ],
+  "post_run": "status/resize Pods, their ServiceAccounts and the temporary node RBAC deleted; probe and target image lists re-rendered empty"
+}

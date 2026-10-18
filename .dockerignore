@@ -1,0 +1,16 @@
+# Build context for build/docker/*.Dockerfile (COPY . .). Keep secrets, local
+# state and non-source trees out of images.
+.git
+.github
+.omc
+**/.omc
+docs
+evidence
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/.terraform
+**/*.tfstate
+**/*.tfstate.*
+**/*.tfplan
+deploy/gcp/environment.lock.json

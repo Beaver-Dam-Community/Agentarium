@@ -1,0 +1,12 @@
+{
+  "bindings": [
+    {
+      "members": [
+        "principal://iam.googleapis.com/projects/111111111111/locations/global/workloadIdentityPools/example-prod.svc.id.goog/kubernetes.serviceaccount.uid/4f8a1c2e-0000-0000-0000-000000000000"
+      ],
+      "role": "roles/storage.objectViewer"
+    }
+  ],
+  "etag": "BwYAAAAAAAA=",
+  "version": 1
+}

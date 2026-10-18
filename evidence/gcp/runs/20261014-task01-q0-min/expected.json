@@ -1,0 +1,46 @@
+[
+  {
+    "row": "runtime.process",
+    "expected": "30 process_exec and 30 process_exit events attributed to the stimulus Pod"
+  },
+  {
+    "row": "runtime.tcp_connect",
+    "expected": "30 tcp_connect events whose sock sport matches the 30 stimulus local ports"
+  },
+  {
+    "row": "runtime.tcp_state",
+    "expected": "ESTABLISHED and CLOSE transitions for the 30 stimulus sockets, joined by node + sock_ptr + tuple + time window (process fields not used, TASK-09 3.2)"
+  },
+  {
+    "row": "runtime.file_open_allowed",
+    "expected": "30 security_file_open events on /work/protected-fixture with return 0"
+  },
+  {
+    "row": "runtime.file_open_attempt",
+    "expected": "sys_openat events for both 30 allowed (fd) and 30 denied (-13 EACCES) opens; denied opens absent from security_file_open"
+  },
+  {
+    "row": "runtime.process_ns",
+    "expected": "process.ns present on exec/kprobe events (enableProcessNs)"
+  },
+  {
+    "row": "netpol.node_file",
+    "expected": "node file records the 3 allowed and the denied connections with the documented fields (TASK-06 3.4: connection, disposition, policies, src/dest pod_name/namespace/workload_name/workload_kind/instance, count, node_name, timestamp)"
+  },
+  {
+    "row": "netpol.rotation",
+    "expected": "measured"
+  },
+  {
+    "row": "netpol.delivery_delay",
+    "expected": "measured"
+  },
+  {
+    "row": "netpol.aggregate_timestamp",
+    "expected": "measured"
+  },
+  {
+    "row": "netpol.drop_counter",
+    "expected": "measured"
+  }
+]

@@ -1,0 +1,230 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "audit-exporter",
+        "namespace": "agent-observe"
+      },
+      "automountServiceAccountToken": false
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ConfigMap",
+      "metadata": {
+        "name": "audit-exporter-keys",
+        "namespace": "agent-observe"
+      },
+      "data": {
+        "keys.json": "{\"${AUDIT_EXPORTER_KMS_KEY_VERSION}\":\"${AUDIT_EXPORTER_PUBLIC_KEY_PEM}\"}"
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "audit-exporter",
+        "namespace": "agent-observe"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/name": "audit-exporter"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/name": "audit-exporter"
+            }
+          },
+          "spec": {
+            "serviceAccountName": "audit-exporter",
+            "automountServiceAccountToken": false,
+            "nodeSelector": {
+              "node-restriction.kubernetes.io/agentarium-role": "control",
+              "iam.gke.io/gke-metadata-server-enabled": "true"
+            },
+            "schedulerName": "default-scheduler",
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 65532,
+              "runAsGroup": 65532,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "terminationGracePeriodSeconds": 30,
+            "initContainers": [
+              {
+                "name": "cloud-sql-proxy",
+                "image": "${SQL_PROXY_IMAGE}",
+                "restartPolicy": "Always",
+                "args": [
+                  "--auto-iam-authn",
+                  "--private-ip",
+                  "--address=127.0.0.1",
+                  "--port=5432",
+                  "--health-check",
+                  "--http-address=0.0.0.0",
+                  "--http-port=9801",
+                  "--impersonate-service-account=${AUDIT_EXPORTER_DB_GSA}",
+                  "${CLOUDSQL_CONNECTION_NAME}"
+                ],
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "50m",
+                    "memory": "64Mi"
+                  },
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "256Mi"
+                  }
+                },
+                "startupProbe": {
+                  "httpGet": {
+                    "path": "/startup",
+                    "port": 9801
+                  },
+                  "periodSeconds": 2,
+                  "failureThreshold": 60
+                },
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/readiness",
+                    "port": 9801
+                  },
+                  "periodSeconds": 5
+                },
+                "livenessProbe": {
+                  "httpGet": {
+                    "path": "/liveness",
+                    "port": 9801
+                  },
+                  "periodSeconds": 10
+                }
+              }
+            ],
+            "containers": [
+              {
+                "name": "audit-exporter",
+                "image": "${AUDIT_EXPORTER_IMAGE}",
+                "args": [
+                  "--evidence-bucket=${AUDIT_EVIDENCE_BUCKET}",
+                  "--decision-bucket=${AUDIT_DECISION_INPUT_EXPORTS_BUCKET}",
+                  "--kms-key-version=${AUDIT_EXPORTER_KMS_KEY_VERSION}",
+                  "--keys=/etc/agentarium/keys/keys.json",
+                  "--identity-url=https://workload-identity.agent-control.svc:8443",
+                  "--bootstrap-token=/var/run/agentarium-bootstrap/token",
+                  "--tls-ca=/etc/agentarium-trust/ca.pem",
+                  "--health-url=https://control-health.agent-observe.svc:8443",
+                  "--health-source-id=audit-exporter",
+                  "--version=${AUDIT_VERSION}"
+                ],
+                "env": [
+                  {
+                    "name": "DB_USER",
+                    "value": "${AUDIT_EXPORTER_DB_USER}"
+                  },
+                  {
+                    "name": "DB_NAME",
+                    "value": "${DB_NAME}"
+                  },
+                  {
+                    "name": "DATABASE_URL",
+                    "value": "host=127.0.0.1 port=5432 user=$(DB_USER) dbname=$(DB_NAME) sslmode=disable"
+                  }
+                ],
+                "volumeMounts": [
+                  {
+                    "name": "trust",
+                    "mountPath": "/etc/agentarium-trust",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "bootstrap",
+                    "mountPath": "/var/run/agentarium-bootstrap",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "keys",
+                    "mountPath": "/etc/agentarium/keys",
+                    "readOnly": true
+                  }
+                ],
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "128Mi"
+                  },
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "512Mi"
+                  }
+                }
+              }
+            ],
+            "volumes": [
+              {
+                "name": "trust",
+                "configMap": {
+                  "name": "agentarium-trust"
+                }
+              },
+              {
+                "name": "bootstrap",
+                "projected": {
+                  "sources": [
+                    {
+                      "serviceAccountToken": {
+                        "path": "token",
+                        "expirationSeconds": 600,
+                        "audience": "agentarium-identity"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "keys",
+                "configMap": {
+                  "name": "audit-exporter-keys"
+                }
+              }
+            ],
+            "tolerations": [
+              {
+                "key": "agentarium.io/observe-not-ready",
+                "operator": "Equal",
+                "value": "true",
+                "effect": "NoSchedule"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "agent": {
+    "max_output_tokens": 8192,
+    "max_request_bytes": 65536,
+    "generation_config": {"temperature": 0.2, "maxOutputTokens": 8192},
+    "response_schema": null
+  },
+  "policy_proposal": {
+    "max_output_tokens": 8192,
+    "max_request_bytes": 65536,
+    "generation_config": {"temperature": 0},
+    "response_schema": {"type": "object"}
+  },
+  "intent_check": {
+    "max_output_tokens": 1024,
+    "max_request_bytes": 16384,
+    "generation_config": {"temperature": 0},
+    "response_schema": {"type": "object", "properties": {"verdict": {"type": "string"}}}
+  },
+  "discovery": {
+    "max_output_tokens": 8192,
+    "max_request_bytes": 65536,
+    "generation_config": {"temperature": 0},
+    "response_schema": {"type": "object", "properties": {"candidates": {"type": "array"}}}
+  }
+}

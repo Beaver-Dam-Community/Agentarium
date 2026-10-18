@@ -1,0 +1,104 @@
+{
+  "source": "deploy/gcp/sensors/render.py (helm template cilium/tetragon 1.7.1)",
+  "service_account": "tetragon",
+  "host_network": true,
+  "host_pid": false,
+  "host_ipc": false,
+  "dns_policy": "ClusterFirstWithHostNet",
+  "host_paths": [
+    "/proc",
+    "/sys/fs/bpf",
+    "/sys/fs/cgroup",
+    "/var/lib/agentarium/sensor-spool",
+    "/var/run/cilium",
+    "/var/run/cilium/tetragon",
+    "/var/run/tetragon"
+  ],
+  "containers": [
+    {
+      "name": "exporter",
+      "privileged": false,
+      "run_as_user": 0,
+      "run_as_group": 0,
+      "capabilities_add": [],
+      "capabilities_drop": [
+        "ALL"
+      ],
+      "host_path_mounts": [
+        {
+          "host_path": "/proc",
+          "mount_path": "/host/proc",
+          "read_only": true,
+          "recursive_read_only": "Enabled",
+          "mount_propagation": "None"
+        },
+        {
+          "host_path": "/sys/fs/cgroup",
+          "mount_path": "/host/sys/fs/cgroup",
+          "read_only": true,
+          "recursive_read_only": "Enabled",
+          "mount_propagation": "None"
+        },
+        {
+          "host_path": "/var/lib/agentarium/sensor-spool",
+          "mount_path": "/var/lib/agentarium/sensor-spool",
+          "read_only": false,
+          "recursive_read_only": null,
+          "mount_propagation": null
+        },
+        {
+          "host_path": "/var/run/cilium/tetragon",
+          "mount_path": "/var/run/cilium/tetragon",
+          "read_only": true,
+          "recursive_read_only": null,
+          "mount_propagation": null
+        }
+      ]
+    },
+    {
+      "name": "tetragon",
+      "privileged": true,
+      "run_as_user": null,
+      "run_as_group": null,
+      "capabilities_add": [],
+      "capabilities_drop": [],
+      "host_path_mounts": [
+        {
+          "host_path": "/proc",
+          "mount_path": "/procRoot",
+          "read_only": false,
+          "recursive_read_only": null,
+          "mount_propagation": null
+        },
+        {
+          "host_path": "/sys/fs/bpf",
+          "mount_path": "/sys/fs/bpf",
+          "read_only": false,
+          "recursive_read_only": null,
+          "mount_propagation": "Bidirectional"
+        },
+        {
+          "host_path": "/var/run/cilium",
+          "mount_path": "/var/run/cilium",
+          "read_only": false,
+          "recursive_read_only": null,
+          "mount_propagation": null
+        },
+        {
+          "host_path": "/var/run/cilium/tetragon",
+          "mount_path": "/var/run/cilium/tetragon",
+          "read_only": false,
+          "recursive_read_only": null,
+          "mount_propagation": null
+        },
+        {
+          "host_path": "/var/run/tetragon",
+          "mount_path": "/var/run/tetragon",
+          "read_only": false,
+          "recursive_read_only": null,
+          "mount_propagation": null
+        }
+      ]
+    }
+  ]
+}

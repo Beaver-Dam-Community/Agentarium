@@ -1,0 +1,27 @@
+# TASK-14 3.4 (release SA): get/update/patch only on existing namespaced
+# TracingPolicies fixed by resourceNames; no create. TASK-09 3.2 names the
+# agent-exec policies. Confirm with the TASK-14 owner before installing.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: agentarium-releaser
+  namespace: agent-exec
+rules:
+  - apiGroups: [cilium.io]
+    resources: [tracingpoliciesnamespaced]
+    resourceNames: [agentarium-tcp-connect, agentarium-protected-file]
+    verbs: [get, update, patch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: agentarium-releaser
+  namespace: agent-exec
+subjects:
+  - kind: ServiceAccount
+    name: releaser
+    namespace: agent-release
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: agentarium-releaser

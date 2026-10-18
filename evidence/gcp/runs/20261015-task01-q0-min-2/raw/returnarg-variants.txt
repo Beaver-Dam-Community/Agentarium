@@ -1,0 +1,6 @@
+# Tetragon 1.7.1 log after updating agentarium-protected-file with each returnArg type
+# for the two syscall hooks (sys_openat, sys_openat2); security_file_open unchanged.
+int   (spec)   : 2 x "kprobe spec pre-validation returned an error, but will continue with loading ... syscall return type is not long int"
+long           : 2 x same warning (2026-10-14T15:12:56Z)
+int64          : 2 x same warning (2026-10-14T15:13:28Z)
+policy restored to sensors/tetragon/policies/file-access.yaml (int) afterwards

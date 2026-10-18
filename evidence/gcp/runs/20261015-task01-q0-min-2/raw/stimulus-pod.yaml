@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata: {name: q0-stimulus-3, namespace: agent-exec, labels: {app.kubernetes.io/name: probe-runner}}
+spec:
+  serviceAccountName: probe-runner
+  automountServiceAccountToken: false
+  schedulerName: default-scheduler
+  restartPolicy: Never
+  nodeSelector: {node-restriction.kubernetes.io/agentarium-role: exec}
+  affinity: {nodeAffinity: {requiredDuringSchedulingIgnoredDuringExecution: {nodeSelectorTerms: [{matchFields: [{key: metadata.name, operator: In, values: [gke-agentarium-prod-exec-pool-eaf0304a-x10z]}]}]}}}
+  tolerations:
+    - {key: agentarium-role, operator: Equal, value: exec, effect: NoSchedule}
+    - {key: agentarium.io/observe-not-ready, operator: Equal, value: "true", effect: NoSchedule}
+  securityContext: {runAsNonRoot: true, seccompProfile: {type: RuntimeDefault}}
+  containers:
+    - name: probe-runner
+      image: asia-northeast3-docker.pkg.dev/karrot-rina/agentarium/q0-stimulus@sha256:ea0daa3ffc1b325ff1eb13933497ce4a331d4881db96b637fc9c05e4d3c59e87
+      command: [/app/bin/probe-runner]
+      env: [{name: Q0_TCP_TARGET, value: "10.30.0.10:53"}, {name: Q0_COUNT, value: "30"}]
+      securityContext: {runAsUser: 10001, runAsNonRoot: true, readOnlyRootFilesystem: true, allowPrivilegeEscalation: false, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 50m, memory: 32Mi, ephemeral-storage: 32Mi}, limits: {cpu: 200m, memory: 64Mi, ephemeral-storage: 64Mi}}
+      volumeMounts: [{name: work, mountPath: /work}]
+  volumes: [{name: work, emptyDir: {sizeLimit: 16Mi}}]

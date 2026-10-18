@@ -1,0 +1,1455 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "policy-gateway",
+        "namespace": "agent-control"
+      },
+      "automountServiceAccountToken": false
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "policy-gateway-epoch",
+        "namespace": "agent-control"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "resources": {
+          "requests": {
+            "storage": "1Gi"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "policy-gateway",
+        "namespace": "agent-control"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/name": "policy-gateway"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/name": "policy-gateway"
+            }
+          },
+          "spec": {
+            "serviceAccountName": "policy-gateway",
+            "automountServiceAccountToken": false,
+            "nodeSelector": {
+              "node-restriction.kubernetes.io/agentarium-role": "control",
+              "iam.gke.io/gke-metadata-server-enabled": "true"
+            },
+            "schedulerName": "default-scheduler",
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 65532,
+              "runAsGroup": 65532,
+              "fsGroup": 65532,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "terminationGracePeriodSeconds": 30,
+            "initContainers": [
+              {
+                "name": "cloud-sql-proxy",
+                "image": "${SQL_PROXY_IMAGE}",
+                "restartPolicy": "Always",
+                "args": [
+                  "--auto-iam-authn",
+                  "--private-ip",
+                  "--address=127.0.0.1",
+                  "--port=5432",
+                  "--health-check",
+                  "--http-address=0.0.0.0",
+                  "--http-port=9801",
+                  "--impersonate-service-account=${GATEWAY_DB_GSA}",
+                  "${CLOUDSQL_CONNECTION_NAME}"
+                ],
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "50m",
+                    "memory": "64Mi"
+                  },
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "256Mi"
+                  }
+                },
+                "startupProbe": {
+                  "httpGet": {
+                    "path": "/startup",
+                    "port": 9801
+                  },
+                  "periodSeconds": 2,
+                  "failureThreshold": 60
+                },
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/readiness",
+                    "port": 9801
+                  },
+                  "periodSeconds": 5
+                },
+                "livenessProbe": {
+                  "httpGet": {
+                    "path": "/liveness",
+                    "port": 9801
+                  },
+                  "periodSeconds": 10
+                }
+              }
+            ],
+            "containers": [
+              {
+                "name": "policy-gateway",
+                "image": "${GATEWAY_IMAGE}",
+                "args": [
+                  "--listen=:8443",
+                  "--database-url=$(DATABASE_URL)",
+                  "--environment=${AGENTARIUM_ENVIRONMENT}",
+                  "--gateway-san=spiffe://agentarium.internal/ns/agent-control/sa/policy-gateway",
+                  "--trust-bundle=/etc/agentarium-trust/ca.pem",
+                  "--identity-url=https://workload-identity.agent-control.svc:8443",
+                  "--bootstrap-token=/var/run/agentarium-bootstrap/token",
+                  "--bundle-key-id=${BUNDLE_KEY_ID}",
+                  "--bundle-key-file=/etc/agentarium-bundle-keys/${BUNDLE_KEY_ID}.pem",
+                  "--adapter-urls=receiver-sender=https://receiver-sender.agent-adapters.svc:8443",
+                  "--model-profiles=/etc/agentarium-model-profiles/model-profiles.json",
+                  "--audit-source-id=policy-gateway",
+                  "--audit-source-version=${RELEASE_VERSION}",
+                  "--epoch-dir=/var/lib/agentarium/epoch",
+                  "--health-url=https://control-health.agent-observe.svc:8443",
+                  "--health-source-id=gateway/$(POD_NAME)",
+                  "--audit-url=https://audit-writer.agent-observe.svc:8443"
+                ],
+                "env": [
+                  {
+                    "name": "POD_NAME",
+                    "valueFrom": {
+                      "fieldRef": {
+                        "fieldPath": "metadata.name"
+                      }
+                    }
+                  },
+                  {
+                    "name": "DB_USER",
+                    "value": "${GATEWAY_DB_USER}"
+                  },
+                  {
+                    "name": "DB_NAME",
+                    "value": "${DB_NAME}"
+                  },
+                  {
+                    "name": "DATABASE_URL",
+                    "value": "host=127.0.0.1 port=5432 user=$(DB_USER) dbname=$(DB_NAME) sslmode=disable"
+                  }
+                ],
+                "ports": [
+                  {
+                    "name": "https",
+                    "containerPort": 8443
+                  }
+                ],
+                "volumeMounts": [
+                  {
+                    "name": "trust",
+                    "mountPath": "/etc/agentarium-trust",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "bootstrap",
+                    "mountPath": "/var/run/agentarium-bootstrap",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "bundle-keys",
+                    "mountPath": "/etc/agentarium-bundle-keys",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "model-profiles",
+                    "mountPath": "/etc/agentarium-model-profiles",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "epoch",
+                    "mountPath": "/var/lib/agentarium/epoch"
+                  }
+                ],
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "128Mi"
+                  },
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "512Mi"
+                  }
+                },
+                "startupProbe": {
+                  "tcpSocket": {
+                    "port": "https"
+                  },
+                  "periodSeconds": 2,
+                  "failureThreshold": 60
+                },
+                "readinessProbe": {
+                  "tcpSocket": {
+                    "port": "https"
+                  },
+                  "periodSeconds": 5
+                },
+                "livenessProbe": {
+                  "tcpSocket": {
+                    "port": "https"
+                  },
+                  "periodSeconds": 10
+                }
+              }
+            ],
+            "volumes": [
+              {
+                "name": "trust",
+                "configMap": {
+                  "name": "agentarium-trust"
+                }
+              },
+              {
+                "name": "bootstrap",
+                "projected": {
+                  "sources": [
+                    {
+                      "serviceAccountToken": {
+                        "path": "token",
+                        "expirationSeconds": 600,
+                        "audience": "agentarium-identity"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "bundle-keys",
+                "configMap": {
+                  "name": "agentarium-bundle-keys"
+                }
+              },
+              {
+                "name": "model-profiles",
+                "configMap": {
+                  "name": "agentarium-model-profiles"
+                }
+              },
+              {
+                "name": "epoch",
+                "persistentVolumeClaim": {
+                  "claimName": "policy-gateway-epoch"
+                }
+              }
+            ],
+            "tolerations": [
+              {
+                "key": "agentarium.io/observe-not-ready",
+                "operator": "Equal",
+                "value": "true",
+                "effect": "NoSchedule"
+              }
+            ]
+          }
+        },
+        "strategy": {
+          "type": "Recreate"
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "policy-gateway",
+        "namespace": "agent-control"
+      },
+      "spec": {
+        "type": "ClusterIP",
+        "clusterIP": "${GATEWAY_CLUSTER_IP}",
+        "selector": {
+          "app.kubernetes.io/name": "policy-gateway"
+        },
+        "ports": [
+          {
+            "name": "https",
+            "port": 8443,
+            "targetPort": "https"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "coordinator",
+        "namespace": "agent-control"
+      },
+      "automountServiceAccountToken": false
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "coordinator-epoch",
+        "namespace": "agent-control"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "resources": {
+          "requests": {
+            "storage": "1Gi"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "coordinator",
+        "namespace": "agent-control"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/name": "coordinator"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/name": "coordinator"
+            }
+          },
+          "spec": {
+            "serviceAccountName": "coordinator",
+            "automountServiceAccountToken": false,
+            "nodeSelector": {
+              "node-restriction.kubernetes.io/agentarium-role": "control",
+              "iam.gke.io/gke-metadata-server-enabled": "true"
+            },
+            "schedulerName": "default-scheduler",
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 65532,
+              "runAsGroup": 65532,
+              "fsGroup": 65532,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "terminationGracePeriodSeconds": 30,
+            "initContainers": [
+              {
+                "name": "cloud-sql-proxy",
+                "image": "${SQL_PROXY_IMAGE}",
+                "restartPolicy": "Always",
+                "args": [
+                  "--auto-iam-authn",
+                  "--private-ip",
+                  "--address=127.0.0.1",
+                  "--port=5432",
+                  "--health-check",
+                  "--http-address=0.0.0.0",
+                  "--http-port=9801",
+                  "--impersonate-service-account=${COORDINATOR_DB_GSA}",
+                  "${CLOUDSQL_CONNECTION_NAME}"
+                ],
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "50m",
+                    "memory": "64Mi"
+                  },
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "256Mi"
+                  }
+                },
+                "startupProbe": {
+                  "httpGet": {
+                    "path": "/startup",
+                    "port": 9801
+                  },
+                  "periodSeconds": 2,
+                  "failureThreshold": 60
+                },
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/readiness",
+                    "port": 9801
+                  },
+                  "periodSeconds": 5
+                },
+                "livenessProbe": {
+                  "httpGet": {
+                    "path": "/liveness",
+                    "port": 9801
+                  },
+                  "periodSeconds": 10
+                }
+              }
+            ],
+            "containers": [
+              {
+                "name": "coordinator",
+                "image": "${COORDINATOR_IMAGE}",
+                "args": [
+                  "--listen=:8443",
+                  "--database-url=$(DATABASE_URL)",
+                  "--environment=${AGENTARIUM_ENVIRONMENT}",
+                  "--trust-bundle=/etc/agentarium-trust/ca.pem",
+                  "--identity-url=https://workload-identity.agent-control.svc:8443",
+                  "--bootstrap-token=/var/run/agentarium-bootstrap/token",
+                  "--audit-source-id=coordinator",
+                  "--audit-source-version=${RELEASE_VERSION}",
+                  "--epoch-dir=/var/lib/agentarium/epoch",
+                  "--health-url=https://control-health.agent-observe.svc:8443",
+                  "--health-source-id=coordinator/$(POD_NAME)"
+                ],
+                "env": [
+                  {
+                    "name": "POD_NAME",
+                    "valueFrom": {
+                      "fieldRef": {
+                        "fieldPath": "metadata.name"
+                      }
+                    }
+                  },
+                  {
+                    "name": "DB_USER",
+                    "value": "${COORDINATOR_DB_USER}"
+                  },
+                  {
+                    "name": "DB_NAME",
+                    "value": "${DB_NAME}"
+                  },
+                  {
+                    "name": "DATABASE_URL",
+                    "value": "host=127.0.0.1 port=5432 user=$(DB_USER) dbname=$(DB_NAME) sslmode=disable"
+                  }
+                ],
+                "ports": [
+                  {
+                    "name": "https",
+                    "containerPort": 8443
+                  }
+                ],
+                "volumeMounts": [
+                  {
+                    "name": "trust",
+                    "mountPath": "/etc/agentarium-trust",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "bootstrap",
+                    "mountPath": "/var/run/agentarium-bootstrap",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "epoch",
+                    "mountPath": "/var/lib/agentarium/epoch"
+                  }
+                ],
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "128Mi"
+                  },
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "512Mi"
+                  }
+                },
+                "startupProbe": {
+                  "tcpSocket": {
+                    "port": "https"
+                  },
+                  "periodSeconds": 2,
+                  "failureThreshold": 60
+                },
+                "readinessProbe": {
+                  "tcpSocket": {
+                    "port": "https"
+                  },
+                  "periodSeconds": 5
+                },
+                "livenessProbe": {
+                  "tcpSocket": {
+                    "port": "https"
+                  },
+                  "periodSeconds": 10
+                }
+              }
+            ],
+            "volumes": [
+              {
+                "name": "trust",
+                "configMap": {
+                  "name": "agentarium-trust"
+                }
+              },
+              {
+                "name": "bootstrap",
+                "projected": {
+                  "sources": [
+                    {
+                      "serviceAccountToken": {
+                        "path": "token",
+                        "expirationSeconds": 600,
+                        "audience": "agentarium-identity"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "epoch",
+                "persistentVolumeClaim": {
+                  "claimName": "coordinator-epoch"
+                }
+              }
+            ],
+            "tolerations": [
+              {
+                "key": "agentarium.io/observe-not-ready",
+                "operator": "Equal",
+                "value": "true",
+                "effect": "NoSchedule"
+              }
+            ]
+          }
+        },
+        "strategy": {
+          "type": "Recreate"
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "coordinator",
+        "namespace": "agent-control"
+      },
+      "spec": {
+        "type": "ClusterIP",
+        "selector": {
+          "app.kubernetes.io/name": "coordinator"
+        },
+        "ports": [
+          {
+            "name": "https",
+            "port": 8443,
+            "targetPort": "https"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "receiver-sender",
+        "namespace": "agent-adapters"
+      },
+      "automountServiceAccountToken": false
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "receiver-sender-epoch",
+        "namespace": "agent-adapters"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "resources": {
+          "requests": {
+            "storage": "1Gi"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "receiver-sender",
+        "namespace": "agent-adapters"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/name": "receiver-sender"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/name": "receiver-sender"
+            }
+          },
+          "spec": {
+            "serviceAccountName": "receiver-sender",
+            "automountServiceAccountToken": false,
+            "nodeSelector": {
+              "node-restriction.kubernetes.io/agentarium-role": "control",
+              "iam.gke.io/gke-metadata-server-enabled": "true"
+            },
+            "schedulerName": "default-scheduler",
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 65532,
+              "runAsGroup": 65532,
+              "fsGroup": 65532,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "terminationGracePeriodSeconds": 30,
+            "initContainers": [
+              {
+                "name": "cloud-sql-proxy",
+                "image": "${SQL_PROXY_IMAGE}",
+                "restartPolicy": "Always",
+                "args": [
+                  "--auto-iam-authn",
+                  "--private-ip",
+                  "--address=127.0.0.1",
+                  "--port=5432",
+                  "--health-check",
+                  "--http-address=0.0.0.0",
+                  "--http-port=9801",
+                  "--impersonate-service-account=${RECEIVER_SENDER_DB_GSA}",
+                  "${CLOUDSQL_CONNECTION_NAME}"
+                ],
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "50m",
+                    "memory": "64Mi"
+                  },
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "256Mi"
+                  }
+                },
+                "startupProbe": {
+                  "httpGet": {
+                    "path": "/startup",
+                    "port": 9801
+                  },
+                  "periodSeconds": 2,
+                  "failureThreshold": 60
+                },
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/readiness",
+                    "port": 9801
+                  },
+                  "periodSeconds": 5
+                },
+                "livenessProbe": {
+                  "httpGet": {
+                    "path": "/liveness",
+                    "port": 9801
+                  },
+                  "periodSeconds": 10
+                }
+              }
+            ],
+            "containers": [
+              {
+                "name": "receiver-sender",
+                "image": "${RECEIVER_SENDER_IMAGE}",
+                "args": [
+                  "--listen=:8443",
+                  "--identity-url=https://workload-identity.agent-control.svc:8443",
+                  "--bootstrap-token=/var/run/agentarium-bootstrap/token",
+                  "--tls-ca-file=/etc/agentarium-trust/ca.pem",
+                  "--coordinator-url=https://coordinator.agent-control.svc:8443",
+                  "--broker-url=https://credential-broker.agent-control.svc:8443",
+                  "--stored-inputs=postgres",
+                  "--environment=${AGENTARIUM_ENVIRONMENT}",
+                  "--bundle-key-id=${BUNDLE_KEY_ID}",
+                  "--bundle-key-file=/etc/agentarium-bundle-keys/${BUNDLE_KEY_ID}.pem",
+                  "--audit-source-id=receiver-sender",
+                  "--audit-source-version=${RELEASE_VERSION}",
+                  "--epoch-dir=/var/lib/agentarium/epoch",
+                  "--health-url=https://control-health.agent-observe.svc:8443",
+                  "--health-source-id=receiver-sender/$(POD_NAME)"
+                ],
+                "env": [
+                  {
+                    "name": "POD_NAME",
+                    "valueFrom": {
+                      "fieldRef": {
+                        "fieldPath": "metadata.name"
+                      }
+                    }
+                  },
+                  {
+                    "name": "POD_UID",
+                    "valueFrom": {
+                      "fieldRef": {
+                        "fieldPath": "metadata.uid"
+                      }
+                    }
+                  },
+                  {
+                    "name": "DB_USER",
+                    "value": "${RECEIVER_SENDER_DB_USER}"
+                  },
+                  {
+                    "name": "DB_NAME",
+                    "value": "${DB_NAME}"
+                  },
+                  {
+                    "name": "DATABASE_URL",
+                    "value": "host=127.0.0.1 port=5432 user=$(DB_USER) dbname=$(DB_NAME) sslmode=disable"
+                  }
+                ],
+                "ports": [
+                  {
+                    "name": "https",
+                    "containerPort": 8443
+                  }
+                ],
+                "volumeMounts": [
+                  {
+                    "name": "trust",
+                    "mountPath": "/etc/agentarium-trust",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "bootstrap",
+                    "mountPath": "/var/run/agentarium-bootstrap",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "bundle-keys",
+                    "mountPath": "/etc/agentarium-bundle-keys",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "epoch",
+                    "mountPath": "/var/lib/agentarium/epoch"
+                  }
+                ],
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "128Mi"
+                  },
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "512Mi"
+                  }
+                },
+                "startupProbe": {
+                  "tcpSocket": {
+                    "port": "https"
+                  },
+                  "periodSeconds": 2,
+                  "failureThreshold": 60
+                },
+                "readinessProbe": {
+                  "tcpSocket": {
+                    "port": "https"
+                  },
+                  "periodSeconds": 5
+                },
+                "livenessProbe": {
+                  "tcpSocket": {
+                    "port": "https"
+                  },
+                  "periodSeconds": 10
+                }
+              }
+            ],
+            "volumes": [
+              {
+                "name": "trust",
+                "configMap": {
+                  "name": "agentarium-trust"
+                }
+              },
+              {
+                "name": "bootstrap",
+                "projected": {
+                  "sources": [
+                    {
+                      "serviceAccountToken": {
+                        "path": "token",
+                        "expirationSeconds": 600,
+                        "audience": "agentarium-identity"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "bundle-keys",
+                "configMap": {
+                  "name": "agentarium-bundle-keys"
+                }
+              },
+              {
+                "name": "epoch",
+                "persistentVolumeClaim": {
+                  "claimName": "receiver-sender-epoch"
+                }
+              }
+            ]
+          }
+        },
+        "strategy": {
+          "type": "Recreate"
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "receiver-sender",
+        "namespace": "agent-adapters"
+      },
+      "spec": {
+        "type": "ClusterIP",
+        "selector": {
+          "app.kubernetes.io/name": "receiver-sender"
+        },
+        "ports": [
+          {
+            "name": "https",
+            "port": 8443,
+            "targetPort": "https"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "receiver",
+        "namespace": "agent-targets"
+      },
+      "automountServiceAccountToken": false
+    },
+    {
+      "apiVersion": "secrets-store.csi.x-k8s.io/v1",
+      "kind": "SecretProviderClass",
+      "metadata": {
+        "name": "receiver-api-key",
+        "namespace": "agent-targets"
+      },
+      "spec": {
+        "provider": "gke",
+        "parameters": {
+          "secrets": "${RECEIVER_API_KEY_SECRET_OBJECTS}"
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "receiver",
+        "namespace": "agent-targets"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/name": "receiver"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/name": "receiver"
+            }
+          },
+          "spec": {
+            "serviceAccountName": "receiver",
+            "automountServiceAccountToken": false,
+            "nodeSelector": {
+              "node-restriction.kubernetes.io/agentarium-role": "control",
+              "iam.gke.io/gke-metadata-server-enabled": "true"
+            },
+            "schedulerName": "default-scheduler",
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 65532,
+              "runAsGroup": 65532,
+              "fsGroup": 65532,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "terminationGracePeriodSeconds": 30,
+            "initContainers": [
+              {
+                "name": "cloud-sql-proxy",
+                "image": "${SQL_PROXY_IMAGE}",
+                "restartPolicy": "Always",
+                "args": [
+                  "--auto-iam-authn",
+                  "--private-ip",
+                  "--address=127.0.0.1",
+                  "--port=5432",
+                  "--health-check",
+                  "--http-address=0.0.0.0",
+                  "--http-port=9801",
+                  "--impersonate-service-account=${RECEIVER_DB_GSA}",
+                  "${CLOUDSQL_CONNECTION_NAME}"
+                ],
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "50m",
+                    "memory": "64Mi"
+                  },
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "256Mi"
+                  }
+                },
+                "startupProbe": {
+                  "httpGet": {
+                    "path": "/startup",
+                    "port": 9801
+                  },
+                  "periodSeconds": 2,
+                  "failureThreshold": 60
+                },
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/readiness",
+                    "port": 9801
+                  },
+                  "periodSeconds": 5
+                },
+                "livenessProbe": {
+                  "httpGet": {
+                    "path": "/liveness",
+                    "port": 9801
+                  },
+                  "periodSeconds": 10
+                }
+              }
+            ],
+            "containers": [
+              {
+                "name": "receiver",
+                "image": "${RECEIVER_IMAGE}",
+                "args": [
+                  "--listen=:8443",
+                  "--database-url=$(DATABASE_URL)",
+                  "--receiver-mode=${RECEIVER_MODE}",
+                  "--target-id=receiver-primary",
+                  "--route-id=submissions-v1",
+                  "--trust-bundle=/etc/agentarium-trust/ca.pem",
+                  "--identity-url=https://workload-identity.agent-control.svc:8443",
+                  "--bootstrap-token=/var/run/agentarium-bootstrap/token",
+                  "--api-key-dir=/var/run/secrets/agentarium/receiver-api-key"
+                ],
+                "env": [
+                  {
+                    "name": "DB_USER",
+                    "value": "${RECEIVER_DB_USER}"
+                  },
+                  {
+                    "name": "DB_NAME",
+                    "value": "${DB_NAME}"
+                  },
+                  {
+                    "name": "DATABASE_URL",
+                    "value": "host=127.0.0.1 port=5432 user=$(DB_USER) dbname=$(DB_NAME) sslmode=disable"
+                  }
+                ],
+                "ports": [
+                  {
+                    "name": "https",
+                    "containerPort": 8443
+                  }
+                ],
+                "volumeMounts": [
+                  {
+                    "name": "trust",
+                    "mountPath": "/etc/agentarium-trust",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "bootstrap",
+                    "mountPath": "/var/run/agentarium-bootstrap",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "api-key",
+                    "mountPath": "/var/run/secrets/agentarium/receiver-api-key",
+                    "readOnly": true
+                  }
+                ],
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "128Mi"
+                  },
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "512Mi"
+                  }
+                },
+                "startupProbe": {
+                  "tcpSocket": {
+                    "port": "https"
+                  },
+                  "periodSeconds": 2,
+                  "failureThreshold": 60
+                },
+                "readinessProbe": {
+                  "tcpSocket": {
+                    "port": "https"
+                  },
+                  "periodSeconds": 5
+                },
+                "livenessProbe": {
+                  "tcpSocket": {
+                    "port": "https"
+                  },
+                  "periodSeconds": 10
+                }
+              }
+            ],
+            "volumes": [
+              {
+                "name": "trust",
+                "configMap": {
+                  "name": "agentarium-trust"
+                }
+              },
+              {
+                "name": "bootstrap",
+                "projected": {
+                  "sources": [
+                    {
+                      "serviceAccountToken": {
+                        "path": "token",
+                        "expirationSeconds": 600,
+                        "audience": "agentarium-identity"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "api-key",
+                "csi": {
+                  "driver": "secrets-store-gke.csi.k8s.io",
+                  "readOnly": true,
+                  "volumeAttributes": {
+                    "secretProviderClass": "receiver-api-key"
+                  }
+                }
+              }
+            ],
+            "tolerations": [
+              {
+                "key": "agentarium.io/observe-not-ready",
+                "operator": "Equal",
+                "value": "true",
+                "effect": "NoSchedule"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "receiver",
+        "namespace": "agent-targets"
+      },
+      "spec": {
+        "type": "ClusterIP",
+        "clusterIP": "${RECEIVER_CLUSTER_IP}",
+        "selector": {
+          "app.kubernetes.io/name": "receiver"
+        },
+        "ports": [
+          {
+            "name": "https",
+            "port": 8443,
+            "targetPort": "https"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "receiver-probe",
+        "namespace": "agent-targets"
+      },
+      "spec": {
+        "type": "ClusterIP",
+        "clusterIP": "${RECEIVER_PROBE_CLUSTER_IP}",
+        "selector": {
+          "app.kubernetes.io/name": "receiver"
+        },
+        "ports": [
+          {
+            "name": "https",
+            "port": 8443,
+            "targetPort": "https"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "evidence-collector",
+        "namespace": "agent-observe"
+      },
+      "automountServiceAccountToken": false
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "evidence-collector-epoch",
+        "namespace": "agent-observe"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "resources": {
+          "requests": {
+            "storage": "1Gi"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "evidence-collector",
+        "namespace": "agent-observe"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/name": "evidence-collector"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/name": "evidence-collector"
+            }
+          },
+          "spec": {
+            "serviceAccountName": "evidence-collector",
+            "automountServiceAccountToken": false,
+            "nodeSelector": {
+              "node-restriction.kubernetes.io/agentarium-role": "control",
+              "iam.gke.io/gke-metadata-server-enabled": "true"
+            },
+            "schedulerName": "default-scheduler",
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 65532,
+              "runAsGroup": 65532,
+              "fsGroup": 65532,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "terminationGracePeriodSeconds": 30,
+            "initContainers": [
+              {
+                "name": "cloud-sql-proxy",
+                "image": "${SQL_PROXY_IMAGE}",
+                "restartPolicy": "Always",
+                "args": [
+                  "--auto-iam-authn",
+                  "--private-ip",
+                  "--address=127.0.0.1",
+                  "--port=5432",
+                  "--health-check",
+                  "--http-address=0.0.0.0",
+                  "--http-port=9801",
+                  "--impersonate-service-account=${EVIDENCE_COLLECTOR_DB_GSA}",
+                  "${CLOUDSQL_CONNECTION_NAME}"
+                ],
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "50m",
+                    "memory": "64Mi"
+                  },
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "256Mi"
+                  }
+                },
+                "startupProbe": {
+                  "httpGet": {
+                    "path": "/startup",
+                    "port": 9801
+                  },
+                  "periodSeconds": 2,
+                  "failureThreshold": 60
+                },
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/readiness",
+                    "port": 9801
+                  },
+                  "periodSeconds": 5
+                },
+                "livenessProbe": {
+                  "httpGet": {
+                    "path": "/liveness",
+                    "port": 9801
+                  },
+                  "periodSeconds": 10
+                }
+              }
+            ],
+            "containers": [
+              {
+                "name": "evidence-collector",
+                "image": "${EVIDENCE_COLLECTOR_IMAGE}",
+                "args": [
+                  "--database-url=$(DATABASE_URL)",
+                  "--tenant=${AGENTARIUM_TENANT}",
+                  "--receiver-url=https://receiver.agent-targets.svc:8443",
+                  "--target-id=receiver-primary",
+                  "--tls-ca=/etc/agentarium-trust/ca.pem",
+                  "--identity-url=https://workload-identity.agent-control.svc:8443",
+                  "--bootstrap-token=/var/run/agentarium-bootstrap/token",
+                  "--health-url=https://control-health.agent-observe.svc:8443",
+                  "--health-source-id=evidence-collector/receiver-primary",
+                  "--version=${RELEASE_VERSION}",
+                  "--audit-source-id=evidence-collector",
+                  "--audit-source-version=${RELEASE_VERSION}",
+                  "--epoch-dir=/var/lib/agentarium/epoch",
+                  "--probe-action-key=${EVIDENCE_PROBE_ACTION_KEY}"
+                ],
+                "env": [
+                  {
+                    "name": "DB_USER",
+                    "value": "${EVIDENCE_COLLECTOR_DB_USER}"
+                  },
+                  {
+                    "name": "DB_NAME",
+                    "value": "${DB_NAME}"
+                  },
+                  {
+                    "name": "DATABASE_URL",
+                    "value": "host=127.0.0.1 port=5432 user=$(DB_USER) dbname=$(DB_NAME) sslmode=disable"
+                  }
+                ],
+                "volumeMounts": [
+                  {
+                    "name": "trust",
+                    "mountPath": "/etc/agentarium-trust",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "bootstrap",
+                    "mountPath": "/var/run/agentarium-bootstrap",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "epoch",
+                    "mountPath": "/var/lib/agentarium/epoch"
+                  }
+                ],
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "128Mi"
+                  },
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "512Mi"
+                  }
+                }
+              }
+            ],
+            "volumes": [
+              {
+                "name": "trust",
+                "configMap": {
+                  "name": "agentarium-trust"
+                }
+              },
+              {
+                "name": "bootstrap",
+                "projected": {
+                  "sources": [
+                    {
+                      "serviceAccountToken": {
+                        "path": "token",
+                        "expirationSeconds": 600,
+                        "audience": "agentarium-identity"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "epoch",
+                "persistentVolumeClaim": {
+                  "claimName": "evidence-collector-epoch"
+                }
+              }
+            ],
+            "tolerations": [
+              {
+                "key": "agentarium.io/observe-not-ready",
+                "operator": "Equal",
+                "value": "true",
+                "effect": "NoSchedule"
+              }
+            ]
+          }
+        },
+        "strategy": {
+          "type": "Recreate"
+        }
+      }
+    }
+  ]
+}

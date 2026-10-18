@@ -1,0 +1,83 @@
+# catalog/gcp/targets.yaml
+# Owner spec: docs/tech-specs/TASK-02-catalog-contracts.md (Appendix A). Schema: schema/targets.schema.json
+# Synthetic test catalog. Angle-bracket values are installer inputs resolved from deploy/gcp/environment.lock.json
+# (schema owned by TASK-16); no real project IDs, addresses or CIDRs are committed. Changing any of them changes catalog_digest.
+# SPEC-QUESTION: Appendix A's origin pattern (^https://[a-z0-9.-]+...) rejects "<...>" placeholders, so the placeholder
+# origin of agent-platform-gemini fails raw schema validation; it validates once the installer renders the lock value.
+targets:
+  - target_id: k8s-agent-targets
+    endpoint_id: k8s-api-v1
+    environment: test
+    tenant: hackathon
+    origin: https://kubernetes.default.svc:443
+    expected_tls_name: kubernetes.default.svc   # API server cert SAN is a Q0 item
+    ca_ref: cluster
+    auth_audience: null
+    allowed_cidrs: ["<service CIDR의 kubernetes ClusterIP>/32"]   # lock: service CIDR / kubernetes ClusterIP (Q0)
+    max_data_class: synthetic
+    operation_ids: [k8s.pods.list, k8s.events.list, k8s.pods.logs]
+    namespace: agent-targets
+  - target_id: receiver-primary
+    endpoint_id: test-receiver-v1
+    environment: test
+    tenant: hackathon
+    origin: https://receiver.agent-targets.svc:8443
+    expected_tls_name: receiver.agent-targets.svc
+    ca_ref: agentarium-trust
+    expected_uri_san: spiffe://agentarium.internal/ns/agent-targets/sa/receiver   # TASK-06 KSA table
+    allowed_cidrs: ["<receiver ClusterIP>/32"]   # lock: receiver ClusterIP
+    max_data_class: synthetic
+    operation_ids: [receiver.submit]
+  - target_id: receiver-probe          # activation probe only (probe.activation.v1)
+    endpoint_id: test-receiver-v1
+    environment: test
+    tenant: hackathon
+    origin: https://receiver-probe.agent-targets.svc:8443
+    expected_tls_name: receiver-probe.agent-targets.svc
+    ca_ref: agentarium-trust
+    # receiver-probe is the probe Service of the same receiver service (COMMON StandingRule). The only
+    # agent-targets KSAs are receiver, probe-sink and start-marker (COMMON KSA table), so this Service's Pods
+    # also run as the receiver KSA.
+    expected_uri_san: spiffe://agentarium.internal/ns/agent-targets/sa/receiver
+    allowed_cidrs: ["<receiver-probe ClusterIP>/32"]   # lock: receiver-probe ClusterIP
+    max_data_class: synthetic
+    operation_ids: [receiver.submit]
+  - target_id: agent-platform-gemini
+    endpoint_id: agent-platform-v1
+    environment: test
+    tenant: hackathon
+    origin: https://<location>-aiplatform.googleapis.com:443   # lock: model location; exact host (global) is a Q0 item
+    expected_tls_name: <location>-aiplatform.googleapis.com
+    ca_ref: system
+    allowed_cidrs: ["199.36.153.8/30"]   # private.googleapis.com VIP via Private Google Access (COMMON, TASK-06 `pga`)
+    max_data_class: internal
+    operation_ids: [model.generate]
+    # SPEC-QUESTION: the lock holds model ID/location per profile (agent, policy_proposal, intent_check, discovery) but the
+    # target `model` object has a single project/location/model_id; the lock entry used here is not specified.
+    model: {project: "<PROJECT_ID>", location: "<LOCATION>", model_id: "<MODEL_ID>"}
+  - target_id: evidence-api
+    # SPEC-QUESTION: origin/port/TLS name/CIDR for evidence-api are not specified. The service is `timeline` in the
+    # agent-observe namespace (TASK-06 egress table, TASK-11); cluster DNS name and port 8443 are assumed by analogy with
+    # the receiver target. max_data_class follows response_data_class of evidence.* (internal).
+    endpoint_id: evidence-api-v1
+    environment: test
+    tenant: hackathon
+    origin: https://timeline.agent-observe.svc:8443
+    expected_tls_name: timeline.agent-observe.svc
+    ca_ref: agentarium-trust
+    expected_uri_san: spiffe://agentarium.internal/ns/agent-observe/sa/timeline   # TASK-06 KSA table
+    allowed_cidrs: ["<timeline ClusterIP>/32"]   # lock: timeline ClusterIP
+    max_data_class: internal
+    operation_ids: [evidence.action.read, evidence.bundle.read, evidence.regression.read]
+  - target_id: discovery-snapshots
+    # SPEC-QUESTION: same as evidence-api; service is `discovery` in agent-observe (TASK-06 egress table).
+    endpoint_id: discovery-api-v1
+    environment: test
+    tenant: hackathon
+    origin: https://discovery.agent-observe.svc:8443
+    expected_tls_name: discovery.agent-observe.svc
+    ca_ref: agentarium-trust
+    expected_uri_san: spiffe://agentarium.internal/ns/agent-observe/sa/discovery   # TASK-06 KSA table
+    allowed_cidrs: ["<discovery ClusterIP>/32"]   # lock: discovery ClusterIP
+    max_data_class: internal
+    operation_ids: [discovery.source.read, discovery.callgraph.read]

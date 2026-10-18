@@ -1,0 +1,12 @@
+{
+  "bindings": [
+    {
+      "members": [
+        "serviceAccount:example-prod.svc.id.goog[agent-exec/probe-runner]"
+      ],
+      "role": "roles/iam.workloadIdentityUser"
+    }
+  ],
+  "etag": "BwYAAAAAAAA=",
+  "version": 1
+}

@@ -1,0 +1,96 @@
+# Role Namespaces. Source: docs/tech-specs/TASK-01-gke-platform.md 3 item 5,
+# 3.2.1 (PSS labels), COMMON Namespace/KSA table.
+# Namespaces are not a control by themselves; RBAC, NetworkPolicy (TASK-06)
+# and admission (../admission) apply together.
+#
+# RENDER NOTE: ${PSS_VERSION} is a placeholder rendered from
+# deploy/gcp/environment.lock.json as "v" + gke.kubernetes_minor (e.g. v1.33).
+# All *-version labels are pinned to that minor; a missing value must fail
+# rendering (do not fall back to "latest").
+#
+# SPEC-QUESTION: agent-sensors "uses PSA privileged" (3.2.1); the spec does not
+# say whether audit/warn are relaxed too. Narrowest reading: only enforce is
+# privileged, audit/warn stay restricted so violations remain visible.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agent-exec
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: "${PSS_VERSION}"
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/audit-version: "${PSS_VERSION}"
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/warn-version: "${PSS_VERSION}"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agent-control
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: "${PSS_VERSION}"
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/audit-version: "${PSS_VERSION}"
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/warn-version: "${PSS_VERSION}"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agent-adapters
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: "${PSS_VERSION}"
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/audit-version: "${PSS_VERSION}"
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/warn-version: "${PSS_VERSION}"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agent-observe
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: "${PSS_VERSION}"
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/audit-version: "${PSS_VERSION}"
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/warn-version: "${PSS_VERSION}"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agent-sensors
+  labels:
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/enforce-version: "${PSS_VERSION}"
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/audit-version: "${PSS_VERSION}"
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/warn-version: "${PSS_VERSION}"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agent-release
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: "${PSS_VERSION}"
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/audit-version: "${PSS_VERSION}"
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/warn-version: "${PSS_VERSION}"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agent-targets
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: "${PSS_VERSION}"
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/audit-version: "${PSS_VERSION}"
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/warn-version: "${PSS_VERSION}"

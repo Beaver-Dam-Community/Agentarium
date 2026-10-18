@@ -1,0 +1,58 @@
+{
+  "namespaces": {
+    "kernel": "62aec079-204c-5723-a898-7fa567e82eb4",
+    "lifecycle": "690f05df-a5fe-51bb-8f23-99c4492afc61",
+    "network-policy": "83cab43f-080b-5fba-830d-37c97ec7be5c"
+  },
+  "ids": [
+    {
+      "source_id": "sensor-a",
+      "source_epoch": "boot-instance",
+      "source_sequence": 1,
+      "kernel_id": "158037b5-8994-533e-9017-b48a5cfe18a1",
+      "lifecycle_id": "8d3e2ab3-4796-5443-9a4c-5799a6f98e69"
+    },
+    {
+      "source_id": "spiffe://agentarium.internal/node/가",
+      "source_epoch": "boot_2",
+      "source_sequence": 9007199254740991,
+      "kernel_id": "9777e1bf-b7bb-5010-aad0-bddd137cb1d3",
+      "lifecycle_id": "c5fdbba4-03c3-54d8-b4d5-f3b26c2d74d9"
+    }
+  ],
+  "ranges": [
+    {
+      "input": {
+        "source_id": "sensor-a",
+        "stream": "kernel",
+        "source_epoch": "boot-instance",
+        "from_seq": 2,
+        "to_seq": 4,
+        "reason": "record_rejected"
+      },
+      "jcs": "{\"from_seq\":2,\"reason\":\"record_rejected\",\"source_epoch\":\"boot-instance\",\"source_id\":\"sensor-a\",\"stream\":\"kernel\",\"to_seq\":4}",
+      "digest": "9cb10cb92932d7e31399153b4ba6906a113b3d81eb7a1a98af571c56f212f2c6"
+    },
+    {
+      "input": {
+        "source_id": "spiffe://agentarium.internal/ns/agent-sensors/sa/netpol-collector",
+        "stream": "network_policy",
+        "source_epoch": "node_boot_instance",
+        "from_seq": 3,
+        "to_seq": 5,
+        "reason": "record_rejected"
+      },
+      "jcs": "{\"from_seq\":3,\"reason\":\"record_rejected\",\"source_epoch\":\"node_boot_instance\",\"source_id\":\"spiffe://agentarium.internal/ns/agent-sensors/sa/netpol-collector\",\"stream\":\"network_policy\",\"to_seq\":5}",
+      "digest": "dd8dd8c3d7187d79c848e9ea968f1971e0bca8d6196865ebb599982b6b34ce77"
+    }
+  ],
+  "network_policy_ids": [
+    {
+      "cluster_uid": "11111111-1111-4111-8111-111111111111",
+      "node_uid": "22222222-2222-4222-8222-222222222222",
+      "source_epoch": "node_boot_instance",
+      "source_sequence": 7,
+      "record_id": "1cc8801d-e82d-5581-9b56-bcb5fecd1b58"
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "run_id": "20261014-task01-admission",
+  "task_id": "TASK-01",
+  "run_kind": "platform_admission_live",
+  "implementation_commit": "3a84d6a11f9144f81c80848693d4681b06a02e50",
+  "environment": {
+    "project_id": "karrot-rina",
+    "project_number": "373082075243",
+    "location": "asia-northeast3-a",
+    "cluster": "agentarium-prod",
+    "cluster_uid": "4489172407144a57bf6a4914d26ed16e22f5d20a9fde42de81eb2f62a770fe9a",
+    "kubernetes_version": "1.36.4-gke.1495002",
+    "release_channel": "REGULAR",
+    "datapath_provider": "ADVANCED_DATAPATH",
+    "node_pools": [
+      {
+        "name": "control-pool",
+        "version": "1.36.4-gke.1495002",
+        "machine_type": "e2-standard-4",
+        "node_count": 3,
+        "image_type": "COS_CONTAINERD",
+        "auto_repair": true,
+        "maintenance_exclusion": "exclusion_until_end_of_support"
+      },
+      {
+        "name": "exec-pool",
+        "version": "1.36.4-gke.1495002",
+        "machine_type": "e2-standard-4",
+        "node_count": 2,
+        "image_type": "COS_CONTAINERD",
+        "auto_repair": false,
+        "maintenance_exclusion": "exclusion_until_end_of_support"
+      },
+      {
+        "name": "system-pool",
+        "version": "1.36.4-gke.1495002",
+        "machine_type": "e2-standard-2",
+        "node_count": 1,
+        "image_type": "COS_CONTAINERD",
+        "auto_repair": true,
+        "maintenance_exclusion": "exclusion_until_end_of_support"
+      }
+    ],
+    "node_os": "Container-Optimized OS from Google",
+    "kernel": "6.12.105+",
+    "container_runtime": "containerd://2.2.7",
+    "nodelocal_dns_cache": false
+  },
+  "inputs": {
+    "environment_lock_sha256": "2b6801931a888a206fb66e75a3b24f268d2e8ee2c15c4fd4034ca5173f48f1dc",
+    "rendered_base_sha256": {
+      "m0-2 roles": "611829b2efa9e507a8473cea3a2310f55ef7239bcf70cd5718bcc32c28aae227",
+      "m0-2 exec": "6dac327408877ea2ac6b40137c505a29ef00ef6033e61a35aa005c5fc9eea591"
+    },
+    "render_values": {
+      "roles": "AGENT_TARGETS_IMAGES = AGENT_ADAPTERS_IMAGES = admission-sleeper; every other list empty",
+      "exec": "roles values + RUNTIME_IMAGE/PROBE_IMAGES/FIXTURE_IMAGES = stand-ins, PROBE_ENTRYPOINTS = fixed stand-in paths"
+    },
+    "images": {
+      "admission-sleeper": "asia-northeast3-docker.pkg.dev/karrot-rina/agentarium/admission-sleeper@sha256:efebe46613059e183b9b55035376164162b49f46930c2423f98d131d439ae04d",
+      "admission-runtime-standin": "asia-northeast3-docker.pkg.dev/karrot-rina/agentarium/admission-runtime-standin@sha256:b90b50cebd7e1a24f8215e55198da01891024ad000327831cdf604351a39f4d5",
+      "admission-probe-standin": "asia-northeast3-docker.pkg.dev/karrot-rina/agentarium/admission-probe-standin@sha256:0788eaeda034e6385e5e183b696150d9064cfdf5f8a0b11c82fdbc0a0f4da359",
+      "admission-fixture-standin": "asia-northeast3-docker.pkg.dev/karrot-rina/agentarium/admission-fixture-standin@sha256:e322c97b9bf9f270c797ce0175bdadb9dec55254eb7a86c7685d218d9631a44c"
+    },
+    "fixture_set_files": [
+      "tests/platform/admission/live_integration_test.go",
+      "tests/platform/admission/live_exec_integration_test.go",
+      "tests/platform/admission/cmd/sleeper/main.go"
+    ]
+  },
+  "fixture_set_digest": "a215b4946db9819426fb53f05bb9d27584d18c57fa25f0eea69da4ff3d35b3ff",
+  "repetitions": 1,
+  "clock": {
+    "roles": [
+      "2026-10-14T12:22:51Z",
+      "2026-10-14T12:23:01Z"
+    ],
+    "exec": [
+      "2026-10-14T12:38:53Z",
+      "2026-10-14T12:39:10Z"
+    ]
+  },
+  "post_run": "admission params re-rendered with empty image lists (fail-closed); all test Pods and ServiceAccounts deleted",
+  "original_commit": "e18ecc0bdec4588d5db948ff6684b8e6a1962dba (pre-rebase; the run used this tree)",
+  "tested_trees": {
+    "deploy/gcp/base": "fb57919f6fb31cadc5b104793396479b5997757d",
+    "tests/platform/admission": "7b06a7737618541499a0abf0f1048b8e66c7441f",
+    "platform/gcp": "f6a3aa4f66362f4bab98a378d93e045f16e8f4fd"
+  },
+  "scope_note": "implementation_commit has the same trees as original_commit for the tested paths. Policies added later (agent-role-status-metadata, pods/resize, node-readiness-scope target limit) were not part of this run; see 20261015-task01-admission-delta."
+}

@@ -1,0 +1,284 @@
+# catalog/gcp/operations.yaml
+# Owner spec: docs/tech-specs/TASK-02-catalog-contracts.md (3.2, 3.3, Appendix A). Schema: schema/operations.schema.json
+# Synthetic test catalog (environment: test). Values that come from deploy/gcp/environment.lock.json are NOT written here;
+# see targets.yaml for target-side lock references.
+catalog_version: test-2026-10-11   # display label only; not a catalog_digest input (TASK-02 3 item 2)
+operations:
+  - operation_id: k8s.pods.list
+    endpoint_id: k8s-api-v1
+    service_id: kubernetes
+    adapter_id: kubernetes-reader
+    transport: https_rest
+    method: GET
+    # SPEC-QUESTION: route_id/route_template for pods.list and events.list are not given (only pod-log-v1 is);
+    # named by analogy with pod-log-v1 and the Kubernetes core/v1 list paths.
+    route_id: pods-list-v1
+    route_template: /api/v1/namespaces/{namespace}/pods
+    effect_type: read
+    disclosure: {kind: none}
+    credential_binding: null          # projected KSA token (TASK-05 3.1)
+    limits:
+      limit: {fixed: 100, max: 100}   # server constant (TASK-02 3.2); schema requires `max`, so max mirrors fixed
+    retry_policy: none
+    idempotency_support: none
+    evidence_strategy: response_only
+    evidence_level_max: accepted
+    evidence_deadline_seconds: 0
+    # SPEC-QUESTION: intent_check_on_standing_rule is specified only for k8s.pods.logs (true) and receiver.submit (false);
+    # other operations are set to false (narrowest: no extra intent check beyond what the spec states).
+    intent_check_on_standing_rule: false
+    response_data_class: synthetic    # production catalog: internal (Appendix A example comment)
+    redact_fields:                    # TASK-05 3.4 example
+      - /items/*/metadata/managedFields
+      - /items/*/spec/containers/*/env
+    response_limit_bytes: 1048576
+    description: "agent-targets namespace의 등록 Pod 목록을 읽는다"
+    schema_version: v1
+    owner: platform-team
+  - operation_id: k8s.events.list
+    endpoint_id: k8s-api-v1
+    service_id: kubernetes
+    adapter_id: kubernetes-reader
+    transport: https_rest
+    method: GET
+    route_id: events-list-v1          # SPEC-QUESTION: see k8s.pods.list
+    route_template: /api/v1/namespaces/{namespace}/events
+    effect_type: read
+    disclosure: {kind: none}
+    credential_binding: null
+    limits:
+      limit: {fixed: 100, max: 100}
+    retry_policy: none
+    idempotency_support: none
+    evidence_strategy: response_only
+    evidence_level_max: accepted
+    evidence_deadline_seconds: 0
+    intent_check_on_standing_rule: false
+    response_data_class: synthetic
+    # SPEC-QUESTION: redact_fields for events are not specified; empty (only the pods example is given in TASK-05 3.4).
+    redact_fields: []
+    response_limit_bytes: 1048576
+    description: "agent-targets namespace의 이벤트 목록을 읽는다"
+    schema_version: v1
+    owner: platform-team
+  - operation_id: k8s.pods.logs
+    endpoint_id: k8s-api-v1
+    service_id: kubernetes
+    adapter_id: kubernetes-reader
+    transport: https_rest
+    method: GET
+    route_id: pod-log-v1
+    route_template: /api/v1/namespaces/{namespace}/pods/{pod_name}/log
+    effect_type: read
+    disclosure: {kind: none}
+    credential_binding: null          # projected KSA token(TASK-05)
+    limits:
+      tail_lines: {min: 1, max: 200}
+      limit_bytes: {min: 1, max: 1048576}
+    retry_policy: none
+    idempotency_support: none
+    evidence_strategy: response_only
+    evidence_level_max: accepted
+    evidence_deadline_seconds: 0
+    intent_check_on_standing_rule: true
+    response_data_class: synthetic    # internal in the production catalog
+    redact_fields: []
+    response_limit_bytes: 1048576
+    description: "agent-targets namespace의 등록 Pod 로그 마지막 몇 줄을 읽는다"
+    schema_version: v1
+    owner: platform-team
+  - operation_id: receiver.submit
+    endpoint_id: test-receiver-v1
+    service_id: test-receiver
+    adapter_id: receiver-sender
+    transport: https_rest
+    method: POST
+    route_id: submissions-v1
+    route_template: /test/v1/submissions
+    effect_type: external_send
+    disclosure: {kind: payload_fields}
+    credential_binding: receiver-api-key
+    limits: {}
+    retry_policy: none
+    idempotency_support: idempotency_key
+    evidence_strategy: receiver_receipt
+    evidence_level_max: effect_verified
+    evidence_deadline_seconds: 30
+    intent_check_on_standing_rule: false
+    response_data_class: none
+    redact_fields: []
+    response_limit_bytes: 65536
+    content_checks: {fields: [summary], email_pattern: true, synthetic_identifiers: ["SYN-USER-0001", "SYN-USER-0002"]}
+    description: "자체 시험 receiver에 승인된 요약을 보낸다"
+    schema_version: v1
+    owner: platform-team
+  - operation_id: model.generate
+    endpoint_id: agent-platform-v1
+    # SPEC-QUESTION: endpoint_id/service_id/route_id for model.generate are not given; names follow the target example
+    # (endpoint_id agent-platform-v1) and the other operations' naming style.
+    service_id: agent-platform
+    adapter_id: model
+    transport: https_rest
+    method: POST
+    route_id: generate-content-v1
+    # SPEC-QUESTION: path is the Gemini Enterprise Agent Platform generateContent REST shape ("registered project/location/model +
+    # :generateContent", TASK-05 3.1); exact path/host and global-location handling are Q0 items.
+    route_template: /v1/projects/{project}/locations/{location}/publishers/google/models/{model_id}:generateContent
+    effect_type: model_disclosure
+    disclosure: {kind: message_sources}
+    credential_binding: null          # GKE metadata server WIF token (TASK-05 3.1), no broker binding
+    # SPEC-QUESTION: TASK-02 3.3 says model `limits` are {max_output_tokens, max_request_bytes} profile constants, but
+    # per-profile values (and max_output_tokens) come from the environment lock / TASK-05 profile table, and the profile
+    # is not an operation-level field. Only client-input ranges from 3.2 and the largest profile request bound (64KiB) are
+    # recorded here; intent_check's 16KiB bound is enforced via data.adapter_constraints / lock.
+    limits:
+      messages: {min: 1, max: 64}
+      tool_declarations: {min: 0, max: 8}
+      request_bytes: {max: 65536}
+    retry_policy: none
+    idempotency_support: none
+    evidence_strategy: provider_response
+    evidence_level_max: accepted      # model/k8s calls are capped at `accepted` (COMMON evidence_level)
+    evidence_deadline_seconds: 0
+    intent_check_on_standing_rule: false
+    model_profiles: [agent, policy_proposal, intent_check, discovery]
+    response_data_class: inherit      # TASK-02 Appendix A: result class = request envelope data_class
+    redact_fields: []
+    # SPEC-QUESTION: model response size bound is not specified; 65536 chosen to match the request bound and the 64KiB read bounds.
+    response_limit_bytes: 65536
+    description: "Agent Platform Gemini generateContent를 서버 고정 profile 한도로 호출한다"
+    schema_version: v1
+    owner: platform-team
+  - operation_id: evidence.action.read
+    # SPEC-QUESTION: endpoint_id/service_id/route_id/owner for evidence.* are not given. Route paths are from COMMON
+    # (internal API ownership) and TASK-11; the path parameter name follows EvidenceTarget.resource_id in TASK-02 3.2.
+    endpoint_id: evidence-api-v1
+    service_id: evidence
+    adapter_id: evidence-reader
+    transport: https_rest
+    method: GET
+    route_id: evidence-action-v1
+    route_template: /internal/evidence/actions/{resource_id}
+    effect_type: read
+    disclosure: {kind: none}
+    credential_binding: null          # mTLS client certificate (TASK-05 3.1)
+    limits: {}
+    retry_policy: none
+    idempotency_support: none
+    evidence_strategy: response_only
+    evidence_level_max: accepted
+    evidence_deadline_seconds: 0
+    intent_check_on_standing_rule: false
+    # SPEC-QUESTION: response data class of sanitized evidence is not specified; `internal` (non-synthetic, not confidential).
+    response_data_class: internal
+    redact_fields: []
+    response_limit_bytes: 65536
+    description: "정제된 action 증거를 조회한다"
+    schema_version: v1
+    owner: platform-team
+  - operation_id: evidence.bundle.read
+    endpoint_id: evidence-api-v1
+    service_id: evidence
+    adapter_id: evidence-reader
+    transport: https_rest
+    method: GET
+    route_id: evidence-bundle-v1
+    route_template: /internal/evidence/bundles/{resource_id}
+    effect_type: read
+    disclosure: {kind: none}
+    credential_binding: null
+    limits: {}
+    retry_policy: none
+    idempotency_support: none
+    evidence_strategy: response_only
+    evidence_level_max: accepted
+    evidence_deadline_seconds: 0
+    intent_check_on_standing_rule: false
+    response_data_class: internal
+    redact_fields: []
+    response_limit_bytes: 65536
+    description: "등록된 base/candidate bundle의 정책 data와 catalog 계약을 조회한다"
+    schema_version: v1
+    owner: platform-team
+  - operation_id: evidence.regression.read
+    endpoint_id: evidence-api-v1
+    service_id: evidence
+    adapter_id: evidence-reader
+    transport: https_rest
+    method: GET
+    route_id: evidence-regression-v1
+    route_template: /internal/evidence/regressions/{resource_id}
+    effect_type: read
+    disclosure: {kind: none}
+    credential_binding: null
+    limits: {}
+    retry_policy: none
+    idempotency_support: none
+    evidence_strategy: response_only
+    evidence_level_max: accepted
+    evidence_deadline_seconds: 0
+    intent_check_on_standing_rule: false
+    response_data_class: internal
+    redact_fields: []
+    response_limit_bytes: 65536
+    description: "회귀 시험 run report를 조회한다(holdout은 집계값만)"
+    schema_version: v1
+    owner: platform-team
+  - operation_id: discovery.source.read
+    # SPEC-QUESTION: endpoint_id/service_id/route_id/owner for discovery.* are not given; route paths are from COMMON
+    # (call path discovery) and TASK-02 4.
+    endpoint_id: discovery-api-v1
+    service_id: discovery
+    adapter_id: evidence-reader       # TASK-05 3.1: evidence-reader also serves /internal/discovery/snapshots/*
+    transport: https_rest
+    method: GET
+    route_id: discovery-source-v1
+    route_template: /internal/discovery/snapshots/{snapshot_id}/files
+    effect_type: read
+    disclosure: {kind: none}
+    credential_binding: null
+    # SPEC-QUESTION: TASK-02 3.2 gives start_line >= 1 (no upper bound) and end_line in start_line..start_line+400, which
+    # the catalog limits shape (required `max`, per-key ranges) cannot express exactly. Upper bound 2^53-1 follows the
+    # strict-JSON integer range (3.1); the 400-line span is recorded as `line_span`.
+    limits:
+      start_line: {min: 1, max: 9007199254740991}
+      end_line: {min: 1, max: 9007199254740991}
+      line_span: {min: 0, max: 400}
+    retry_policy: none
+    idempotency_support: none
+    evidence_strategy: response_only
+    evidence_level_max: accepted
+    evidence_deadline_seconds: 0
+    intent_check_on_standing_rule: false
+    # SPEC-QUESTION: response data class of snapshot source is not specified; `internal` (conservative).
+    response_data_class: internal
+    redact_fields: []
+    response_limit_bytes: 65536
+    description: "고정 snapshot 안의 소스 파일 줄 범위를 읽는다"
+    schema_version: v1
+    owner: platform-team
+  - operation_id: discovery.callgraph.read
+    endpoint_id: discovery-api-v1
+    service_id: discovery
+    adapter_id: evidence-reader
+    transport: https_rest
+    method: GET
+    route_id: discovery-callgraph-v1
+    route_template: /internal/discovery/snapshots/{snapshot_id}/callgraph
+    effect_type: read
+    disclosure: {kind: none}
+    credential_binding: null
+    limits:
+      depth: {min: 1, max: 3}
+    retry_policy: none
+    idempotency_support: none
+    evidence_strategy: response_only
+    evidence_level_max: accepted
+    evidence_deadline_seconds: 0
+    intent_check_on_standing_rule: false
+    response_data_class: internal
+    redact_fields: []
+    response_limit_bytes: 65536
+    description: "고정 snapshot의 symbol call graph를 깊이 3 이하로 읽는다"
+    schema_version: v1
+    owner: platform-team

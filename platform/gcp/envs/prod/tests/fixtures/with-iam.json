@@ -1,0 +1,24 @@
+{
+  "project": {
+    "id": "example-prod"
+  },
+  "iam": {
+    "oidc_client_secret": "projects/example-prod/secrets/oidc",
+    "credential_secret_resources": [
+      "projects/123456789012/secrets/receiver"
+    ]
+  },
+  "identity": {
+    "claim_key_secret": "projects/123456789012/secrets/identity-claim-key",
+    "claim_key_version": "1"
+  },
+  "receiver": {
+    "cluster_ip": "10.30.0.21",
+    "probe_cluster_ip": "10.30.0.22",
+    "receiver_mode": "idempotent",
+    "api_key_secret": "projects/123456789012/secrets/receiver",
+    "api_key_versions": [
+      "1"
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "project": {
+    "id": "example-prod"
+  },
+  "identity": {
+    "claim_key_secret": "projects/123456789012/secrets/identity-claim-key",
+    "claim_key_version": "1"
+  }
+}

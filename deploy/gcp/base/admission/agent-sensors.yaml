@@ -1,0 +1,204 @@
+# agent-sensors exception policy.
+# Source: docs/tech-specs/TASK-01-gke-platform.md 3.2.1. The spec defines the
+# rules in prose and a table but gives no literal YAML; this policy encodes:
+#   - approved SAs only, with Pod label app.kubernetes.io/name == KSA
+#     (COMMON "KSA and label rules"; TASK-06 3.1 KSA table adds netpol-collector),
+#   - images only from the agent-sensors.images digest list,
+#   - hostPath only from the per-SA table,
+#   - /var/log/network mounted readOnly for netpol-collector,
+#   - in a tetragon Pod every container except the regular "tetragon"
+#     container mounts only the export directory (readOnly), the spool and
+#     host /proc and /sys/fs/cgroup, the last two with readOnly: true,
+#     recursiveReadOnly: Enabled and mountPropagation: None all explicit; a
+#     missing option, IfPossible or HostToContainer is rejected (TASK-01 3.2.1
+#     "exporter host procfs deployment prerequisites", TASK-09 node nonce responder),
+#   - in a tetragon Pod only the regular "tetragon" container may be
+#     privileged, escalate privileges or add capabilities, and it alone runs
+#     the pinned agent-sensors.tetragon.image digest (TASK-01 3.2.1),
+#   - in a lifecycle-recorder Pod only the regular container named
+#     "containerd-proxy" mounts the containerd socket, and it mounts no other
+#     hostPath (TASK-01 3.2.1, TASK-09 3.6 containerd access boundary),
+#   - a lifecycle-recorder Pod shares no host namespace or process namespace,
+#     no container is privileged or may escalate, only the spool-owner init
+#     container adds a capability (CHOWN), every container other than
+#     containerd-proxy and spool-owner sets runAsNonRoot, and containerd-proxy
+#     mounts only the socket and emptyDir volumes (no token),
+#   - no host namespace other than hostPID (see SPEC-QUESTION on hostNetwork).
+# Params: ConfigMap agent-control/agent-role-constraints (constraints.yaml).
+#
+# SPEC-QUESTION: 3.2.1 says host namespaces other than hostPID are rejected,
+# but TASK-01 4 (node sensor row: "privileged exception, hostNetwork"), TASK-06 3.1
+# (all agent-sensors KSAs are "hostNetwork DaemonSet") and TASK-09 3.1
+# (Tetragon needs hostNetwork) require hostNetwork. Narrowest reading that keeps
+# the sensors deployable: hostIPC is rejected, hostPID and hostNetwork are not.
+# SPEC-QUESTION: the spec names the key agent-sensors.images but not the
+# ConfigMap holding it, nor a key for the Tetragon hostPath list (owned by
+# TASK-09 Helm values). Both are placed in agent-role-constraints, the only
+# other constraints ConfigMap in the admission baseline and drift-probe scope;
+# the Tetragon list key is agent-sensors.tetragon.hostPaths.
+# SPEC-QUESTION: "owner-only" for /var/lib/agentarium/netpol-spool is a host
+# directory mode; admission cannot see it. Only the path is checked here.
+# SPEC-QUESTION: the spec gives no message codes for this policy; the
+# SENSORS_* messages below follow the EXEC_/PROBE_/ROLE_ naming pattern.
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: agent-sensors-contract
+spec:
+  failurePolicy: Fail
+  paramKind:
+    apiVersion: v1
+    kind: ConfigMap
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: [CREATE, UPDATE]
+        resources: [pods, pods/ephemeralcontainers]
+  variables:
+    - name: allowedImages
+      expression: params.data['agent-sensors.images'].split(',')
+    - name: containers
+      expression: >-
+        object.spec.containers +
+        (has(object.spec.initContainers) ? object.spec.initContainers : []) +
+        (has(object.spec.ephemeralContainers) ? object.spec.ephemeralContainers : [])
+    # Every container of a tetragon Pod except the regular container named
+    # "tetragon" (init and ephemeral containers included), whatever its name or
+    # image, gets the exporter mount limits.
+    - name: nonTetragonContainers
+      expression: >-
+        object.spec.containers.filter(c, c.name != 'tetragon') +
+        (has(object.spec.initContainers) ? object.spec.initContainers : []) +
+        (has(object.spec.ephemeralContainers) ? object.spec.ephemeralContainers : [])
+    - name: tetragonImage
+      expression: params.data['agent-sensors.tetragon.image']
+    - name: hostPathVolumes
+      expression: >-
+        has(object.spec.volumes) ? object.spec.volumes.filter(v, has(v.hostPath)) : []
+    - name: allowedHostPaths
+      expression: >-
+        object.spec.serviceAccountName == 'tetragon' ?
+          params.data['agent-sensors.tetragon.hostPaths'].split(',') :
+        object.spec.serviceAccountName == 'lifecycle-recorder' ?
+          ['/run/containerd/containerd.sock', '/sys/fs/cgroup', '/var/lib/agentarium/lifecycle-spool'] :
+        object.spec.serviceAccountName == 'runtime-guard' ?
+          ['/var/run/nri'] :
+        object.spec.serviceAccountName == 'netpol-collector' ?
+          ['/var/log/network', '/var/lib/agentarium/netpol-spool'] :
+        []
+  validations:
+    - expression: >-
+        has(object.metadata.labels) &&
+        'app.kubernetes.io/name' in object.metadata.labels &&
+        object.metadata.labels['app.kubernetes.io/name'] in
+          ['tetragon', 'lifecycle-recorder', 'runtime-guard', 'netpol-collector'] &&
+        object.spec.serviceAccountName == object.metadata.labels['app.kubernetes.io/name']
+      message: SENSORS_IDENTITY_INVALID
+    - expression: >-
+        variables.containers.all(c, c.image.contains('@sha256:') && c.image in variables.allowedImages)
+      message: SENSORS_IMAGE_NOT_ALLOWED
+    - expression: >-
+        variables.hostPathVolumes.all(v, v.hostPath.path in variables.allowedHostPaths)
+      message: SENSORS_HOSTPATH_NOT_ALLOWED
+    - expression: >-
+        variables.hostPathVolumes.filter(v, v.hostPath.path == '/var/log/network').all(v,
+          variables.containers.all(c, !has(c.volumeMounts) ||
+            c.volumeMounts.all(m, m.name != v.name || (has(m.readOnly) && m.readOnly == true))))
+      message: SENSORS_HOSTPATH_NOT_READ_ONLY
+    - expression: >-
+        object.spec.serviceAccountName != 'tetragon' ||
+        variables.nonTetragonContainers.all(c,
+          !has(c.volumeMounts) || c.volumeMounts.all(m,
+            !variables.hostPathVolumes.exists(v, v.name == m.name) ||
+            variables.hostPathVolumes.exists(v, v.name == m.name &&
+              ((v.hostPath.path == '/var/run/cilium/tetragon' &&
+                has(m.readOnly) && m.readOnly == true) ||
+               (v.hostPath.path in ['/proc', '/sys/fs/cgroup'] &&
+                has(m.readOnly) && m.readOnly == true &&
+                has(m.recursiveReadOnly) && m.recursiveReadOnly == 'Enabled' &&
+                has(m.mountPropagation) && m.mountPropagation == 'None') ||
+               v.hostPath.path == '/var/lib/agentarium/sensor-spool'))))
+      message: SENSORS_EXPORTER_MOUNT_INVALID
+    # A privileged container ignores readOnly mounts and can remount them, so
+    # the export-directory limit above holds only if no other container is
+    # privileged. allowPrivilegeEscalation must be explicitly false.
+    - expression: >-
+        object.spec.serviceAccountName != 'tetragon' ||
+        variables.nonTetragonContainers.all(c,
+          has(c.securityContext) &&
+          !(has(c.securityContext.privileged) && c.securityContext.privileged == true) &&
+          has(c.securityContext.allowPrivilegeEscalation) && c.securityContext.allowPrivilegeEscalation == false &&
+          !(has(c.securityContext.capabilities) && has(c.securityContext.capabilities.add) &&
+            size(c.securityContext.capabilities.add) > 0))
+      message: SENSORS_CONTAINER_PRIVILEGE_INVALID
+    # The privileged container is the pinned Tetragon image, and no other
+    # container runs that image.
+    - expression: >-
+        object.spec.serviceAccountName != 'tetragon' ||
+        (object.spec.containers.all(c, c.name != 'tetragon' || c.image == variables.tetragonImage) &&
+         variables.nonTetragonContainers.all(c, c.image != variables.tetragonImage))
+      message: SENSORS_TETRAGON_IMAGE_INVALID
+    - expression: >-
+        variables.hostPathVolumes.filter(v, v.hostPath.path == '/sys/fs/cgroup').all(v,
+          variables.containers.all(c, !has(c.volumeMounts) ||
+            c.volumeMounts.all(m, m.name != v.name || (has(m.readOnly) && m.readOnly == true))))
+      message: SENSORS_HOSTPATH_NOT_READ_ONLY
+    # The socket is mounted by exactly the regular containerd-proxy container
+    # (names are unique across regular, init and ephemeral containers), and
+    # that container mounts no other hostPath.
+    - expression: >-
+        object.spec.serviceAccountName != 'lifecycle-recorder' ||
+        (variables.containers.all(c,
+          !has(c.volumeMounts) || c.volumeMounts.all(m,
+            !variables.hostPathVolumes.exists(v, v.name == m.name) ||
+            variables.hostPathVolumes.exists(v, v.name == m.name &&
+              (v.hostPath.path == '/run/containerd/containerd.sock') == (c.name == 'containerd-proxy')))) &&
+         !(has(object.spec.initContainers) && object.spec.initContainers.exists(c, c.name == 'containerd-proxy')) &&
+         !(has(object.spec.ephemeralContainers) && object.spec.ephemeralContainers.exists(c, c.name == 'containerd-proxy')))
+      message: SENSORS_CONTAINERD_SOCKET_MOUNT_INVALID
+    # Without these, a recorder container could reach the socket through
+    # hostPID and privileged (/proc/1/root/run/containerd/containerd.sock).
+    - expression: >-
+        object.spec.serviceAccountName != 'lifecycle-recorder' ||
+        (!(has(object.spec.hostPID) && object.spec.hostPID) &&
+         !(has(object.spec.hostNetwork) && object.spec.hostNetwork) &&
+         !(has(object.spec.shareProcessNamespace) && object.spec.shareProcessNamespace) &&
+         variables.containers.all(c,
+           has(c.securityContext) &&
+           !(has(c.securityContext.privileged) && c.securityContext.privileged) &&
+           has(c.securityContext.allowPrivilegeEscalation) && c.securityContext.allowPrivilegeEscalation == false &&
+           (!has(c.securityContext.capabilities) || !has(c.securityContext.capabilities.add) ||
+            size(c.securityContext.capabilities.add) == 0 ||
+            (c.securityContext.capabilities.add == ['CHOWN'] && c.name == 'spool-owner' &&
+             has(object.spec.initContainers) && object.spec.initContainers.exists(i, i.name == 'spool-owner'))) &&
+           (c.name == 'containerd-proxy' ||
+            (c.name == 'spool-owner' && has(object.spec.initContainers) && object.spec.initContainers.exists(i, i.name == 'spool-owner')) ||
+            (has(c.securityContext.runAsNonRoot) && c.securityContext.runAsNonRoot))))
+      message: SENSORS_RECORDER_PRIVILEGE_INVALID
+    - expression: >-
+        object.spec.serviceAccountName != 'lifecycle-recorder' ||
+        object.spec.containers.filter(c, c.name == 'containerd-proxy').all(c,
+          !has(c.volumeMounts) || c.volumeMounts.all(m,
+            has(object.spec.volumes) && object.spec.volumes.exists(v, v.name == m.name &&
+              (has(v.emptyDir) || (has(v.hostPath) && v.hostPath.path == '/run/containerd/containerd.sock')))))
+      message: SENSORS_RECORDER_PROXY_VOLUME_INVALID
+    - expression: >-
+        !has(object.spec.hostIPC) || object.spec.hostIPC == false
+      message: SENSORS_HOST_NAMESPACE_FORBIDDEN
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: agent-sensors-contract
+spec:
+  policyName: agent-sensors-contract
+  validationActions: [Deny]
+  paramRef:
+    name: agent-role-constraints
+    namespace: agent-control
+    parameterNotFoundAction: Deny
+  matchResources:
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: agent-sensors

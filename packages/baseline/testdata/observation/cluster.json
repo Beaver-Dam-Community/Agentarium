@@ -1,0 +1,105 @@
+{
+  "name": "agentarium-prod",
+  "location": "asia-northeast3",
+  "resourceLabels": {
+    "env": "prod"
+  },
+  "currentMasterVersion": "1.33.5-gke.100",
+  "maintenancePolicy": {
+    "resourceVersion": "e3b0c442",
+    "window": {
+      "dailyMaintenanceWindow": {
+        "startTime": "03:00"
+      },
+      "maintenanceExclusions": {
+        "no-node-upgrades": {
+          "startTime": "2026-10-01T00:00:00Z",
+          "endTime": "2027-01-01T00:00:00Z",
+          "maintenanceExclusionOptions": {
+            "scope": "NO_MINOR_OR_NODE_UPGRADES"
+          }
+        }
+      }
+    }
+  },
+  "nodePools": [
+    {
+      "name": "system-pool",
+      "config": {
+        "machineType": "e2-standard-2",
+        "taints": [
+          {
+            "key": "components.gke.io/gke-managed-components",
+            "value": "true",
+            "effect": "NO_SCHEDULE"
+          }
+        ],
+        "labels": {
+          "node-restriction.kubernetes.io/agentarium-role": "system"
+        },
+        "workloadMetadataConfig": {
+          "mode": "GKE_METADATA"
+        }
+      },
+      "management": {
+        "autoUpgrade": true,
+        "autoRepair": true
+      },
+      "status": "RUNNING",
+      "version": "1.33.5-gke.100"
+    },
+    {
+      "name": "exec-pool",
+      "config": {
+        "machineType": "e2-standard-4",
+        "taints": [
+          {
+            "key": "agentarium-role",
+            "value": "exec",
+            "effect": "NO_SCHEDULE"
+          },
+          {
+            "key": "agentarium.io/observe-not-ready",
+            "value": "true",
+            "effect": "NO_SCHEDULE"
+          }
+        ],
+        "labels": {
+          "node-restriction.kubernetes.io/agentarium-role": "exec"
+        },
+        "workloadMetadataConfig": {
+          "mode": "GKE_METADATA"
+        }
+      },
+      "management": {
+        "autoUpgrade": true
+      },
+      "status": "RUNNING",
+      "initialNodeCount": 2
+    },
+    {
+      "name": "control-pool",
+      "config": {
+        "machineType": "e2-standard-4",
+        "taints": [
+          {
+            "key": "agentarium.io/observe-not-ready",
+            "value": "true",
+            "effect": "NO_SCHEDULE"
+          }
+        ],
+        "labels": {
+          "node-restriction.kubernetes.io/agentarium-role": "control"
+        },
+        "workloadMetadataConfig": {
+          "mode": "GKE_METADATA"
+        }
+      },
+      "management": {
+        "autoUpgrade": true,
+        "autoRepair": true
+      },
+      "status": "RUNNING"
+    }
+  ]
+}

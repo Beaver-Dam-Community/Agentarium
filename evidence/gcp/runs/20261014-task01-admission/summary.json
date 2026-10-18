@@ -1,0 +1,42 @@
+{
+  "task_id": "TASK-01",
+  "status": "pass",
+  "implementation_commit": "3a84d6a11f9144f81c80848693d4681b06a02e50",
+  "image_digest": null,
+  "environment_manifest": "manifest.json",
+  "policy_bundle_id": null,
+  "policy_epoch": null,
+  "run_id": "20261014-task01-admission",
+  "run_kind": "platform_admission_live",
+  "fixture_set_digest": "a215b4946db9819426fb53f05bb9d27584d18c57fa25f0eea69da4ff3d35b3ff",
+  "baseline_bundle_digest": null,
+  "candidate_digest": null,
+  "expected_cases": 34,
+  "observed_cases": 34,
+  "passed": 34,
+  "failed": 0,
+  "unknown": 0,
+  "metrics": null,
+  "invariants": null,
+  "release_eligible": null,
+  "startup_capture": null,
+  "evidence_refs": [
+    "expected.json",
+    "observed.jsonl",
+    "report.md",
+    "admission-sleeper asia-northeast3-docker.pkg.dev/karrot-rina/agentarium/admission-sleeper@sha256:efebe46613059e183b9b55035376164162b49f46930c2423f98d131d439ae04d",
+    "admission-runtime-standin asia-northeast3-docker.pkg.dev/karrot-rina/agentarium/admission-runtime-standin@sha256:b90b50cebd7e1a24f8215e55198da01891024ad000327831cdf604351a39f4d5",
+    "admission-probe-standin asia-northeast3-docker.pkg.dev/karrot-rina/agentarium/admission-probe-standin@sha256:0788eaeda034e6385e5e183b696150d9064cfdf5f8a0b11c82fdbc0a0f4da359",
+    "admission-fixture-standin asia-northeast3-docker.pkg.dev/karrot-rina/agentarium/admission-fixture-standin@sha256:e322c97b9bf9f270c797ce0175bdadb9dec55254eb7a86c7685d218d9631a44c"
+  ],
+  "limitations": [
+    "runtime/probe/fixture images are stand-ins (a SIGTERM-waiting process at the fixed entrypoint); admission and placement only, no runtime behaviour",
+    "single repetition",
+    "NRI bypass annotation (forbiddenAnnotationKeys comes from the Q0 runtime profile; empty here)",
+    "RBAC matrix, node-readiness gating, bootstrap order (M1+)",
+    "ephemeral container add (needs a running runtime Pod)",
+    "rollout within 10 minutes (needs the runtime Deployment, TASK-15)",
+    "runtime_resources_removed: recorded only, observed=admitted (LimitRange defaulted the resources)",
+    "VAP typeChecking was not recorded in this run (recorded in 20261015-task01-admission-delta)"
+  ]
+}

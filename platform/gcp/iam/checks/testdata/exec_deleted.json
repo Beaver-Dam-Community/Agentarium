@@ -1,0 +1,12 @@
+{
+  "bindings": [
+    {
+      "members": [
+        "deleted:principal://iam.googleapis.com/projects/111111111111/locations/global/workloadIdentityPools/example-prod.svc.id.goog/subject/ns/agent-exec/sa/agent-runtime?uid=123456789"
+      ],
+      "role": "roles/storage.objectViewer"
+    }
+  ],
+  "etag": "BwYAAAAAAAA=",
+  "version": 1
+}

@@ -1,0 +1,14 @@
+{"kind":"start","seq":0,"time":"2026-10-14T13:19:20.735075005Z","pid":1,"ok":true}
+{"kind":"process","seq":0,"time":"2026-10-14T13:19:20.740046969Z","pid":11,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":1,"time":"2026-10-14T13:19:20.808323515Z","pid":15,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"process","seq":2,"time":"2026-10-14T13:19:20.811172406Z","pid":19,"path":"/app/bin/probe-runner","ok":true}
+{"kind":"tcp","seq":0,"time":"2026-10-14T13:19:23.813823386Z","remote":"10.30.0.1:443","errno":"dial tcp 10.30.0.1:443: i/o timeout","ok":false}
+{"kind":"tcp","seq":1,"time":"2026-10-14T13:19:26.866456698Z","remote":"10.30.0.1:443","errno":"dial tcp 10.30.0.1:443: i/o timeout","ok":false}
+{"kind":"tcp","seq":2,"time":"2026-10-14T13:19:29.919158497Z","remote":"10.30.0.1:443","errno":"dial tcp 10.30.0.1:443: i/o timeout","ok":false}
+{"kind":"file_open_allowed","seq":0,"time":"2026-10-14T13:19:29.969750858Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":1,"time":"2026-10-14T13:19:29.969834142Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_allowed","seq":2,"time":"2026-10-14T13:19:29.969885221Z","path":"/work/protected-fixture","ok":true}
+{"kind":"file_open_denied","seq":0,"time":"2026-10-14T13:19:29.969972384Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":1,"time":"2026-10-14T13:19:29.970018305Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"file_open_denied","seq":2,"time":"2026-10-14T13:19:29.970039626Z","path":"/work/protected-fixture","errno":"permission denied","ok":false}
+{"kind":"done","seq":0,"time":"2026-10-14T13:19:29.970045552Z","ok":true}

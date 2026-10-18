@@ -1,0 +1,206 @@
+[
+  {
+    "test": "TestLiveAdmission",
+    "case": "allowed_control_pod",
+    "namespace": "agent-targets",
+    "expected": "Running on a control node"
+  },
+  {
+    "test": "TestLiveAdmission",
+    "case": "privileged",
+    "namespace": "agent-targets",
+    "expected": "rejected (PodSecurity)"
+  },
+  {
+    "test": "TestLiveAdmission",
+    "case": "host_network",
+    "namespace": "agent-targets",
+    "expected": "rejected (PodSecurity)"
+  },
+  {
+    "test": "TestLiveAdmission",
+    "case": "tag_image",
+    "namespace": "agent-targets",
+    "expected": "rejected (ROLE_IMAGE_NOT_ALLOWED)"
+  },
+  {
+    "test": "TestLiveAdmission",
+    "case": "digest_not_allowed",
+    "namespace": "agent-targets",
+    "expected": "rejected (ROLE_IMAGE_NOT_ALLOWED)"
+  },
+  {
+    "test": "TestLiveAdmission",
+    "case": "exec_node_selected",
+    "namespace": "agent-targets",
+    "expected": "rejected (ROLE_PLACEMENT_INVALID)"
+  },
+  {
+    "test": "TestLiveAdmission",
+    "case": "node_name_set",
+    "namespace": "agent-targets",
+    "expected": "rejected (ROLE_PLACEMENT_INVALID)"
+  },
+  {
+    "test": "TestLiveAdmission",
+    "case": "other_scheduler",
+    "namespace": "agent-targets",
+    "expected": "rejected (ROLE_PLACEMENT_INVALID)"
+  },
+  {
+    "test": "TestLiveAdmission",
+    "case": "label_sa_mismatch",
+    "namespace": "agent-targets",
+    "expected": "rejected (ROLE_LABEL_OR_PRIORITY_INVALID)"
+  },
+  {
+    "test": "TestLiveAdmission",
+    "case": "runtime_priority_class",
+    "namespace": "agent-targets",
+    "expected": "rejected (ROLE_LABEL_OR_PRIORITY_INVALID)"
+  },
+  {
+    "test": "TestLiveAdmission",
+    "case": "runtime_class_set",
+    "namespace": "agent-targets",
+    "expected": "rejected (ROLE_RUNTIME_INVALID)"
+  },
+  {
+    "test": "TestLiveAdmission",
+    "case": "adapter_start_taint_toleration",
+    "namespace": "agent-adapters",
+    "expected": "rejected (ROLE_ADAPTER_BOOTSTRAP_TOLERATION_FORBIDDEN)"
+  },
+  {
+    "test": "TestLiveAdmission",
+    "case": "exec_pod_without_runtime_contract",
+    "namespace": "agent-exec",
+    "expected": "rejected (denied)"
+  },
+  {
+    "test": "TestLiveAdmission",
+    "case": "exec_pod_on_control",
+    "namespace": "agent-exec",
+    "expected": "rejected (denied)"
+  },
+  {
+    "test": "TestLiveExecProfiles",
+    "case": "runtime_pending_under_start_taint",
+    "namespace": "agent-exec",
+    "expected": "admitted; Pending with an untolerated observe-not-ready taint; agent-runtime-quota pods=1"
+  },
+  {
+    "test": "TestLiveExecProfiles",
+    "case": "probe_runs_before_readiness",
+    "namespace": "agent-exec",
+    "expected": "Running on an exec node; agent-probe-quota pods>=1; agent-runtime-quota pods unchanged (1)"
+  },
+  {
+    "test": "TestLiveExecProfiles",
+    "case": "fixture_pending_under_start_taint",
+    "namespace": "agent-exec",
+    "expected": "admitted; Pending with an untolerated observe-not-ready taint"
+  },
+  {
+    "test": "TestLiveExecProfiles",
+    "case": "runtime_privileged",
+    "namespace": "agent-exec",
+    "expected": "rejected (PodSecurity)"
+  },
+  {
+    "test": "TestLiveExecProfiles",
+    "case": "runtime_on_control",
+    "namespace": "agent-exec",
+    "expected": "rejected (EXEC_PLACEMENT_INVALID)"
+  },
+  {
+    "test": "TestLiveExecProfiles",
+    "case": "runtime_secret_volume",
+    "namespace": "agent-exec",
+    "expected": "rejected (EXEC_SECRET_OR_VOLUME_INVALID)"
+  },
+  {
+    "test": "TestLiveExecProfiles",
+    "case": "runtime_other_digest",
+    "namespace": "agent-exec",
+    "expected": "rejected (EXEC_IMAGE_OR_ENTRYPOINT_INVALID)"
+  },
+  {
+    "test": "TestLiveExecProfiles",
+    "case": "runtime_probe_image",
+    "namespace": "agent-exec",
+    "expected": "rejected (EXEC_IMAGE_OR_ENTRYPOINT_INVALID)"
+  },
+  {
+    "test": "TestLiveExecProfiles",
+    "case": "runtime_token_automount",
+    "namespace": "agent-exec",
+    "expected": "rejected (EXEC_IDENTITY_INVALID)"
+  },
+  {
+    "test": "TestLiveExecProfiles",
+    "case": "runtime_other_audience",
+    "namespace": "agent-exec",
+    "expected": "rejected (EXEC_SECRET_OR_VOLUME_INVALID)"
+  },
+  {
+    "test": "TestLiveExecProfiles",
+    "case": "runtime_large_work_dir",
+    "namespace": "agent-exec",
+    "expected": "rejected (EXEC_SECRET_OR_VOLUME_INVALID)"
+  },
+  {
+    "test": "TestLiveExecProfiles",
+    "case": "runtime_runtime_class",
+    "namespace": "agent-exec",
+    "expected": "rejected (EXEC_RUNTIME_INVALID)"
+  },
+  {
+    "test": "TestLiveExecProfiles",
+    "case": "runtime_start_taint_toleration",
+    "namespace": "agent-exec",
+    "expected": "rejected (EXEC_TOLERATION_INVALID)"
+  },
+  {
+    "test": "TestLiveExecProfiles",
+    "case": "runtime_second_container",
+    "namespace": "agent-exec",
+    "expected": "rejected (EXEC_CONTAINER_SET_INVALID)"
+  },
+  {
+    "test": "TestLiveExecProfiles",
+    "case": "probe_label_with_runtime_sa",
+    "namespace": "agent-exec",
+    "expected": "rejected (EXEC_ROLE_LABEL_INVALID)"
+  },
+  {
+    "test": "TestLiveExecProfiles",
+    "case": "probe_with_runtime_image",
+    "namespace": "agent-exec",
+    "expected": "rejected (PROBE_IMAGE_OR_ENTRYPOINT_INVALID)"
+  },
+  {
+    "test": "TestLiveExecProfiles",
+    "case": "probe_wrong_entrypoint",
+    "namespace": "agent-exec",
+    "expected": "rejected (PROBE_IMAGE_OR_ENTRYPOINT_INVALID)"
+  },
+  {
+    "test": "TestLiveExecProfiles",
+    "case": "fixture_restart_always",
+    "namespace": "agent-exec",
+    "expected": "rejected (FIXTURE_RESTART_POLICY_INVALID)"
+  },
+  {
+    "test": "TestLiveExecProfiles",
+    "case": "fixture_start_taint_toleration",
+    "namespace": "agent-exec",
+    "expected": "rejected (PROBE_TOLERATION_INVALID)"
+  },
+  {
+    "test": "TestLiveExecProfiles",
+    "case": "unknown_profile_label",
+    "namespace": "agent-exec",
+    "expected": "rejected (EXEC_ROLE_LABEL_INVALID)"
+  }
+]

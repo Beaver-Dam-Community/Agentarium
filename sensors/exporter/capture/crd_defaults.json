@@ -1,0 +1,1379 @@
+{
+ "source": {
+  "cilium.io_tracingpolicies.yaml": "sha256:21aef097670ccda504fa23e072292f9497e4d82575862a22acef9a5fc8b77e70",
+  "cilium.io_tracingpoliciesnamespaced.yaml": "sha256:2d25afefa30872ea116ee491f3522b54c101259c15e7620290ba4e1a9ff4c33e",
+  "release": "cilium/tetragon v1.7.1"
+ },
+ "specs": {
+  "TracingPolicy": {
+   "properties": {
+    "fentries": {
+     "items": {
+      "properties": {
+       "args": {
+        "items": {
+         "properties": {
+          "maxData": {
+           "default": false
+          },
+          "resolve": {
+           "default": ""
+          },
+          "returnCopy": {
+           "default": false
+          },
+          "type": {
+           "default": "auto"
+          }
+         }
+        }
+       },
+       "data": {
+        "items": {
+         "properties": {
+          "maxData": {
+           "default": false
+          },
+          "resolve": {
+           "default": ""
+          },
+          "returnCopy": {
+           "default": false
+          },
+          "type": {
+           "default": "auto"
+          }
+         }
+        }
+       },
+       "return": {
+        "default": false
+       },
+       "returnArg": {
+        "properties": {
+         "maxData": {
+          "default": false
+         },
+         "resolve": {
+          "default": ""
+         },
+         "returnCopy": {
+          "default": false
+         },
+         "type": {
+          "default": "auto"
+         }
+        }
+       },
+       "selectors": {
+        "items": {
+         "properties": {
+          "matchBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchCapabilities": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchCapabilityChanges": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchPIDs": {
+           "items": {
+            "properties": {
+             "followForks": {
+              "default": false
+             },
+             "isNamespacePID": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchParentBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          }
+         }
+        }
+       },
+       "syscall": {
+        "default": true
+       }
+      }
+     }
+    },
+    "kprobes": {
+     "items": {
+      "properties": {
+       "args": {
+        "items": {
+         "properties": {
+          "maxData": {
+           "default": false
+          },
+          "resolve": {
+           "default": ""
+          },
+          "returnCopy": {
+           "default": false
+          },
+          "type": {
+           "default": "auto"
+          }
+         }
+        }
+       },
+       "data": {
+        "items": {
+         "properties": {
+          "maxData": {
+           "default": false
+          },
+          "resolve": {
+           "default": ""
+          },
+          "returnCopy": {
+           "default": false
+          },
+          "type": {
+           "default": "auto"
+          }
+         }
+        }
+       },
+       "return": {
+        "default": false
+       },
+       "returnArg": {
+        "properties": {
+         "maxData": {
+          "default": false
+         },
+         "resolve": {
+          "default": ""
+         },
+         "returnCopy": {
+          "default": false
+         },
+         "type": {
+          "default": "auto"
+         }
+        }
+       },
+       "selectors": {
+        "items": {
+         "properties": {
+          "matchBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchCapabilities": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchCapabilityChanges": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchPIDs": {
+           "items": {
+            "properties": {
+             "followForks": {
+              "default": false
+             },
+             "isNamespacePID": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchParentBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          }
+         }
+        }
+       },
+       "syscall": {
+        "default": true
+       }
+      }
+     }
+    },
+    "lsmhooks": {
+     "items": {
+      "properties": {
+       "args": {
+        "items": {
+         "properties": {
+          "maxData": {
+           "default": false
+          },
+          "resolve": {
+           "default": ""
+          },
+          "returnCopy": {
+           "default": false
+          },
+          "type": {
+           "default": "auto"
+          }
+         }
+        }
+       },
+       "selectors": {
+        "items": {
+         "properties": {
+          "matchBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchCapabilities": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchCapabilityChanges": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchPIDs": {
+           "items": {
+            "properties": {
+             "followForks": {
+              "default": false
+             },
+             "isNamespacePID": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchParentBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "selectorsMacros": {
+     "additionalProperties": {
+      "properties": {
+       "matchBinaries": {
+        "items": {
+         "properties": {
+          "followChildren": {
+           "default": false
+          }
+         }
+        }
+       },
+       "matchCapabilities": {
+        "items": {
+         "properties": {
+          "isNamespaceCapability": {
+           "default": false
+          },
+          "type": {
+           "default": "Effective"
+          }
+         }
+        }
+       },
+       "matchCapabilityChanges": {
+        "items": {
+         "properties": {
+          "isNamespaceCapability": {
+           "default": false
+          },
+          "type": {
+           "default": "Effective"
+          }
+         }
+        }
+       },
+       "matchPIDs": {
+        "items": {
+         "properties": {
+          "followForks": {
+           "default": false
+          },
+          "isNamespacePID": {
+           "default": false
+          }
+         }
+        }
+       },
+       "matchParentBinaries": {
+        "items": {
+         "properties": {
+          "followChildren": {
+           "default": false
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "tracepoints": {
+     "items": {
+      "properties": {
+       "args": {
+        "items": {
+         "properties": {
+          "maxData": {
+           "default": false
+          },
+          "resolve": {
+           "default": ""
+          },
+          "returnCopy": {
+           "default": false
+          },
+          "type": {
+           "default": "auto"
+          }
+         }
+        }
+       },
+       "selectors": {
+        "items": {
+         "properties": {
+          "matchBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchCapabilities": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchCapabilityChanges": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchPIDs": {
+           "items": {
+            "properties": {
+             "followForks": {
+              "default": false
+             },
+             "isNamespacePID": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchParentBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "uprobes": {
+     "items": {
+      "properties": {
+       "args": {
+        "items": {
+         "properties": {
+          "maxData": {
+           "default": false
+          },
+          "resolve": {
+           "default": ""
+          },
+          "returnCopy": {
+           "default": false
+          },
+          "type": {
+           "default": "auto"
+          }
+         }
+        }
+       },
+       "data": {
+        "items": {
+         "properties": {
+          "maxData": {
+           "default": false
+          },
+          "resolve": {
+           "default": ""
+          },
+          "returnCopy": {
+           "default": false
+          },
+          "type": {
+           "default": "auto"
+          }
+         }
+        }
+       },
+       "return": {
+        "default": false
+       },
+       "returnArg": {
+        "properties": {
+         "maxData": {
+          "default": false
+         },
+         "resolve": {
+          "default": ""
+         },
+         "returnCopy": {
+          "default": false
+         },
+         "type": {
+          "default": "auto"
+         }
+        }
+       },
+       "selectors": {
+        "items": {
+         "properties": {
+          "matchBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchCapabilities": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchCapabilityChanges": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchPIDs": {
+           "items": {
+            "properties": {
+             "followForks": {
+              "default": false
+             },
+             "isNamespacePID": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchParentBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "usdts": {
+     "items": {
+      "properties": {
+       "args": {
+        "items": {
+         "properties": {
+          "maxData": {
+           "default": false
+          },
+          "resolve": {
+           "default": ""
+          },
+          "returnCopy": {
+           "default": false
+          },
+          "type": {
+           "default": "auto"
+          }
+         }
+        }
+       },
+       "selectors": {
+        "items": {
+         "properties": {
+          "matchBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchCapabilities": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchCapabilityChanges": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchPIDs": {
+           "items": {
+            "properties": {
+             "followForks": {
+              "default": false
+             },
+             "isNamespacePID": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchParentBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "TracingPolicyNamespaced": {
+   "properties": {
+    "fentries": {
+     "items": {
+      "properties": {
+       "args": {
+        "items": {
+         "properties": {
+          "maxData": {
+           "default": false
+          },
+          "resolve": {
+           "default": ""
+          },
+          "returnCopy": {
+           "default": false
+          },
+          "type": {
+           "default": "auto"
+          }
+         }
+        }
+       },
+       "data": {
+        "items": {
+         "properties": {
+          "maxData": {
+           "default": false
+          },
+          "resolve": {
+           "default": ""
+          },
+          "returnCopy": {
+           "default": false
+          },
+          "type": {
+           "default": "auto"
+          }
+         }
+        }
+       },
+       "return": {
+        "default": false
+       },
+       "returnArg": {
+        "properties": {
+         "maxData": {
+          "default": false
+         },
+         "resolve": {
+          "default": ""
+         },
+         "returnCopy": {
+          "default": false
+         },
+         "type": {
+          "default": "auto"
+         }
+        }
+       },
+       "selectors": {
+        "items": {
+         "properties": {
+          "matchBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchCapabilities": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchCapabilityChanges": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchPIDs": {
+           "items": {
+            "properties": {
+             "followForks": {
+              "default": false
+             },
+             "isNamespacePID": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchParentBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          }
+         }
+        }
+       },
+       "syscall": {
+        "default": true
+       }
+      }
+     }
+    },
+    "kprobes": {
+     "items": {
+      "properties": {
+       "args": {
+        "items": {
+         "properties": {
+          "maxData": {
+           "default": false
+          },
+          "resolve": {
+           "default": ""
+          },
+          "returnCopy": {
+           "default": false
+          },
+          "type": {
+           "default": "auto"
+          }
+         }
+        }
+       },
+       "data": {
+        "items": {
+         "properties": {
+          "maxData": {
+           "default": false
+          },
+          "resolve": {
+           "default": ""
+          },
+          "returnCopy": {
+           "default": false
+          },
+          "type": {
+           "default": "auto"
+          }
+         }
+        }
+       },
+       "return": {
+        "default": false
+       },
+       "returnArg": {
+        "properties": {
+         "maxData": {
+          "default": false
+         },
+         "resolve": {
+          "default": ""
+         },
+         "returnCopy": {
+          "default": false
+         },
+         "type": {
+          "default": "auto"
+         }
+        }
+       },
+       "selectors": {
+        "items": {
+         "properties": {
+          "matchBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchCapabilities": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchCapabilityChanges": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchPIDs": {
+           "items": {
+            "properties": {
+             "followForks": {
+              "default": false
+             },
+             "isNamespacePID": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchParentBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          }
+         }
+        }
+       },
+       "syscall": {
+        "default": true
+       }
+      }
+     }
+    },
+    "lsmhooks": {
+     "items": {
+      "properties": {
+       "args": {
+        "items": {
+         "properties": {
+          "maxData": {
+           "default": false
+          },
+          "resolve": {
+           "default": ""
+          },
+          "returnCopy": {
+           "default": false
+          },
+          "type": {
+           "default": "auto"
+          }
+         }
+        }
+       },
+       "selectors": {
+        "items": {
+         "properties": {
+          "matchBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchCapabilities": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchCapabilityChanges": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchPIDs": {
+           "items": {
+            "properties": {
+             "followForks": {
+              "default": false
+             },
+             "isNamespacePID": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchParentBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "selectorsMacros": {
+     "additionalProperties": {
+      "properties": {
+       "matchBinaries": {
+        "items": {
+         "properties": {
+          "followChildren": {
+           "default": false
+          }
+         }
+        }
+       },
+       "matchCapabilities": {
+        "items": {
+         "properties": {
+          "isNamespaceCapability": {
+           "default": false
+          },
+          "type": {
+           "default": "Effective"
+          }
+         }
+        }
+       },
+       "matchCapabilityChanges": {
+        "items": {
+         "properties": {
+          "isNamespaceCapability": {
+           "default": false
+          },
+          "type": {
+           "default": "Effective"
+          }
+         }
+        }
+       },
+       "matchPIDs": {
+        "items": {
+         "properties": {
+          "followForks": {
+           "default": false
+          },
+          "isNamespacePID": {
+           "default": false
+          }
+         }
+        }
+       },
+       "matchParentBinaries": {
+        "items": {
+         "properties": {
+          "followChildren": {
+           "default": false
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "tracepoints": {
+     "items": {
+      "properties": {
+       "args": {
+        "items": {
+         "properties": {
+          "maxData": {
+           "default": false
+          },
+          "resolve": {
+           "default": ""
+          },
+          "returnCopy": {
+           "default": false
+          },
+          "type": {
+           "default": "auto"
+          }
+         }
+        }
+       },
+       "selectors": {
+        "items": {
+         "properties": {
+          "matchBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchCapabilities": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchCapabilityChanges": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchPIDs": {
+           "items": {
+            "properties": {
+             "followForks": {
+              "default": false
+             },
+             "isNamespacePID": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchParentBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "uprobes": {
+     "items": {
+      "properties": {
+       "args": {
+        "items": {
+         "properties": {
+          "maxData": {
+           "default": false
+          },
+          "resolve": {
+           "default": ""
+          },
+          "returnCopy": {
+           "default": false
+          },
+          "type": {
+           "default": "auto"
+          }
+         }
+        }
+       },
+       "data": {
+        "items": {
+         "properties": {
+          "maxData": {
+           "default": false
+          },
+          "resolve": {
+           "default": ""
+          },
+          "returnCopy": {
+           "default": false
+          },
+          "type": {
+           "default": "auto"
+          }
+         }
+        }
+       },
+       "return": {
+        "default": false
+       },
+       "returnArg": {
+        "properties": {
+         "maxData": {
+          "default": false
+         },
+         "resolve": {
+          "default": ""
+         },
+         "returnCopy": {
+          "default": false
+         },
+         "type": {
+          "default": "auto"
+         }
+        }
+       },
+       "selectors": {
+        "items": {
+         "properties": {
+          "matchBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchCapabilities": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchCapabilityChanges": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchPIDs": {
+           "items": {
+            "properties": {
+             "followForks": {
+              "default": false
+             },
+             "isNamespacePID": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchParentBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "usdts": {
+     "items": {
+      "properties": {
+       "args": {
+        "items": {
+         "properties": {
+          "maxData": {
+           "default": false
+          },
+          "resolve": {
+           "default": ""
+          },
+          "returnCopy": {
+           "default": false
+          },
+          "type": {
+           "default": "auto"
+          }
+         }
+        }
+       },
+       "selectors": {
+        "items": {
+         "properties": {
+          "matchBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchCapabilities": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchCapabilityChanges": {
+           "items": {
+            "properties": {
+             "isNamespaceCapability": {
+              "default": false
+             },
+             "type": {
+              "default": "Effective"
+             }
+            }
+           }
+          },
+          "matchPIDs": {
+           "items": {
+            "properties": {
+             "followForks": {
+              "default": false
+             },
+             "isNamespacePID": {
+              "default": false
+             }
+            }
+           }
+          },
+          "matchParentBinaries": {
+           "items": {
+            "properties": {
+             "followChildren": {
+              "default": false
+             }
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,113 @@
+{
+  "apiVersion": "rbac.authorization.k8s.io/v1",
+  "kind": "RoleList",
+  "metadata": {
+    "resourceVersion": "999"
+  },
+  "items": [
+    {
+      "metadata": {
+        "name": "runtime",
+        "resourceVersion": "123",
+        "uid": "0f6c7b8e-0000-4000-8000-000000000001",
+        "creationTimestamp": "2026-10-01T00:00:00Z",
+        "generation": 3,
+        "managedFields": [
+          {
+            "manager": "kubectl",
+            "operation": "Apply"
+          }
+        ],
+        "namespace": "agent-exec"
+      },
+      "rules": []
+    },
+    {
+      "metadata": {
+        "name": "tetragon",
+        "resourceVersion": "123",
+        "uid": "0f6c7b8e-0000-4000-8000-000000000001",
+        "creationTimestamp": "2026-10-01T00:00:00Z",
+        "generation": 3,
+        "managedFields": [
+          {
+            "manager": "kubectl",
+            "operation": "Apply"
+          }
+        ],
+        "namespace": "agent-sensors"
+      },
+      "rules": [
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "configmaps"
+          ],
+          "verbs": [
+            "get"
+          ]
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "name": "probe-reader",
+        "resourceVersion": "123",
+        "uid": "0f6c7b8e-0000-4000-8000-000000000001",
+        "creationTimestamp": "2026-10-01T00:00:00Z",
+        "generation": 3,
+        "managedFields": [
+          {
+            "manager": "kubectl",
+            "operation": "Apply"
+          }
+        ],
+        "namespace": "agent-targets"
+      },
+      "rules": [
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "pods"
+          ],
+          "verbs": [
+            "get"
+          ]
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "name": "unrelated",
+        "resourceVersion": "123",
+        "uid": "0f6c7b8e-0000-4000-8000-000000000001",
+        "creationTimestamp": "2026-10-01T00:00:00Z",
+        "generation": 3,
+        "managedFields": [
+          {
+            "manager": "kubectl",
+            "operation": "Apply"
+          }
+        ],
+        "namespace": "agent-control"
+      },
+      "rules": [
+        {
+          "apiGroups": [
+            ""
+          ],
+          "resources": [
+            "secrets"
+          ],
+          "verbs": [
+            "get"
+          ]
+        }
+      ]
+    }
+  ]
+}

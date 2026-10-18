@@ -1,0 +1,33 @@
+# TASK-02 3.4 (snapshot creation): discovery creates the snapshot Job in
+# agent-observe, reads its status, and lists that Job's Pods (job-name label
+# selector) to keep the Kubernetes-reported termination reason. Job names are
+# generated per request, so resourceNames are not possible. Job create would
+# otherwise let discovery run a Pod as any agent-observe ServiceAccount; the
+# admission policies in ../admission/discovery-snapshot.yaml pin every Job it
+# creates to the discovery-snapshot KSA, scanner image, arguments and volume.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: agentarium-discovery
+  namespace: agent-observe
+rules:
+  - apiGroups: [batch]
+    resources: [jobs]
+    verbs: [create, get]
+  - apiGroups: [""]
+    resources: [pods]
+    verbs: [list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: agentarium-discovery
+  namespace: agent-observe
+subjects:
+  - kind: ServiceAccount
+    name: discovery
+    namespace: agent-observe
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: agentarium-discovery

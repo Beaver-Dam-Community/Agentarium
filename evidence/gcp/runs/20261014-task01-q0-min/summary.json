@@ -1,0 +1,38 @@
+{
+  "task_id": "TASK-01",
+  "status": "incomplete",
+  "implementation_commit": "91bb1c7aa8aaf0c7e80c2badbc2bf6474b63425f",
+  "image_digest": null,
+  "environment_manifest": "manifest.json",
+  "policy_bundle_id": null,
+  "policy_epoch": null,
+  "run_id": "20261014-task01-q0-min",
+  "run_kind": "q0_min_observation",
+  "fixture_set_digest": "7d7d7b7b9abb67a5be82f4cb8a236a91fe72d3e363e270156994197fd4bb7e37",
+  "baseline_bundle_digest": null,
+  "candidate_digest": null,
+  "expected_cases": 11,
+  "observed_cases": 13,
+  "passed": 5,
+  "failed": 0,
+  "unknown": 3,
+  "metrics": null,
+  "invariants": null,
+  "release_eligible": null,
+  "startup_capture": null,
+  "evidence_refs": [
+    "expected.json",
+    "netpol-log-format.json",
+    "observed.jsonl",
+    "raw/",
+    "report.md"
+  ],
+  "limitations": [
+    "one exec node, one kernel; no event-loss or load measurement",
+    "tcp_set_state process/Pod fields are not usable (softirq context)",
+    "sys_openat2 not exercised",
+    "hostNetwork and node-originated traffic in network policy logs not tested",
+    "answer key is the stimulus self-record, not an independent observer",
+    "CLOSE: only transitions observed inside the collection window were counted; the cause of the 5 missing in run2 was the kube-system namespace rule (see 20261015-task01-q0-min-2)"
+  ]
+}

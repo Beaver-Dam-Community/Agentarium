@@ -1,0 +1,20 @@
+# Temporary objects of the network policy log check (deleted after the run).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: q0-probe-runner-allow
+  namespace: agent-exec
+  annotations: {policy.network.gke.io/enable-logging: "true"}
+spec:
+  podSelector: {matchLabels: {app.kubernetes.io/name: probe-runner}}
+  policyTypes: [Egress]
+  egress:
+    - to: [{namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: kube-system}}, podSelector: {matchLabels: {k8s-app: kube-dns}}}]
+      ports: [{protocol: TCP, port: 53}, {protocol: UDP, port: 53}]
+---
+# Stimulus Pods q0-netpol-a (Q0_TCP_TARGET=10.30.0.10:53, allowed) and
+# q0-netpol-b (Q0_TCP_TARGET=10.30.0.1:443, denied), Q0_COUNT=3: same spec as
+# q0-stimulus in the run2 Pod manifest below with only the env changed.
+# Log reader: Pod q0-netpol-reader in agent-sensors (SA netpol-collector,
+# image busybox digest from manifest.json, hostPath /var/log/network readOnly,
+# command "tail -n 200 /var/log/network/policy_action.log").

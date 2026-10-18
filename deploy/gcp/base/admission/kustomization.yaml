@@ -1,0 +1,19 @@
+# TASK-01 admission base (docs/tech-specs/TASK-01-gke-platform.md 3.2, 3.2.1, 3.3).
+# Requires Kubernetes >= 1.30 (ValidatingAdmissionPolicy GA). Install checks:
+# API support, CEL typeChecking with no expressionWarnings, and the negative
+# admission tests must pass before any agent-exec Deployment is installed.
+#
+# RENDER NOTE: constraints.yaml contains ${NAME} placeholders filled from
+# deploy/gcp/environment.lock.json and CI outputs. Render before apply; a
+# remaining ${...} token is a render failure. Offline checks live in
+# tests/platform/admission/.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - priority-classes.yaml
+  - constraints.yaml
+  - agent-exec.yaml
+  - agent-roles.yaml
+  - agent-sensors.yaml
+  - node-readiness-scope.yaml
+  - discovery-snapshot.yaml

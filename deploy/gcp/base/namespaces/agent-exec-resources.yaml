@@ -1,0 +1,67 @@
+# agent-exec quotas and container limits.
+# Source: docs/tech-specs/TASK-01-gke-platform.md 3.3. Values are the spec's
+# start values; change them only with load results and an approved change.
+#
+# Runtime quota = 4 replicas + 1 rollout surge (500m/512Mi/256Mi requests and
+# 2/2Gi/2Gi limits per Pod). Raise it together with the replica count.
+# ephemeral-storage is not listed: the API server rejects it in a PriorityClass-scoped
+# quota (Beaver-Dam-Community/Agentarium#9). It stays bounded by EXEC_RESOURCES_REQUIRED,
+# the LimitRange 2Gi container maximum and the single-container runtime Pod.
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: agent-runtime-quota
+  namespace: agent-exec
+spec:
+  scopeSelector:
+    matchExpressions:
+      - scopeName: PriorityClass
+        operator: In
+        values: [agentarium-runtime]
+  hard:
+    pods: "5"
+    requests.cpu: 2500m
+    requests.memory: 2560Mi
+    limits.cpu: "10"
+    limits.memory: 10Gi
+---
+# Probe runner and start fixture Pods: Pod count = exec node count + fixture
+# concurrency cap 20 (start value). Kept separate so probes and fixtures never
+# consume the runtime quota or block a runtime rollout.
+# SPEC-QUESTION: the spec gives only the formula. 22 = node_pools.exec default
+# node count (2, TASK-01 4 lock table) + 20; there is no lock key for it, so it
+# must be updated by hand when node_pools.exec changes.
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: agent-probe-quota
+  namespace: agent-exec
+spec:
+  scopeSelector:
+    matchExpressions:
+      - scopeName: PriorityClass
+        operator: NotIn
+        values: [agentarium-runtime]
+  hard:
+    pods: "22"
+---
+# Container maximums cpu 2 / memory 2Gi / ephemeral-storage 2Gi (spec 3.3).
+# SPEC-QUESTION: the spec does not name this LimitRange; name chosen here.
+# SPEC-QUESTION: API defaulting sets a LimitRange item's default limit to max
+# and default request to the default limit when they are omitted, and the
+# LimitRanger mutating plugin runs before ValidatingAdmissionPolicy. A Pod that
+# omits resources is therefore filled with 2/2Gi/2Gi before
+# EXEC_RESOURCES_REQUIRED is evaluated, so the "resources removed" negative test
+# (spec 3.3) is expected to be defaulted rather than rejected by the VAP.
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: agent-exec-limits
+  namespace: agent-exec
+spec:
+  limits:
+    - type: Container
+      max:
+        cpu: "2"
+        memory: 2Gi
+        ephemeral-storage: 2Gi

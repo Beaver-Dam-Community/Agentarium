@@ -1,0 +1,16 @@
+{
+  "bindings": [
+    {
+      "condition": {
+        "expression": "request.auth.claims.pool == 'example-regression.svc.id.goog'",
+        "title": "mixed pool"
+      },
+      "members": [
+        "principal://iam.googleapis.com/projects/111111111111/locations/global/workloadIdentityPools/example-prod.svc.id.goog/subject/ns/agent-control/sa/policy-gateway"
+      ],
+      "role": "roles/storage.objectViewer"
+    }
+  ],
+  "etag": "BwYAAAAAAAA=",
+  "version": 3
+}

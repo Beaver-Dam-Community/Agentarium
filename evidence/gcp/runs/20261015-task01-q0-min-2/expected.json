@@ -1,0 +1,22 @@
+[
+  {
+    "row": "runtime.tcp_state",
+    "expected": "ESTABLISHED and CLOSE for all 30 stimulus sockets with the deny list reduced to health_check (node + sock_ptr + tuple + time join)"
+  },
+  {
+    "row": "runtime.tcp_connect",
+    "expected": "30 connects; destination as seen by the kprobe"
+  },
+  {
+    "row": "runtime.process",
+    "expected": "30 child exec/exit"
+  },
+  {
+    "row": "runtime.file_open",
+    "expected": "security_file_open for 30 allowed opens; sys_openat for 30 allowed and 30 denied"
+  },
+  {
+    "row": "policy.returnarg_type",
+    "expected": "which returnArg type for syscall hooks loads without the pre-validation warning"
+  }
+]

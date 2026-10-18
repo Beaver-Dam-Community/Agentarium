@@ -1,0 +1,47 @@
+{
+ "stimuli": {
+  "start": 1,
+  "process": 30,
+  "tcp": 30,
+  "file_open_allowed": 30,
+  "file_open_denied": 30,
+  "done": 1
+ },
+ "stimuli_ok": {
+  "start": 1,
+  "process": 30,
+  "tcp": 30,
+  "file_open_allowed": 30,
+  "done": 1
+ },
+ "events_for_pod": {
+  "process_exec": 31,
+  "process_exit": 31,
+  "process_kprobe:__x64_sys_openat": 61,
+  "process_kprobe:security_file_open": 31,
+  "process_kprobe:tcp_connect": 30,
+  "process_kprobe:tcp_set_state": 1
+ },
+ "open_returns": {
+  "__x64_sys_openat=-13": 30,
+  "__x64_sys_openat=4": 31,
+  "security_file_open=0": 31
+ },
+ "tcp": {
+  "stimulus_ports": 30,
+  "connect_matched": 30,
+  "distinct_cookies": 12,
+  "connect_daddr": {
+   "10.30.0.10:53": 30
+  },
+  "established_matched": 30,
+  "close_matched": 30,
+  "set_state_events_with_stimulus_sport": 60,
+  "set_state_attribution_namespace": {
+   "(empty)": 39,
+   "agent-sensors": 12,
+   "kube-system": 8,
+   "agent-exec": 1
+  }
+ }
+}

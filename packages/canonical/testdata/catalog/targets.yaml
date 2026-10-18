@@ -1,0 +1,70 @@
+# Synthetic test targets. Addresses are test values, not installation inputs.
+targets:
+  - target_id: k8s-agent-targets
+    endpoint_id: k8s-api-v1
+    environment: test
+    tenant: hackathon
+    origin: https://kubernetes.default.svc:443
+    expected_tls_name: kubernetes.default.svc
+    ca_ref: cluster
+    auth_audience: null
+    allowed_cidrs: ["10.96.0.1/32"]
+    max_data_class: synthetic
+    operation_ids: [k8s.pods.list, k8s.events.list, k8s.pods.logs]
+    namespace: agent-targets
+  - target_id: receiver-primary
+    endpoint_id: test-receiver-v1
+    environment: test
+    tenant: hackathon
+    origin: https://receiver.agent-targets.svc:8443
+    expected_tls_name: receiver.agent-targets.svc
+    ca_ref: agentarium-trust
+    expected_uri_san: spiffe://agentarium.internal/ns/agent-targets/sa/receiver
+    allowed_cidrs: ["10.96.10.20/32"]
+    max_data_class: synthetic
+    operation_ids: [receiver.submit]
+  - target_id: receiver-probe
+    endpoint_id: test-receiver-v1
+    environment: test
+    tenant: hackathon
+    origin: https://receiver-probe.agent-targets.svc:8443
+    expected_tls_name: receiver-probe.agent-targets.svc
+    ca_ref: agentarium-trust
+    expected_uri_san: spiffe://agentarium.internal/ns/agent-targets/sa/receiver-probe
+    allowed_cidrs: ["10.96.10.21/32"]
+    max_data_class: synthetic
+    operation_ids: [receiver.submit]
+  - target_id: agent-platform-gemini
+    endpoint_id: agent-platform-v1
+    environment: test
+    tenant: hackathon
+    origin: https://us-central1-aiplatform.googleapis.com:443
+    expected_tls_name: us-central1-aiplatform.googleapis.com
+    ca_ref: system
+    allowed_cidrs: ["199.36.153.8/30"]
+    max_data_class: internal
+    operation_ids: [model.generate]
+    model: {project: "agentarium-test", location: "us-central1", model_id: "gemini-test-model"}
+  - target_id: evidence-api
+    endpoint_id: evidence-api-v1
+    environment: test
+    tenant: hackathon
+    origin: https://timeline.agent-observe.svc:8443
+    expected_tls_name: timeline.agent-observe.svc
+    ca_ref: agentarium-trust
+    expected_uri_san: spiffe://agentarium.internal/ns/agent-observe/sa/timeline
+    auth_audience: null
+    allowed_cidrs: ["10.96.20.10/32"]
+    max_data_class: internal
+    operation_ids: [evidence.action.read, evidence.bundle.read, evidence.regression.read]
+  - target_id: discovery-snapshots
+    endpoint_id: discovery-snapshots-v1
+    environment: test
+    tenant: hackathon
+    origin: https://discovery.agent-observe.svc:8443
+    expected_tls_name: discovery.agent-observe.svc
+    ca_ref: agentarium-trust
+    expected_uri_san: spiffe://agentarium.internal/ns/agent-observe/sa/discovery
+    allowed_cidrs: ["10.96.20.11/32"]
+    max_data_class: internal
+    operation_ids: [discovery.source.read, discovery.callgraph.read]

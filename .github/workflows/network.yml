@@ -1,0 +1,27 @@
+name: network-contracts
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  render-and-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: go run ./tools/netpol-render --check
+      - run: go test ./tools/netpol-render ./tests/egress
+      - run: python3 -m unittest discover -s tests/egress -p "test_*.py"
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.15.7'
+      - name: Private Google Access configuration (no cloud credentials)
+        run: |
+          terraform fmt -check -recursive platform/gcp/iam/private-google-access
+          terraform -chdir=platform/gcp/iam/private-google-access init -backend=false -input=false
+          terraform -chdir=platform/gcp/iam/private-google-access validate
+          terraform -chdir=platform/gcp/iam/private-google-access test

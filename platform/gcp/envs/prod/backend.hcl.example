@@ -1,0 +1,7 @@
+# Copy to backend.hcl (git-ignored) and fill in. The bucket is created once per
+# project outside Terraform, private and versioned, e.g.:
+#   gcloud storage buckets create gs://<project>-agentarium-tfstate --location=<region> \
+#     --uniform-bucket-level-access --public-access-prevention
+#   gcloud storage buckets update gs://<project>-agentarium-tfstate --versioning
+bucket = "REPLACE_WITH_STATE_BUCKET"
+prefix = "agentarium/prod"

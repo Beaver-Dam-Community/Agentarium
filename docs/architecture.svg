@@ -1,0 +1,90 @@
+<svg aria-labelledby="agentarium-gcp-flow-title agentarium-gcp-flow-desc" role="img" width="1240" height="816" preserveAspectRatio="xMidYMid meet" viewBox="0 0 1240 816" xmlns="http://www.w3.org/2000/svg">
+<title id="agentarium-gcp-flow-title">Agentarium request flow on Google Cloud</title>
+<desc id="agentarium-gcp-flow-desc">An isolated execution Pod sends requests to the policy gateway. Only allowed requests reach a per-service adapter, which re-checks them just before sending to the target Google Cloud service. Approvals, decisions, sends, target results, and node kernel evidence are compared, and the findings feed policy proposals, testing, human approval, controlled release, and re-verification.</desc><style>.flow-title { font:600 20px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif; fill:#17212d; }
+.flow-body { font:400 16px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif; fill:#526070; }
+.flow-step { font:600 12px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif; fill:#526070; }
+.flow-zone { font:700 20px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif; fill:#17212d; }
+.flow-arrow { font:600 16px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif; fill:#1859a8; }
+.flow-stop { font:600 12px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif; fill:#a62222; }
+.flow-call { stroke:#1859a8; stroke-width:4; fill:none; }
+.flow-audit { stroke:#637486; stroke-width:1.5; stroke-dasharray:4 4; fill:none; }</style>
+<defs>
+<marker id="gcp-flow-arrow" markerHeight="6" markerWidth="8" orient="auto" refX="8" refY="3"><path d="M0 0 L8 3 L0 6 Z" fill="#1859a8"></path></marker>
+<marker id="gcp-flow-audit" markerHeight="6" markerWidth="8" orient="auto" refX="8" refY="3"><path d="M0 0 L8 3 L0 6 Z" fill="#637486"></path></marker>
+<marker id="gcp-flow-muted" markerHeight="6" markerWidth="8" orient="auto" refX="8" refY="3"><path d="M0 0 L8 3 L0 6 Z" fill="#526070"></path></marker>
+</defs>
+<rect fill="#fff" height="784" rx="8" stroke="#cbd6e1" width="1208" x="16" y="16"></rect>
+<text class="flow-zone" x="40" y="52">GCP · Google Cloud Platform</text>
+<rect fill="#f4f7fa" height="320" rx="8" stroke="#cbd6e1" stroke-dasharray="4 4" width="888" x="32" y="80"></rect>
+<text class="flow-zone" x="56" y="112">GKE · Agent execution and control areas</text>
+<text class="flow-body" x="56" y="140">Shared basis: user approval contract + endpoint catalog</text>
+<!-- Primary calls: thick, straight, left to right. -->
+<line class="flow-call" marker-end="url(#gcp-flow-arrow)" x1="272" x2="352" y1="264" y2="264"></line>
+<line class="flow-call" marker-end="url(#gcp-flow-arrow)" x1="592" x2="672" y1="264" y2="264"></line>
+<line class="flow-call" marker-end="url(#gcp-flow-arrow)" x1="904" x2="984" y1="264" y2="264"></line>
+<rect fill="#fff" height="32" width="64" x="280" y="224"></rect><text class="flow-arrow" text-anchor="middle" x="312" y="244">Request</text>
+<rect fill="#fff" height="32" width="64" x="600" y="224"></rect><text class="flow-arrow" text-anchor="middle" x="632" y="244">Allow</text>
+<rect fill="#fff" height="32" width="64" x="912" y="224"></rect><text class="flow-arrow" text-anchor="middle" x="944" y="244">Run</text>
+<!-- Evidence arrows: separate vertical paths, not part of the calling chain. -->
+<line class="flow-audit" marker-end="url(#gcp-flow-audit)" x1="472" x2="472" y1="368" y2="456"></line>
+<line class="flow-audit" marker-end="url(#gcp-flow-audit)" x1="788" x2="788" y1="368" y2="456"></line>
+<line class="flow-audit" marker-end="url(#gcp-flow-audit)" x1="1096" x2="1096" y1="368" y2="456"></line>
+<line class="flow-audit" marker-end="url(#gcp-flow-audit)" x1="164" x2="164" y1="368" y2="456"></line>
+<rect fill="#fff" height="28" width="260" x="176" y="404"></rect><text class="flow-body" x="184" y="424">Node kernel evidence</text>
+<line class="flow-audit" marker-end="url(#gcp-flow-audit)" x1="616" x2="616" y1="576" y2="624"></line>
+<!-- Main nodes. -->
+<g data-flow-node="pod">
+<rect fill="#fff" height="208" rx="8" stroke="#637486" stroke-width="1.5" width="216" x="56" y="160"></rect>
+<text class="flow-step" x="80" y="192">Execution environment</text>
+<text class="flow-title" x="80" y="228">Execution Pod</text>
+<text class="flow-body" x="80" y="264">Hosts multiple sessions</text>
+<text class="flow-body" x="80" y="292">Reaches only the gateway</text>
+<text class="flow-body" x="80" y="320">Holds no real secrets</text>
+</g>
+<g data-flow-node="gateway">
+<rect fill="#eef4fc" height="208" rx="8" stroke="#1859a8" stroke-width="2" width="240" x="352" y="160"></rect>
+<text class="flow-step" x="376" y="192">Decides what is allowed</text>
+<text class="flow-title" x="376" y="228">Policy gateway</text>
+<text class="flow-body" x="376" y="264">Service, operation, target</text>
+<text class="flow-body" x="376" y="292">Checks approval, session</text>
+<text class="flow-body" x="376" y="320">Deny / approval / allow</text>
+<text class="flow-stop" x="376" y="348">Deny or wait ends here</text>
+</g>
+<g data-flow-node="adapter">
+<rect fill="#eef8f2" height="208" rx="8" stroke="#116b48" stroke-width="2" width="232" x="672" y="160"></rect>
+<text class="flow-step" x="696" y="192">Verifies, then calls</text>
+<text class="flow-title" x="696" y="228">Per-service adapter</text>
+<text class="flow-body" x="696" y="264">Re-checks before sending</text>
+<text class="flow-body" x="696" y="292">Destination, TLS, secret</text>
+<text class="flow-body" x="696" y="320">Read / send / model call</text>
+<text class="flow-stop" x="696" y="348">Mismatch blocks the send</text>
+</g>
+<g data-flow-node="destination">
+<rect fill="#f4f7fa" height="208" rx="8" stroke="#637486" stroke-width="1.5" width="216" x="984" y="160"></rect>
+<text class="flow-step" x="1008" y="192">Result evidence</text>
+<text class="flow-title" x="1008" y="228">Target services</text>
+<text class="flow-body" x="1008" y="264">GKE read API</text>
+<text class="flow-body" x="1008" y="292">Test receiver server</text>
+<text class="flow-body" x="1008" y="320">Agent Platform</text>
+<text class="flow-body" x="1008" y="348">Gemini API</text>
+</g>
+<!-- One supporting lane instead of a second topology. -->
+<g data-flow-node="evidence">
+<rect fill="#f4f7fa" height="120" rx="8" stroke="#cbd6e1" width="1168" x="32" y="456"></rect>
+<text class="flow-title" x="56" y="488">Action alignment check · end-to-end records</text>
+<text class="flow-body" x="56" y="520">Compares approvals, decisions, sends, and target results with process, connection, and file events</text>
+<text class="flow-body" x="56" y="552">Independent evidence in Cloud SQL and Cloud Storage · confirmed / estimated / unknown links · scoped holds</text>
+</g>
+<g data-flow-node="policy-cycle">
+<rect fill="#eef4fc" height="112" rx="8" stroke="#1859a8" width="1168" x="32" y="624"></rect>
+<text class="flow-title" x="56" y="656">Policy proposal · improvement · release</text>
+<text class="flow-body" x="56" y="688">Evidence + policy diff → regression test → human approval → controlled release (dispatch held) → activation check · re-verify · rollback</text>
+<text class="flow-body" x="56" y="716">Separate release identity · confirmed policy applies to the next request · the model cannot change production</text>
+</g>
+<line stroke="#dce3eb" x1="32" x2="1200" y1="760" y2="760"></line>
+<line class="flow-call" marker-end="url(#gcp-flow-arrow)" x1="48" x2="104" y1="788" y2="788"></line>
+<text class="flow-body" x="120" y="792">Request path</text>
+<line class="flow-audit" marker-end="url(#gcp-flow-audit)" x1="308" x2="364" y1="788" y2="788"></line>
+<text class="flow-body" x="380" y="792">Evidence collection</text>
+<text class="flow-body" x="624" y="792">Results return through the gateway result API</text>
+</svg>

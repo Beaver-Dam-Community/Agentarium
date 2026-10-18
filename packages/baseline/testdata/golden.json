@@ -1,0 +1,8 @@
+{
+  "admission": "51ff658168fea38de392d9a33868af2dfbac014d2437b3e9876374b00b6b210f",
+  "exec_rbac": "96448d64dab67eb513dfafaffa2431da8d03c111ac2d11f12725faa2686ca105",
+  "network_policy": "094ef75c0c7a6b022a5142fa2c2d5113b0592a2feb8ccdf63587f2892c384a88",
+  "node_pool_config": "0e9f00ecd6701232e31313c8f5aa7a9aa9d01401afc2381805d9a7336797364a",
+  "sensor_policy": "9cde54492bd2db42e1a9002cf390709a23368171dcaf23f908cdfe92b566eafb",
+  "sensor_release_policies": "b7df0824cc45a0a006443eaf53261c431f43c9006430bdfb6a887a5b981583e4"
+}

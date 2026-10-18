@@ -1,0 +1,26 @@
+[
+  {
+    "resource": "//storage.googleapis.com/example-decision-inputs",
+    "asset_type": "storage.googleapis.com/Bucket",
+    "role": "roles/storage.objectViewer",
+    "member": "principal://iam.googleapis.com/projects/222222222222/locations/global/workloadIdentityPools/example-regression.svc.id.goog/subject/ns/agent-release/sa/decision-replay"
+  },
+  {
+    "resource": "//cloudkms.googleapis.com/projects/example-prod/locations/us-central1/keyRings/audit/cryptoKeys/manifest",
+    "asset_type": "cloudkms.googleapis.com/CryptoKey",
+    "role": "projects/example-prod/roles/agentariumManifestPublicKey",
+    "member": "principal://iam.googleapis.com/projects/222222222222/locations/global/workloadIdentityPools/example-regression.svc.id.goog/subject/ns/agent-release/sa/decision-replay"
+  },
+  {
+    "resource": "//storage.googleapis.com/example-regression-requests",
+    "asset_type": "storage.googleapis.com/Bucket",
+    "role": "roles/storage.objectViewer",
+    "member": "principal://iam.googleapis.com/projects/222222222222/locations/global/workloadIdentityPools/example-regression.svc.id.goog/subject/ns/agent-release/sa/regression-runner"
+  },
+  {
+    "resource": "//storage.googleapis.com/example-regression-reports",
+    "asset_type": "storage.googleapis.com/Bucket",
+    "role": "roles/storage.objectCreator",
+    "member": "principal://iam.googleapis.com/projects/222222222222/locations/global/workloadIdentityPools/example-regression.svc.id.goog/subject/ns/agent-release/sa/regression-runner"
+  }
+]

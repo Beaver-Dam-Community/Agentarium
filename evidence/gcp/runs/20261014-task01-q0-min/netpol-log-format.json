@@ -1,0 +1,100 @@
+{
+  "path": "/var/log/network/policy_action.log",
+  "format": "JSON lines",
+  "top_level_keys": [
+    "connection",
+    "count",
+    "dest",
+    "disposition",
+    "node_name",
+    "policies",
+    "src",
+    "timestamp"
+  ],
+  "connection_keys": [
+    "dest_ip",
+    "dest_port",
+    "direction",
+    "protocol",
+    "src_ip",
+    "src_port"
+  ],
+  "src_keys_pod": [
+    "namespace",
+    "pod_name",
+    "pod_namespace"
+  ],
+  "dest_keys_pod": [
+    "namespace",
+    "pod_name",
+    "pod_namespace"
+  ],
+  "dest_keys_non_pod": [
+    "instance"
+  ],
+  "notes": [
+    "dest_ip is the backend after service translation (kube-dns Pod IP, API server private endpoint 10.10.0.2), not the ClusterIP",
+    "deny records aggregate repeats within the 5 s window; count counts packets including SYN retransmits (3 dial attempts -> counts [6, 3])",
+    "policies[] only on allow records, with name, namespace, kind, revision and cilium labels"
+  ],
+  "sample_allow": {
+    "connection": {
+      "src_ip": "10.20.1.6",
+      "dest_ip": "10.20.0.14",
+      "src_port": 33966,
+      "dest_port": 53,
+      "protocol": "tcp",
+      "direction": "egress"
+    },
+    "disposition": "allow",
+    "policies": [
+      {
+        "name": "q0-probe-runner-allow",
+        "namespace": "agent-exec",
+        "labels": [
+          "k8s:io.cilium.k8s.policy.derived-from=NetworkPolicy",
+          "k8s:io.cilium.k8s.policy.name=q0-probe-runner-allow",
+          "k8s:io.cilium.k8s.policy.namespace=agent-exec",
+          "k8s:io.cilium.k8s.policy.uid=1e8bd4f8-08ef-41cd-9eb0-6d364cafa801"
+        ],
+        "revision": "2",
+        "kind": "NetworkPolicy"
+      }
+    ],
+    "src": {
+      "pod_name": "q0-netpol-a",
+      "pod_namespace": "agent-exec",
+      "namespace": "agent-exec"
+    },
+    "dest": {
+      "pod_name": "kube-dns-8695f64d49-nrjzg",
+      "pod_namespace": "kube-system",
+      "namespace": "kube-system"
+    },
+    "count": 1,
+    "node_name": "gke-agentarium-prod-exec-pool-eaf0304a-x10z",
+    "timestamp": "2026-10-14T13:19:18.841156259Z"
+  },
+  "sample_deny": {
+    "connection": {
+      "src_ip": "10.20.1.7",
+      "dest_ip": "10.10.0.2",
+      "src_port": 42712,
+      "dest_port": 443,
+      "protocol": "tcp",
+      "direction": "egress"
+    },
+    "disposition": "deny",
+    "src": {
+      "pod_name": "q0-netpol-b",
+      "pod_namespace": "agent-exec",
+      "namespace": "agent-exec"
+    },
+    "dest": {
+      "instance": "10.10.0.2"
+    },
+    "count": 6,
+    "node_name": "gke-agentarium-prod-exec-pool-eaf0304a-x10z",
+    "timestamp": "2026-10-14T13:19:20.811510707Z"
+  }
+}

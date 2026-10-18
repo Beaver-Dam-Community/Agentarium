@@ -1,0 +1,139 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "ServiceAccount",
+      "metadata": {
+        "name": "probe-sink",
+        "namespace": "agent-targets"
+      },
+      "automountServiceAccountToken": false
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "probe-sink",
+        "namespace": "agent-targets"
+      },
+      "spec": {
+        "replicas": 2,
+        "strategy": {
+          "type": "RollingUpdate",
+          "rollingUpdate": {
+            "maxUnavailable": 0,
+            "maxSurge": 1
+          }
+        },
+        "selector": {
+          "matchLabels": {
+            "app.kubernetes.io/name": "probe-sink"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/name": "probe-sink"
+            }
+          },
+          "spec": {
+            "serviceAccountName": "probe-sink",
+            "automountServiceAccountToken": false,
+            "nodeSelector": {
+              "node-restriction.kubernetes.io/agentarium-role": "control"
+            },
+            "schedulerName": "default-scheduler",
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 65532,
+              "runAsGroup": 65532,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "terminationGracePeriodSeconds": 10,
+            "tolerations": [
+              {
+                "key": "agentarium.io/observe-not-ready",
+                "operator": "Equal",
+                "value": "true",
+                "effect": "NoSchedule"
+              }
+            ],
+            "containers": [
+              {
+                "name": "probe-sink",
+                "image": "${PROBE_SINK_IMAGE}",
+                "args": [
+                  "--listen=:8443"
+                ],
+                "ports": [
+                  {
+                    "name": "tcp",
+                    "containerPort": 8443
+                  }
+                ],
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "20m",
+                    "memory": "32Mi"
+                  },
+                  "limits": {
+                    "cpu": "200m",
+                    "memory": "64Mi"
+                  }
+                },
+                "readinessProbe": {
+                  "tcpSocket": {
+                    "port": "tcp"
+                  },
+                  "periodSeconds": 5
+                },
+                "livenessProbe": {
+                  "tcpSocket": {
+                    "port": "tcp"
+                  },
+                  "periodSeconds": 10
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "probe-sink",
+        "namespace": "agent-targets"
+      },
+      "spec": {
+        "type": "ClusterIP",
+        "clusterIP": "${PROBE_SINK_CLUSTER_IP}",
+        "selector": {
+          "app.kubernetes.io/name": "probe-sink"
+        },
+        "ports": [
+          {
+            "name": "tcp",
+            "protocol": "TCP",
+            "port": 8443,
+            "targetPort": "tcp"
+          }
+        ]
+      }
+    }
+  ]
+}

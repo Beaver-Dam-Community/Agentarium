@@ -1,0 +1,283 @@
+# Execution Namespace (agent-exec) admission policies.
+# Source: docs/tech-specs/TASK-01-gke-platform.md 3.2. The agent-exec-contract,
+# agent-exec-probe-contract and agent-exec-profile policies and the
+# agent-exec-contract binding are copied verbatim from the spec. The agent-exec-profile binding follows the
+# prose rule "same namespaceSelector as agent-exec-contract, no paramRef".
+#
+# agent-exec-profile matches pods/status and pods/resize too (spec PR #11):
+# pods/status keeps metadata changes (EXEC_STATUS_METADATA_IMMUTABLE), and
+# pods/resize changes container resources that the contracts never see
+# (EXEC_RESIZE_FORBIDDEN). The contracts are not matched on pods/status
+# because their param-dependent checks (runtimeImage, probeImages) would deny
+# kubelet status updates of Pods admitted under an earlier digest.
+# Params: ConfigMap agent-control/agent-exec-constraints (constraints.yaml).
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: agent-exec-contract
+spec:
+  failurePolicy: Fail
+  paramKind:
+    apiVersion: v1
+    kind: ConfigMap
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: [CREATE, UPDATE]
+        resources: [pods, pods/ephemeralcontainers]
+  matchConditions:
+    - name: runtime-profile
+      expression: >-
+        has(object.metadata.labels) &&
+        'app.kubernetes.io/name' in object.metadata.labels &&
+        object.metadata.labels['app.kubernetes.io/name'] == 'agent-runtime'
+  variables:
+    - name: c
+      expression: object.spec.containers[0]
+  validations:
+    - expression: >-
+        !has(object.metadata.annotations) ||
+        params.data.forbiddenAnnotationKeys.split(',').all(k, !(k in object.metadata.annotations))
+      message: EXEC_ANNOTATION_FORBIDDEN
+    - expression: >-
+        object.spec.serviceAccountName == 'agent-runtime' &&
+        has(object.spec.automountServiceAccountToken) &&
+        object.spec.automountServiceAccountToken == false
+      message: EXEC_IDENTITY_INVALID
+    - expression: >-
+        has(object.spec.priorityClassName) &&
+        object.spec.priorityClassName == 'agentarium-runtime'
+      message: EXEC_PRIORITY_CLASS_INVALID
+    - expression: >-
+        has(object.spec.nodeSelector) &&
+        'node-restriction.kubernetes.io/agentarium-role' in object.spec.nodeSelector &&
+        object.spec.nodeSelector['node-restriction.kubernetes.io/agentarium-role'] == 'exec' &&
+        (!has(object.spec.nodeName) || object.spec.nodeName == '') &&
+        object.spec.schedulerName == 'default-scheduler'
+      message: EXEC_PLACEMENT_INVALID
+    - expression: >-
+        object.spec.containers.size() == 1 &&
+        variables.c.name == 'agent-runtime' &&
+        (!has(object.spec.initContainers) || object.spec.initContainers.size() == 0) &&
+        (!has(object.spec.ephemeralContainers) || object.spec.ephemeralContainers.size() == 0)
+      message: EXEC_CONTAINER_SET_INVALID
+    - expression: >-
+        variables.c.image == params.data.runtimeImage &&
+        variables.c.command == [params.data.runtimeCommand] &&
+        (!has(variables.c.args) || variables.c.args.size() == 0)
+      message: EXEC_IMAGE_OR_ENTRYPOINT_INVALID
+    - expression: >-
+        has(variables.c.securityContext) &&
+        has(variables.c.securityContext.readOnlyRootFilesystem) &&
+        variables.c.securityContext.readOnlyRootFilesystem == true &&
+        has(variables.c.securityContext.runAsUser) &&
+        variables.c.securityContext.runAsUser == 10001
+      message: EXEC_FILESYSTEM_INVALID
+    - expression: >-
+        (!has(variables.c.envFrom) || variables.c.envFrom.size() == 0) &&
+        (!has(variables.c.env) || variables.c.env.all(e, !has(e.valueFrom))) &&
+        (!has(object.spec.imagePullSecrets) || object.spec.imagePullSecrets.size() == 0) &&
+        has(object.spec.volumes) && object.spec.volumes.size() == 2 &&
+        object.spec.volumes.exists(v, v.name == 'work' && has(v.emptyDir) &&
+          has(dyn(v.emptyDir).sizeLimit) && quantity(string(dyn(v.emptyDir).sizeLimit)).compareTo(quantity('512Mi')) <= 0) &&
+        object.spec.volumes.exists(v, v.name == 'identity' && has(v.projected) &&
+          v.projected.sources.size() == 1 && v.projected.sources.all(s,
+            has(s.serviceAccountToken) && s.serviceAccountToken.audience == 'agentarium-identity' &&
+            s.serviceAccountToken.expirationSeconds == 600 && s.serviceAccountToken.path == 'token')) &&
+        variables.c.volumeMounts.size() == 2 &&
+        variables.c.volumeMounts.exists(m, m.name == 'work' && m.mountPath == '/work') &&
+        variables.c.volumeMounts.exists(m, m.name == 'identity' &&
+          m.mountPath == '/run/agentarium/identity' && m.readOnly == true)
+      message: EXEC_SECRET_OR_VOLUME_INVALID
+    - expression: >-
+        (!has(object.spec.runtimeClassName) ||
+          (params.data.guardedRuntimeEnabled == 'true' &&
+           object.spec.runtimeClassName == 'agentarium-guarded')) &&
+        (!has(object.spec.os) || object.spec.os.name == 'linux')
+      message: EXEC_RUNTIME_INVALID
+    - expression: >-
+        has(variables.c.resources) && has(variables.c.resources.requests) &&
+        has(variables.c.resources.limits) &&
+        ['cpu', 'memory', 'ephemeral-storage'].all(k,
+          k in variables.c.resources.requests && k in variables.c.resources.limits)
+      message: EXEC_RESOURCES_REQUIRED
+    - expression: >-
+        has(object.spec.tolerations) &&
+        object.spec.tolerations.exists(t, t.key == 'agentarium-role' &&
+          t.operator == 'Equal' && t.value == 'exec' && t.effect == 'NoSchedule') &&
+        object.spec.tolerations.all(t,
+          (t.key == 'agentarium-role' && t.operator == 'Equal' && t.value == 'exec' && t.effect == 'NoSchedule') ||
+          (t.key in ['node.kubernetes.io/not-ready', 'node.kubernetes.io/unreachable'] &&
+           t.operator == 'Exists' && t.effect == 'NoExecute' &&
+           has(t.tolerationSeconds) && t.tolerationSeconds <= 300))
+      message: EXEC_TOLERATION_INVALID
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: agent-exec-contract
+spec:
+  policyName: agent-exec-contract
+  validationActions: [Deny]
+  paramRef:
+    name: agent-exec-constraints
+    namespace: agent-control
+    parameterNotFoundAction: Deny
+  matchResources:
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: agent-exec
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: agent-exec-profile
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: [CREATE, UPDATE]
+        resources: [pods, pods/ephemeralcontainers, pods/status, pods/resize]
+  validations:
+    - expression: >-
+        has(object.metadata.labels) &&
+        'app.kubernetes.io/name' in object.metadata.labels &&
+        object.metadata.labels['app.kubernetes.io/name'] in ['agent-runtime', 'probe-runner', 'start-fixture'] &&
+        object.spec.serviceAccountName == object.metadata.labels['app.kubernetes.io/name']
+      message: EXEC_ROLE_LABEL_INVALID
+    - expression: >-
+        !has(request.subResource) || request.subResource != 'status' ||
+        ((has(object.metadata.labels) ? object.metadata.labels : {}) ==
+           (has(oldObject.metadata.labels) ? oldObject.metadata.labels : {}) &&
+         (has(object.metadata.annotations) ? object.metadata.annotations : {}) ==
+           (has(oldObject.metadata.annotations) ? oldObject.metadata.annotations : {}))
+      message: EXEC_STATUS_METADATA_IMMUTABLE
+    - expression: >-
+        !has(request.subResource) || request.subResource != 'resize'
+      message: EXEC_RESIZE_FORBIDDEN
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: agent-exec-profile
+spec:
+  policyName: agent-exec-profile
+  validationActions: [Deny]
+  matchResources:
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: agent-exec
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: agent-exec-probe-contract
+spec:
+  failurePolicy: Fail
+  paramKind:
+    apiVersion: v1
+    kind: ConfigMap
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: [CREATE, UPDATE]
+        resources: [pods, pods/ephemeralcontainers]
+  matchConditions:
+    - name: probe-or-fixture
+      expression: >-
+        has(object.metadata.labels) &&
+        'app.kubernetes.io/name' in object.metadata.labels &&
+        object.metadata.labels['app.kubernetes.io/name'] in ['probe-runner', 'start-fixture']
+  variables:
+    - name: c
+      expression: object.spec.containers[0]
+    - name: profile
+      expression: object.metadata.labels['app.kubernetes.io/name']
+    - name: daemonsetTolerations
+      expression: >-
+        ['node.kubernetes.io/disk-pressure', 'node.kubernetes.io/memory-pressure',
+         'node.kubernetes.io/pid-pressure', 'node.kubernetes.io/unschedulable']
+  validations:
+    - expression: >-
+        object.spec.serviceAccountName == variables.profile &&
+        has(object.spec.automountServiceAccountToken) &&
+        object.spec.automountServiceAccountToken == false &&
+        (!has(object.spec.priorityClassName) || object.spec.priorityClassName != 'agentarium-runtime')
+      message: PROBE_IDENTITY_INVALID
+    - expression: >-
+        object.spec.containers.size() == 1 &&
+        (!has(object.spec.initContainers) || object.spec.initContainers.size() == 0) &&
+        (!has(object.spec.ephemeralContainers) || object.spec.ephemeralContainers.size() == 0) &&
+        variables.c.image.contains('@sha256:') &&
+        variables.c.image in (variables.profile == 'probe-runner' ?
+          params.data.probeImages : params.data.fixtureImages).split(',') &&
+        has(variables.c.command) && variables.c.command.size() == 1 &&
+        (variables.c.image + '=' + variables.c.command[0]) in params.data.probeEntrypoints.split(',') &&
+        (!has(variables.c.args) || variables.c.args.size() == 0)
+      message: PROBE_IMAGE_OR_ENTRYPOINT_INVALID
+    - expression: >-
+        has(variables.c.securityContext) &&
+        variables.c.securityContext.readOnlyRootFilesystem == true &&
+        variables.c.securityContext.runAsUser == 10001 &&
+        (!has(variables.c.envFrom) || variables.c.envFrom.size() == 0) &&
+        (!has(variables.c.env) || variables.c.env.all(e, !has(e.valueFrom))) &&
+        (!has(object.spec.volumes) || object.spec.volumes.all(v,
+          (has(v.emptyDir) && has(dyn(v.emptyDir).sizeLimit)) ||
+          (has(v.projected) && v.projected.sources.all(s, has(s.serviceAccountToken) &&
+             s.serviceAccountToken.audience == 'agentarium-identity'))))
+      message: PROBE_VOLUME_INVALID
+    - expression: >-
+        has(object.spec.nodeSelector) &&
+        'node-restriction.kubernetes.io/agentarium-role' in object.spec.nodeSelector &&
+        object.spec.nodeSelector['node-restriction.kubernetes.io/agentarium-role'] == 'exec' &&
+        (!has(object.spec.nodeName) || object.spec.nodeName == '') &&
+        object.spec.schedulerName == 'default-scheduler'
+      message: PROBE_PLACEMENT_INVALID
+    - expression: >-
+        (!has(object.spec.runtimeClassName) ||
+          (params.data.guardedRuntimeEnabled == 'true' &&
+           object.spec.runtimeClassName == 'agentarium-guarded')) &&
+        (!has(object.metadata.annotations) ||
+          params.data.forbiddenAnnotationKeys.split(',').all(k, !(k in object.metadata.annotations)))
+      message: PROBE_RUNTIME_INVALID
+    - expression: >-
+        variables.profile != 'start-fixture' || object.spec.restartPolicy == 'Never'
+      message: FIXTURE_RESTART_POLICY_INVALID
+    - expression: >-
+        !has(object.spec.tolerations) || object.spec.tolerations.all(t,
+          (t.key == 'agentarium-role' && t.operator == 'Equal' && t.value == 'exec' && t.effect == 'NoSchedule') ||
+          (variables.profile == 'probe-runner' && (
+            (t.key == 'agentarium.io/observe-not-ready' && t.effect == 'NoSchedule') ||
+            (t.key in ['node.kubernetes.io/not-ready', 'node.kubernetes.io/unreachable'] &&
+             t.operator == 'Exists' && t.effect == 'NoExecute') ||
+            (t.key in variables.daemonsetTolerations && t.operator == 'Exists' && t.effect == 'NoSchedule'))) ||
+          (variables.profile == 'start-fixture' &&
+            t.key in ['node.kubernetes.io/not-ready', 'node.kubernetes.io/unreachable'] &&
+            t.operator == 'Exists' && t.effect == 'NoExecute' &&
+            has(t.tolerationSeconds) && t.tolerationSeconds <= 300))
+      message: PROBE_TOLERATION_INVALID
+---
+# SPEC-QUESTION: the spec gives no literal binding for agent-exec-probe-contract.
+# It reads the probeImages/fixtureImages/probeEntrypoints keys of
+# agent-exec-constraints, so it reuses the agent-exec-contract paramRef and
+# namespaceSelector. The agent-adapters probe-runner is covered by
+# agent-role-contract instead (spec 3.2), so this binding is agent-exec only.
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: agent-exec-probe-contract
+spec:
+  policyName: agent-exec-probe-contract
+  validationActions: [Deny]
+  paramRef:
+    name: agent-exec-constraints
+    namespace: agent-control
+    parameterNotFoundAction: Deny
+  matchResources:
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: agent-exec

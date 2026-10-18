@@ -1,0 +1,11 @@
+# Source: docs/tech-specs/TASK-01-gke-platform.md 3.3. Only runtime Pods may
+# use this class: agent-exec-contract requires it, agent-exec-probe-contract
+# and agent-role-contract reject it. ResourceQuota scopes split on it
+# (deploy/gcp/base/namespaces/agent-exec-resources.yaml).
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: agentarium-runtime
+value: 1000
+preemptionPolicy: Never
+globalDefault: false

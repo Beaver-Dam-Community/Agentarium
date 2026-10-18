@@ -1,0 +1,86 @@
+[
+  {
+    "case": "typecheck.agent-exec-contract",
+    "expected": "present, observedGeneration == generation, 0 expressionWarnings"
+  },
+  {
+    "case": "typecheck.agent-exec-probe-contract",
+    "expected": "present, observedGeneration == generation, 0 expressionWarnings"
+  },
+  {
+    "case": "typecheck.agent-exec-profile",
+    "expected": "present, observedGeneration == generation, 0 expressionWarnings"
+  },
+  {
+    "case": "typecheck.agent-role-contract",
+    "expected": "present, observedGeneration == generation, 0 expressionWarnings"
+  },
+  {
+    "case": "typecheck.agent-role-status-metadata",
+    "expected": "present, observedGeneration == generation, 0 expressionWarnings"
+  },
+  {
+    "case": "typecheck.agent-sensors-contract",
+    "expected": "present, observedGeneration == generation, 0 expressionWarnings"
+  },
+  {
+    "case": "typecheck.node-readiness-scope",
+    "expected": "present, observedGeneration == generation, 0 expressionWarnings"
+  },
+  {
+    "case": "role_status.relabel",
+    "expected": "denied (ROLE_STATUS_METADATA_IMMUTABLE)"
+  },
+  {
+    "case": "role_status.annotate",
+    "expected": "denied (ROLE_STATUS_METADATA_IMMUTABLE)"
+  },
+  {
+    "case": "role_status.status_only",
+    "expected": "admitted"
+  },
+  {
+    "case": "exec_profile.resize_cpu_limit",
+    "expected": "denied (EXEC_RESIZE_FORBIDDEN)"
+  },
+  {
+    "case": "exec_profile.status_relabel",
+    "expected": "denied (EXEC_STATUS_METADATA_IMMUTABLE|EXEC_ROLE_LABEL_INVALID)"
+  },
+  {
+    "case": "node_readiness.system_add_start_taint",
+    "expected": "denied (NODE_READINESS_SCOPE_INVALID)"
+  },
+  {
+    "case": "node_readiness.exec_remove_start_taint",
+    "expected": "admitted"
+  },
+  {
+    "case": "node_readiness.exec_add_other_taint",
+    "expected": "denied (NODE_READINESS_SCOPE_INVALID)"
+  },
+  {
+    "case": "node_readiness.exec_change_role_label",
+    "expected": "denied (NODE_READINESS_SCOPE_INVALID)"
+  },
+  {
+    "case": "sensors.tetragon_admitted",
+    "expected": "Tetragon DaemonSet Pods admitted and Ready"
+  },
+  {
+    "case": "sensors.image_not_allowed",
+    "expected": "denied (SENSORS_IMAGE_NOT_ALLOWED)"
+  },
+  {
+    "case": "sensors.hostpath_not_allowed",
+    "expected": "denied (SENSORS_HOSTPATH_NOT_ALLOWED)"
+  },
+  {
+    "case": "sensors.host_ipc",
+    "expected": "denied (SENSORS_HOST_NAMESPACE_FORBIDDEN)"
+  },
+  {
+    "case": "sensors.label_sa_mismatch",
+    "expected": "denied (SENSORS_IDENTITY_INVALID)"
+  }
+]

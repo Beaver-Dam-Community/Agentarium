@@ -1,0 +1,103 @@
+# Node update scope for the node-readiness controller KSA.
+# Source: docs/tech-specs/TASK-01-gke-platform.md 3.2.1 (node-readiness-scope).
+# Binding copied verbatim from the spec. The binding has no matchResources, so
+# it covers every Node; the policy's matchCondition limits it to
+# system:serviceaccount:agent-control:node-readiness.
+#
+# SPEC-DELTA (policy): the spec literal compares only the non-start taints,
+# labels, annotations and spec.unschedulable, so the SA could still set
+# metadata.ownerReferences (the garbage collector then deletes the Node),
+# metadata.finalizers, spec.providerID/podCIDR(s)/externalID/configSource, add
+# an agentarium.io/observe-not-ready taint with effect NoExecute (evicts the
+# Node's Pods) or another value, or change labels through nodes/status. The
+# controller only toggles agentarium.io/observe-not-ready=true:NoSchedule
+# (3.5), so this policy adds, on top of the spec literal:
+#   - resources: nodes/status (RBAC does not grant it; defense in depth),
+#   - variables newStartTaints/oldStartTaints,
+#   - a validation that every start-key taint is true:NoSchedule or was
+#     already present unchanged,
+#   - a validation that finalizers, ownerReferences and the other spec fields
+#     are unchanged.
+#   - a validation that the target Node carries the protected role label exec
+#     or control (read from oldObject; labels cannot change in the same
+#     request). system-pool Nodes run the GKE managed components and never get
+#     the start taint, so the API server, not only the controller's informer
+#     selector, keeps the SA off them (spec PR #7).
+# The spec literal's two validations are kept unchanged as the first two
+# (the target-node check is in the spec literal since PR #7).
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: node-readiness-scope
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: [UPDATE]
+        resources: [nodes, nodes/status]
+  matchConditions:
+    - name: node-readiness-only
+      expression: request.userInfo.username == 'system:serviceaccount:agent-control:node-readiness'
+  variables:
+    - name: newTaints
+      expression: >-
+        has(object.spec.taints) ?
+          object.spec.taints.filter(t, t.key != 'agentarium.io/observe-not-ready') : []
+    - name: oldTaints
+      expression: >-
+        has(oldObject.spec.taints) ?
+          oldObject.spec.taints.filter(t, t.key != 'agentarium.io/observe-not-ready') : []
+    - name: newStartTaints
+      expression: >-
+        has(object.spec.taints) ?
+          object.spec.taints.filter(t, t.key == 'agentarium.io/observe-not-ready') : []
+    - name: oldStartTaints
+      expression: >-
+        has(oldObject.spec.taints) ?
+          oldObject.spec.taints.filter(t, t.key == 'agentarium.io/observe-not-ready') : []
+  validations:
+    - expression: >-
+        variables.newTaints == variables.oldTaints &&
+        (has(object.metadata.labels) ? object.metadata.labels : {}) ==
+          (has(oldObject.metadata.labels) ? oldObject.metadata.labels : {}) &&
+        (has(object.metadata.annotations) ? object.metadata.annotations : {}) ==
+          (has(oldObject.metadata.annotations) ? oldObject.metadata.annotations : {}) &&
+        (has(object.spec.unschedulable) ? object.spec.unschedulable : false) ==
+          (has(oldObject.spec.unschedulable) ? oldObject.spec.unschedulable : false)
+      message: NODE_READINESS_SCOPE_INVALID
+    - expression: >-
+        has(oldObject.metadata.labels) &&
+        'node-restriction.kubernetes.io/agentarium-role' in oldObject.metadata.labels &&
+        oldObject.metadata.labels['node-restriction.kubernetes.io/agentarium-role'] in ['exec', 'control']
+      message: NODE_READINESS_SCOPE_INVALID
+    - expression: >-
+        variables.newStartTaints.all(t,
+          (has(t.value) && t.value == 'true' && t.effect == 'NoSchedule') ||
+          t in variables.oldStartTaints)
+      message: NODE_READINESS_SCOPE_INVALID
+    - expression: >-
+        (has(object.metadata.finalizers) ? object.metadata.finalizers : []) ==
+          (has(oldObject.metadata.finalizers) ? oldObject.metadata.finalizers : []) &&
+        (has(object.metadata.ownerReferences) ? object.metadata.ownerReferences : []) ==
+          (has(oldObject.metadata.ownerReferences) ? oldObject.metadata.ownerReferences : []) &&
+        (has(object.spec.podCIDR) ? object.spec.podCIDR : '') ==
+          (has(oldObject.spec.podCIDR) ? oldObject.spec.podCIDR : '') &&
+        (has(object.spec.podCIDRs) ? object.spec.podCIDRs : []) ==
+          (has(oldObject.spec.podCIDRs) ? oldObject.spec.podCIDRs : []) &&
+        (has(object.spec.providerID) ? object.spec.providerID : '') ==
+          (has(oldObject.spec.providerID) ? oldObject.spec.providerID : '') &&
+        (has(object.spec.externalID) ? object.spec.externalID : '') ==
+          (has(oldObject.spec.externalID) ? oldObject.spec.externalID : '') &&
+        has(object.spec.configSource) == has(oldObject.spec.configSource) &&
+        (!has(object.spec.configSource) || object.spec.configSource == oldObject.spec.configSource)
+      message: NODE_READINESS_SCOPE_INVALID
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: node-readiness-scope
+spec:
+  policyName: node-readiness-scope
+  validationActions: [Deny]
